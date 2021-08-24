@@ -22,3 +22,11 @@ https://blog.logrocket.com/building-without-bundling/
 https://stackoverflow.com/a/56746062/85472
 https://github.com/WICG/import-maps
 https://chromestatus.com/feature/5315286962012160
+
+
+## WebMidi
+
+https://github.com/djipco/webmidi
+
+### sysex
+https://webmidijs.org/docs/v2.5.2/classes/Output.html#method_sendSysex
