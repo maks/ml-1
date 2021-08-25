@@ -11,6 +11,14 @@ and then:
 yarn run live-server
 ```
 
+### Devtools
+
+```
+const m = await import('/src/firemidi.js');
+m.getMidi()
+```
+
+
 refs: 
 https://medium.com/@salathielgenese/setup-typescript-for-modern-browser-a75d699673f6
 

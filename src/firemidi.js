@@ -1,37 +1,51 @@
-WebMidi.enable(function (err) {
+export let midiOutput = null;
 
-    if (err) {
-        console.log("WebMidi could not be enabled.", err);
-    } else {
-        console.log("WebMidi enabled!");
+export function getMidi() {
+  navigator.requestMIDIAccess({ sysex: true })
+    .then(function (midiAccess) {
+      const outputs = midiAccess.outputs.values();
+      console.log(outputs);
+      for (const output of outputs) {
+        console.log(output);
+        midiOutput = output;
+      }
+    });
+}
 
-        console.log(WebMidi.inputs);
-        console.log(WebMidi.outputs);
+export function clearAll() {
+  midiOutput.send([0xB0, 0x7F, 0]);
+}
 
-        // Reacting when a new device becomes available
-        WebMidi.addListener("connected", function (e) {
-            console.log(e);
-        });
+/// turn on and set the colour of a pad button
+// export function colorPad(int padRow, int padColumn, PadColor color) {
+export function colorPad(padRow, padColumn, color) {
+  const sysexHeader = [
+    0xF0, // System Exclusive
+    0x47, // Akai Manufacturer ID
+    0x7F, // The All-Call address
+    0x43, // “Fire” product
+    0x65, // Write LED cmd
+    0x00, // mesg length - high byte
+    0x04, // mesg length - low byte
+  ];
+  const sysexFooter = [
+    0xF7, // End of Exclusive
+  ];
 
-        // Reacting when a device becomes unavailable
-        WebMidi.addListener("disconnected", function (e) {
-            console.log(e);
-        });
+  const ledData = [
+    (padRow * 16 + padColumn),
+    color.r,
+    color.g,
+    color.b,
+  ];
 
-        const input = WebMidi.inputs[1];
+  // const b = BytesBuilder();
+  // b.add(sysexHeader);
+  // b.add(ledData);
+  // b.add(sysexFooter);
 
-        input.addListener('noteon', "all",
-            function (e) {
-                console.log("Received 'noteon' message (" + e.note.name + "--" + e.note.number + ").");
-            }
-        );
+  // final midiData = b.toBytes();
+  const midiData = [...sysexHeader, ...ledData, ...sysexFooter];
 
-        // Listen to control change message on all channels
-        input.addListener('controlchange', "all",
-            function (e) {
-                console.log("Received 'controlchange' message.", e);
-            }
-        );
-    }
-    // true to sysex support
-}, true);
+  midiOutput.send(midiData);
+}
