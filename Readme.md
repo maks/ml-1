@@ -14,9 +14,21 @@ yarn run live-server
 ### Devtools
 
 testing using devtools console:
-```
+``` javascript
 const m = await import('/src/firemidi.js');
-m.getMidi()
+m.getMidi();
+
+// test pad color
+m.colorPad(1,1,{r: 25, g:25, b:25});
+
+// test OLED
+function testBitmap() {
+  const oled = [];
+  for (var i = 0; i < 128 * 8; i++) {
+    oled[i] = (i % 2) == 0;
+  }
+  sendSysexBitmap(oled);
+}
 ```
 
 

@@ -44,14 +44,6 @@ export function colorPad(padRow, padColumn, color) {
   midiOutput.send(midiData);
 }
 
-export function testBitmap() {
-  const oled = [];
-  for (var i = 0; i < 128 * 8; i++) {
-    oled[i] = (i % 2) == 0;
-  }
-  sendSysexBitmap(oled);
-}
-
 const _aBitMutate = [
   [13, 19, 25, 31, 37, 43, 49],
   [0, 20, 26, 32, 38, 44, 50],
