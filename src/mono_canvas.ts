@@ -9,8 +9,8 @@ export interface Font {
 }
 
 type Direction = 'left' | 'left diagonal' | 'right' | 'right diagonal'
-type Color = boolean
-type Pixel = [number, number, Color]
+type Monochrome = boolean
+type Pixel = [number, number, Monochrome]
 
 
 export class Oled {
@@ -19,7 +19,7 @@ export class Oled {
   private readonly WIDTH: number
 
   // State
-  public bitmap: Color[];
+  public bitmap: Monochrome[];
   private cursor_x: number
   private cursor_y: number
 
@@ -30,7 +30,7 @@ export class Oled {
     this.cursor_x = 0
     this.cursor_y = 0
 
-    this.bitmap = new Array<Color>(this.WIDTH * this.HEIGHT);
+    this.bitmap = new Array<Monochrome>(this.WIDTH * this.HEIGHT);
 
     const screenSize = `${this.WIDTH}x${this.HEIGHT}`
   }
@@ -42,7 +42,7 @@ export class Oled {
   }
 
   /// draw single pixel
-  private drawPixel(pixel: [number, number, Color]) {
+  private drawPixel(pixel: [number, number, Monochrome]) {
     this.bitmap[pixel[0] + (this.WIDTH * pixel[1])] = pixel[2];
   }
 
@@ -52,12 +52,12 @@ export class Oled {
     this.cursor_y = y
   }
 
-  private _invertColor(color: Color): Color {
+  private _invertColor(color: Monochrome): Monochrome {
     return !color
   }
 
   // write text to the oled
-  public writeString(font: Font, size: number, string: string, color: Color, wrap: boolean, linespacing: number | null): void {
+  public writeString(font: Font, size: number, string: string, color: Monochrome, wrap: boolean, linespacing: number | null): void {
     const wordArr = string.split(' ')
 
     const len = wordArr.length
@@ -114,7 +114,7 @@ export class Oled {
   }
 
   // draw an individual character to the screen
-  private _drawChar(font: Font, byteArray: number[][], size: number, color: Color): void {
+  private _drawChar(font: Font, byteArray: number[][], size: number, color: Monochrome): void {
     // take your positions...
     const x = this.cursor_x
     const y = this.cursor_y
@@ -178,7 +178,7 @@ export class Oled {
 
 
   // draw an image pixel array on the screen
-  public drawBitmap(pixels: Color[]): void {
+  public drawBitmap(pixels: Monochrome[]): void {
     for (let i = 0; i < pixels.length; i++) {
       const x = Math.floor(i % this.WIDTH)
       const y = Math.floor(i / this.WIDTH)
@@ -188,7 +188,7 @@ export class Oled {
   }
 
   // using Bresenham's line algorithm
-  public drawLine(x0: number, y0: number, x1: number, y1: number, color: Color): void {
+  public drawLine(x0: number, y0: number, x1: number, y1: number, color: Monochrome): void {
     const dx = Math.abs(x1 - x0)
     const sx = x0 < x1 ? 1 : -1
     const dy = Math.abs(y1 - y0)
@@ -209,7 +209,7 @@ export class Oled {
   }
 
   // Draw an outlined  rectangle
-  public drawRect(x: number, y: number, w: number, h: number, color: Color): void {
+  public drawRect(x: number, y: number, w: number, h: number, color: Monochrome): void {
     // top
     this.drawLine(x, y, x + w, y, color)
 
@@ -224,7 +224,7 @@ export class Oled {
   };
 
   // draw a filled rectangle on the oled
-  public fillRect(x: number, y: number, w: number, h: number, color: Color): void {
+  public fillRect(x: number, y: number, w: number, h: number, color: Monochrome): void {
     // one iteration for each column of the rectangle
     for (let i = x; i < x + w; i += 1) {
       // draws a vert line
@@ -239,14 +239,14 @@ export class Oled {
    * method on the Adafruit GFX library
    * https://github.com/adafruit/Adafruit-GFX-Library
    */
-  public drawCircle(x0: number, y0: number, r: number, color: Color): void {
+  public drawCircle(x0: number, y0: number, r: number, color: Monochrome): void {
     let f = 1 - r
     let ddF_x = 1
     let ddF_y = -2 * r
     let x = 0
     let y = r
 
-    const pointlist: Array<[number, number, Color]> = [
+    const pointlist: Array<[number, number, Monochrome]> = [
       [x0, y0 + r, color],
       [x0, y0 - r, color],
       [x0 + r, y0, color],
@@ -265,7 +265,7 @@ export class Oled {
       ddF_x += 2
       f += ddF_x
 
-      const pointlist: Array<[number, number, Color]> =
+      const pointlist: Array<[number, number, Monochrome]> =
         [
           [x0 + x, y0 + y, color],
           [x0 - x, y0 + y, color],
