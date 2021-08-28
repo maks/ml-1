@@ -1,85 +1,84 @@
-import 'dart:typed_data';
+export class CCInputs {
+  public static readonly buttonDown = 144;
+  public static readonly buttonUp = 128;
+  public static readonly dialRotate = 176;
 
-const buttonDown = 144;
-const buttonUp = 128;
-const dialRotate = 176;
+  public static readonly rotateLeft = 127;
+  public static readonly rotateRight = 1;
 
-const rotateLeft = 127;
-const rotateRight = 1;
+  public static readonly dialTouchOn = 127;
+  public static readonly dialTouchOff = 0;
 
-const dialTouchOn = 127;
-const dialTouchOff = 0;
+  public static readonly volume = 16;
+  public static readonly pan = 17;
+  public static readonly filter = 18;
+  public static readonly resonance = 19;
 
-const volume = 16;
-const pan = 17;
-const filter = 18;
-const resonance = 19;
+  public static readonly selectDown = 25;
+  public static readonly bankSelect = 26;
 
-const selectDown = 25;
-const bankSelect = 26;
+  public static readonly patternUp = 31;
+  public static readonly patternDown = 32;
+  public static readonly browser = 33;
+  public static readonly gridLeft = 34;
+  public static readonly gridRight = 35;
 
-const patternUp = 31;
-const patternDown = 32;
-const browser = 33;
-const gridLeft = 34;
-const gridRight = 35;
+  public static readonly muteButton1 = 36;
+  public static readonly muteButton2 = 37;
+  public static readonly muteButton3 = 38;
+  public static readonly muteButton4 = 39;
 
-const muteButton1 = 36;
-const muteButton2 = 37;
-const muteButton3 = 38;
-const muteButton4 = 39;
+  public static readonly step = 44;
+  public static readonly note = 45;
+  public static readonly drum = 46;
+  public static readonly perform = 47;
+  public static readonly shift = 48;
+  public static readonly alt = 49;
+  public static readonly pattern = 50;
 
-const step = 44;
-const note = 45;
-const drum = 46;
-const perform = 47;
-const shift = 48;
-const alt = 49;
-const pattern = 50;
+  public static readonly play = 51;
+  public static readonly stop = 52;
+  public static readonly record = 53;
 
-const play = 51;
-const stop = 52;
-const record = 53;
+  public static readonly select = 118;
 
-const select = 118;
+  // All
+  public static readonly off = 0;
 
-// All
-const off = 0;
+  // Red Only
+  // pattern up/down, browser, grid left/right
+  public static readonly paleRed = 1;
+  public static readonly red = 2;
 
-// Red Only
-// pattern up/down, browser, grid left/right
-const paleRed = 1;
-const red = 2;
+  // Green only
+  // mute 1,2,3,4
+  public static readonly paleGreen = 1;
+  public static readonly green = 2;
 
-// Green only
-// mute 1,2,3,4
-const paleGreen = 1;
-const green = 2;
+  // Yellow only
+  // alt, stop
+  public static readonly paleYellow = 1;
+  public static readonly yellow = 2;
 
-// Yellow only
-// alt, stop
-const paleYellow = 1;
-const yellow = 2;
+  // Yellow-Red
+  // step, note, drum, perform, shift, record
+  public static readonly paleYellow2 = 1;
+  public static readonly paleRed2 = 2;
+  public static readonly yellow2 = 3;
+  public static readonly red2 = 4;
 
-// Yellow-Red
-// step, note, drum, perform, shift, record
-const paleYellow2 = 1;
-const paleRed2 = 2;
-const yellow2 = 3;
-const red2 = 4;
+  // Yellow-Green
+  // pattern, play
+  public static readonly paleGreen3 = 1;
+  public static readonly paleYellow3 = 2;
+  public static readonly green3 = 3;
+  public static readonly yellow3 = 4;
 
-// Yellow-Green
-// pattern, play
-const paleGreen3 = 1;
-const paleYellow3 = 2;
-const green3 = 3;
-const yellow3 = 4;
-
-function on(id: number, value: number) {
-  return [
-    0xB0, // midi control change code
-    id,
-    value,
-  ];
+  public on(id: number, value: number) {
+    return [
+      0xB0, // midi control change code
+      id,
+      value,
+    ];
+  }
 }
-

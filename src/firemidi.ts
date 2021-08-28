@@ -2,6 +2,35 @@ export let midiOutput: WebMidi.MIDIOutput;
 
 export * from "./controlbank_led.js";
 
+export * from "./mono_canvas.js";
+
+export * from "./oled_font57.js";
+
+import { font5x7 } from "./oled_font57.js";
+import { Oled } from "./mono_canvas.js";
+
+const lineHeight = 8;
+const font = font5x7;
+const oledBitmap: Oled = new Oled(64, 128);
+
+export function drawHeading(heading: string) {
+  oledBitmap.clear();
+  oledBitmap.setCursor(0, 0);
+  oledBitmap.writeString(font, 1, heading, true, true, 1);
+  oledBitmap.setCursor(0, lineHeight);
+  oledBitmap.writeString(font, 1, '='.repeat(heading.length), true, true, 1);
+
+  sendSysexBitmap(oledBitmap.bitmap);
+}
+
+export function testDraw() {
+  oledBitmap.clear();
+  oledBitmap.setCursor(20, 20);
+  oledBitmap.drawRect(0, 0, 30, 40, true);
+  sendSysexBitmap(oledBitmap.bitmap);
+}
+
+
 export function getMidi() {
   navigator.requestMIDIAccess({ sysex: true })
     .then(function (midiAccess) {
@@ -67,7 +96,7 @@ const _aBitMutate = [
   [6, 12, 18, 24, 30, 36, 42],
 ];
 
-var _aOLEDBitmap: number[] = [];
+var _aOLEDBitmap = new Uint8Array(1175);
 
 export function sendSysexBitmap(boolMap: boolean[]) {
   const bitmap = _aOLEDBitmap;
@@ -78,6 +107,7 @@ export function sendSysexBitmap(boolMap: boolean[]) {
   _aOLEDBitmap[1] = 0x07;
   _aOLEDBitmap[2] = 0x00;
   _aOLEDBitmap[3] = 0x7f;
+
 
   // Clear the screen
   var x = 0;
@@ -98,6 +128,7 @@ export function sendSysexBitmap(boolMap: boolean[]) {
   }
 
   const length = bitmap.length;
+  console.log("BIITMAP:" + length);
 
   const sysexHeader = [
     0xF0, // System Exclusive
@@ -109,6 +140,7 @@ export function sendSysexBitmap(boolMap: boolean[]) {
     0x09,
     (length & 0x7F), // Payload length low
   ];
+
 
   const sysexFooter = [
     0xF7, // End of Exclusive
@@ -138,6 +170,7 @@ function _plotPixel(X: number, Y: number, C: MonoChrome) {
     // Remap by tiling 7x8 block of translated pixels.
     //
     remapBit = _aBitMutate[Y][X % 7];
+
     if (C > 0) {
       _aOLEDBitmap[4 + Math.floor(X / 7) * 8 + Math.floor(remapBit / 7)] |= 1 << (remapBit % 7);
     } else {

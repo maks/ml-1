@@ -1,67 +1,68 @@
-import 'dart:typed_data';
-const buttonDown = 144;
-const buttonUp = 128;
-const dialRotate = 176;
-const rotateLeft = 127;
-const rotateRight = 1;
-const dialTouchOn = 127;
-const dialTouchOff = 0;
-const volume = 16;
-const pan = 17;
-const filter = 18;
-const resonance = 19;
-const selectDown = 25;
-const bankSelect = 26;
-const patternUp = 31;
-const patternDown = 32;
-const browser = 33;
-const gridLeft = 34;
-const gridRight = 35;
-const muteButton1 = 36;
-const muteButton2 = 37;
-const muteButton3 = 38;
-const muteButton4 = 39;
-const step = 44;
-const note = 45;
-const drum = 46;
-const perform = 47;
-const shift = 48;
-const alt = 49;
-const pattern = 50;
-const play = 51;
-const stop = 52;
-const record = 53;
-const select = 118;
+export class CCInputs {
+    on(id, value) {
+        return [
+            0xB0,
+            id,
+            value,
+        ];
+    }
+}
+CCInputs.buttonDown = 144;
+CCInputs.buttonUp = 128;
+CCInputs.dialRotate = 176;
+CCInputs.rotateLeft = 127;
+CCInputs.rotateRight = 1;
+CCInputs.dialTouchOn = 127;
+CCInputs.dialTouchOff = 0;
+CCInputs.volume = 16;
+CCInputs.pan = 17;
+CCInputs.filter = 18;
+CCInputs.resonance = 19;
+CCInputs.selectDown = 25;
+CCInputs.bankSelect = 26;
+CCInputs.patternUp = 31;
+CCInputs.patternDown = 32;
+CCInputs.browser = 33;
+CCInputs.gridLeft = 34;
+CCInputs.gridRight = 35;
+CCInputs.muteButton1 = 36;
+CCInputs.muteButton2 = 37;
+CCInputs.muteButton3 = 38;
+CCInputs.muteButton4 = 39;
+CCInputs.step = 44;
+CCInputs.note = 45;
+CCInputs.drum = 46;
+CCInputs.perform = 47;
+CCInputs.shift = 48;
+CCInputs.alt = 49;
+CCInputs.pattern = 50;
+CCInputs.play = 51;
+CCInputs.stop = 52;
+CCInputs.record = 53;
+CCInputs.select = 118;
 // All
-const off = 0;
+CCInputs.off = 0;
 // Red Only
 // pattern up/down, browser, grid left/right
-const paleRed = 1;
-const red = 2;
+CCInputs.paleRed = 1;
+CCInputs.red = 2;
 // Green only
 // mute 1,2,3,4
-const paleGreen = 1;
-const green = 2;
+CCInputs.paleGreen = 1;
+CCInputs.green = 2;
 // Yellow only
 // alt, stop
-const paleYellow = 1;
-const yellow = 2;
+CCInputs.paleYellow = 1;
+CCInputs.yellow = 2;
 // Yellow-Red
 // step, note, drum, perform, shift, record
-const paleYellow2 = 1;
-const paleRed2 = 2;
-const yellow2 = 3;
-const red2 = 4;
+CCInputs.paleYellow2 = 1;
+CCInputs.paleRed2 = 2;
+CCInputs.yellow2 = 3;
+CCInputs.red2 = 4;
 // Yellow-Green
 // pattern, play
-const paleGreen3 = 1;
-const paleYellow3 = 2;
-const green3 = 3;
-const yellow3 = 4;
-function on(id, value) {
-    return [
-        0xB0,
-        id,
-        value,
-    ];
-}
+CCInputs.paleGreen3 = 1;
+CCInputs.paleYellow3 = 2;
+CCInputs.green3 = 3;
+CCInputs.yellow3 = 4;

@@ -1,5 +1,26 @@
 export let midiOutput;
 export * from "./controlbank_led.js";
+export * from "./mono_canvas.js";
+export * from "./oled_font57.js";
+import { font5x7 } from "./oled_font57.js";
+import { Oled } from "./mono_canvas.js";
+const lineHeight = 8;
+const font = font5x7;
+const oledBitmap = new Oled(64, 128);
+export function drawHeading(heading) {
+    oledBitmap.clear();
+    oledBitmap.setCursor(0, 0);
+    oledBitmap.writeString(font, 1, heading, true, true, 1);
+    oledBitmap.setCursor(0, lineHeight);
+    oledBitmap.writeString(font, 1, '='.repeat(heading.length), true, true, 1);
+    sendSysexBitmap(oledBitmap.bitmap);
+}
+export function testDraw() {
+    oledBitmap.clear();
+    oledBitmap.setCursor(20, 20);
+    oledBitmap.drawRect(0, 0, 30, 40, true);
+    sendSysexBitmap(oledBitmap.bitmap);
+}
 export function getMidi() {
     navigator.requestMIDIAccess({ sysex: true })
         .then(function (midiAccess) {
@@ -48,7 +69,7 @@ const _aBitMutate = [
     [5, 11, 17, 23, 29, 35, 55],
     [6, 12, 18, 24, 30, 36, 42],
 ];
-var _aOLEDBitmap = [];
+var _aOLEDBitmap = new Uint8Array(1175);
 export function sendSysexBitmap(boolMap) {
     const bitmap = _aOLEDBitmap;
     // these need to go after the bitmap length high/low bytes
@@ -75,6 +96,7 @@ export function sendSysexBitmap(boolMap) {
         }
     }
     const length = bitmap.length;
+    console.log("BIITMAP:" + length);
     const sysexHeader = [
         0xF0,
         0x47,

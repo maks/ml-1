@@ -1,6 +1,10 @@
 export class ControlBankLED {
     static off() {
-        return this.on();
+        return [
+            0xB0,
+            0x1B,
+            0,
+        ];
     }
     static on(channel = false, mixer = false, user1 = false, user2 = false) {
         let value = [];

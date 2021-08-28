@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@midival/core@^0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@midival/core/-/core-0.0.13.tgz#e1efd4913b5ecc687f34bb4f263c6c17ea1689b3"
-  integrity sha512-E/UXSOfvAo0diyhavbGfdXpVRe9/xZkNGmfe8/DhJ1MjItga4Ibc6gaeT9p92EebAABR5J6k+kKmEQSyp8/pYg==
+"@types/webmidi@^2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@types/webmidi/-/webmidi-2.0.6.tgz#c9b1428bbc5d5f49cc6201eae0dc5e2b3fd23e0e"
+  integrity sha512-sfS0A5IryqmBrUpcGPipEPeFdpqmZzP6b6lZFxHKgz5n2Vhzh4yJ5P2TvoDUhDjqJyv0Y25ng0Qodgo2Vu08ug==
 
 accepts@~1.3.4:
   version "1.3.7"
