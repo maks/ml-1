@@ -1,4 +1,5 @@
 export let midiOutput: WebMidi.MIDIOutput;
+export let midiInput: WebMidi.MIDIInput;
 
 export * from "./controlbank_led.js";
 
@@ -36,12 +37,32 @@ export function getMidi() {
   navigator.requestMIDIAccess({ sysex: true })
     .then(function (midiAccess) {
       const outputs = midiAccess.outputs.values();
+      const inputs = midiAccess.inputs.values();
+
       console.log(outputs);
       for (const output of outputs) {
         console.log(output);
         midiOutput = output;
       }
+
+      console.log(inputs);
+      for (const input of inputs) {
+        console.log(input);
+        midiInput = input;
+      }
+
+      midiOutput.onstatechange = (state) =>
+        console.log("state change:" + state);
+
+      midiInput.onmidimessage = listenMidi;
+
     });
+
+
+}
+
+export function listenMidi(mesg: WebMidi.MIDIMessageEvent) {
+  console.log(`Midi mesg data: ${mesg.data}`);
 }
 
 export function clearAll() {
