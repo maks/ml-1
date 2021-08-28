@@ -15,7 +15,7 @@ yarn run live-server
 
 testing using devtools console:
 ``` javascript
-const m = await import('/src/firemidi.js');
+const m = await import('/dist/firemidi.js');
 m.getMidi();
 
 // test pad color

@@ -4,7 +4,11 @@
         "moduleResolution": "node",
         "target": "es2015",
         "strict": true,
-        "outDir": "./dist"
+        "outDir": "./dist",
+        "lib": [
+            "dom",
+            "es2015"
+        ]
     },
     "include": [
         "src/**/*"

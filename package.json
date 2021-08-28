@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@midival/core": "^0.0.13",
+    "@types/webmidi": "^2.0.6",
     "oled-font-5x7": "^1.0.3"
   },
   "devDependencies": {

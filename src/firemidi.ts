@@ -1,4 +1,6 @@
-export let midiOutput = null;
+export let midiOutput: WebMidi.MIDIOutput;
+
+export * from "./controlbank_led.js";
 
 export function getMidi() {
   navigator.requestMIDIAccess({ sysex: true })
@@ -16,9 +18,19 @@ export function clearAll() {
   midiOutput.send([0xB0, 0x7F, 0]);
 }
 
+interface Color {
+  r: number,
+  g: number,
+  b: number
+}
+
+type Black = 0x00
+type White = 0x01
+type MonoChrome = Black | White
+
 /// turn on and set the colour of a pad button
 // export function colorPad(int padRow, int padColumn, PadColor color) {
-export function colorPad(padRow, padColumn, color) {
+export function colorPad(padRow: number, padColumn: number, color: Color) {
   const sysexHeader = [
     0xF0, // System Exclusive
     0x47, // Akai Manufacturer ID
@@ -55,10 +67,9 @@ const _aBitMutate = [
   [6, 12, 18, 24, 30, 36, 42],
 ];
 
-var _aOLEDBitmap = [];
+var _aOLEDBitmap: number[] = [];
 
-// void _sendSysexBitmap(List<bool> boolMap) {
-export function sendSysexBitmap(boolMap) {
+export function sendSysexBitmap(boolMap: boolean[]) {
   const bitmap = _aOLEDBitmap;
   // these need to go after the bitmap length high/low bytes
   // but need to be included in the payload length, hence we just
@@ -113,8 +124,7 @@ export function sendSysexBitmap(boolMap) {
 /// Y - Y coordinate of pixel (0..63).
 /// C - Color, 0=black, nonzero=white.
 /// ref: https://blog.segger.com/decoding-the-akai-fire-part-3/
-// void _plotPixel(int X, int Y, int C) {
-function _plotPixel(X, Y, C) {
+function _plotPixel(X: number, Y: number, C: MonoChrome) {
   var remapBit;
   //
   if (X < 128 && Y < 64) {
