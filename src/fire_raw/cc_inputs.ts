@@ -40,6 +40,9 @@ export class CCInputs {
   public static readonly stop = 52;
   public static readonly record = 53;
 
+  public static readonly firstPad = 54;
+  public static readonly lastPad = 117;
+
   public static readonly select = 118;
 
   // All

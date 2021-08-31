@@ -11,6 +11,7 @@ import { font5x7 } from "./oled/oled_font57.js";
 import { Oled } from "./oled/mono_canvas.js";
 import { sendSysexBitmap } from "./fire_raw/fire_oled.js";
 import { CCInputs } from "./fire_raw/cc_inputs.js";
+import { colorPad, allPadsColor } from "./fire_raw/pads.js";
 
 const lineHeight = 8;
 const font = font5x7;
@@ -50,6 +51,19 @@ export function testTransport() {
       t.record();
     },
   });
+  t.allOff();
+
+  const p = new PadControls(
+    {
+      midiInput: midiInput,
+      midiOutput: midiOutput,
+      onPad: (index) => {
+        console.log('PAD:' + index)
+        p.ledOn(index);
+      }
+    }
+  );
+  p.allOff();
 }
 
 
@@ -111,21 +125,21 @@ export class TransportControls {
 
 
   public play() {
-    this._allOff();
+    this.allOff();
     midiOutput.send(CCInputs.on(CCInputs.play, CCInputs.green3));
   }
 
   public stop() {
-    this._allOff();
+    this.allOff();
     midiOutput.send(CCInputs.on(CCInputs.stop, CCInputs.yellow));
   }
 
   public record() {
-    this._allOff();
+    this.allOff();
     midiOutput.send(CCInputs.on(CCInputs.record, CCInputs.recRed));
   }
 
-  private _allOff() {
+  private allOff() {
     midiOutput.send(CCInputs.on(CCInputs.play, CCInputs.off));
     midiOutput.send(CCInputs.on(CCInputs.record, CCInputs.off));
     midiOutput.send(CCInputs.on(CCInputs.stop, CCInputs.off));
@@ -209,10 +223,26 @@ export class DialControls {
 
 export class PadControls {
   private midiOutput: WebMidi.MIDIOutput
+  padListener: (index: number) => void;
+  private defaultColor = { r: 50, g: 50, b: 100 };
 
-  constructor({ midiInput, midiOutput }: { midiInput: WebMidi.MIDIInput, midiOutput: WebMidi.MIDIOutput, }) {
+  constructor({ midiInput, midiOutput, onPad: padListener }:
+    {
+      midiInput: WebMidi.MIDIInput,
+      midiOutput: WebMidi.MIDIOutput,
+      onPad: (index: number) => void
+    }) {
     midiInput.onmidimessage = (e) => this.onMidiMessage(e);
     this.midiOutput = midiOutput;
+    this.padListener = padListener;
+  }
+
+  public ledOn(padIndex: number) {
+    colorPad(midiOutput, padIndex, this.defaultColor);
+  }
+
+  public allOff() {
+    allPadsColor(midiOutput, { r: 0, g: 0, b: 0 });
   }
 
   private onMidiMessage(mesg: WebMidi.MIDIMessageEvent) {
@@ -220,7 +250,9 @@ export class PadControls {
     if (mesg.data[0] != CCInputs.buttonDown) {
       return;
     }
-    // TODO
-    // if (mesg.data[1])
+    const noteVal = mesg.data[1];
+    if (noteVal >= CCInputs.firstPad && noteVal <= CCInputs.lastPad) {
+      this.padListener(noteVal - CCInputs.firstPad);
+    }
   }
 }

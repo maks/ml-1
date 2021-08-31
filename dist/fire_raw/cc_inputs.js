@@ -39,6 +39,8 @@ CCInputs.pattern = 50;
 CCInputs.play = 51;
 CCInputs.stop = 52;
 CCInputs.record = 53;
+CCInputs.firstPad = 54;
+CCInputs.lastPad = 117;
 CCInputs.select = 118;
 // All
 CCInputs.off = 0;

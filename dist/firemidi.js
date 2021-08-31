@@ -7,6 +7,7 @@ import { font5x7 } from "./oled/oled_font57.js";
 import { Oled } from "./oled/mono_canvas.js";
 import { sendSysexBitmap } from "./fire_raw/fire_oled.js";
 import { CCInputs } from "./fire_raw/cc_inputs.js";
+import { colorPad, allPadsColor } from "./fire_raw/pads.js";
 const lineHeight = 8;
 const font = font5x7;
 const oledBitmap = new Oled(64, 128);
@@ -41,6 +42,16 @@ export function testTransport() {
             t.record();
         },
     });
+    t.allOff();
+    const p = new PadControls({
+        midiInput: midiInput,
+        midiOutput: midiOutput,
+        onPad: (index) => {
+            console.log('PAD:' + index);
+            p.ledOn(index);
+        }
+    });
+    p.allOff();
 }
 export function getMidi() {
     navigator.requestMIDIAccess({ sysex: true })
@@ -76,18 +87,18 @@ export class TransportControls {
         this.recordListener = onRecord;
     }
     play() {
-        this._allOff();
+        this.allOff();
         midiOutput.send(CCInputs.on(CCInputs.play, CCInputs.green3));
     }
     stop() {
-        this._allOff();
+        this.allOff();
         midiOutput.send(CCInputs.on(CCInputs.stop, CCInputs.yellow));
     }
     record() {
-        this._allOff();
+        this.allOff();
         midiOutput.send(CCInputs.on(CCInputs.record, CCInputs.recRed));
     }
-    _allOff() {
+    allOff() {
         midiOutput.send(CCInputs.on(CCInputs.play, CCInputs.off));
         midiOutput.send(CCInputs.on(CCInputs.record, CCInputs.off));
         midiOutput.send(CCInputs.on(CCInputs.stop, CCInputs.off));
@@ -150,16 +161,26 @@ export class DialControls {
     }
 }
 export class PadControls {
-    constructor({ midiInput, midiOutput }) {
+    constructor({ midiInput, midiOutput, onPad: padListener }) {
+        this.defaultColor = { r: 50, g: 50, b: 100 };
         midiInput.onmidimessage = (e) => this.onMidiMessage(e);
         this.midiOutput = midiOutput;
+        this.padListener = padListener;
+    }
+    ledOn(padIndex) {
+        colorPad(midiOutput, padIndex, this.defaultColor);
+    }
+    allOff() {
+        allPadsColor(midiOutput, { r: 0, g: 0, b: 0 });
     }
     onMidiMessage(mesg) {
         // only handle button down for now
         if (mesg.data[0] != CCInputs.buttonDown) {
             return;
         }
-        // TODO
-        // if (mesg.data[1])
+        const noteVal = mesg.data[1];
+        if (noteVal >= CCInputs.firstPad && noteVal <= CCInputs.lastPad) {
+            this.padListener(noteVal - CCInputs.firstPad);
+        }
     }
 }
