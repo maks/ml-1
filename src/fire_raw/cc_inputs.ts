@@ -61,11 +61,17 @@ export class CCInputs {
   public static readonly yellow = 2;
 
   // Yellow-Red
-  // step, note, drum, perform, shift, record
+  // step, note, drum, perform, shift
   public static readonly paleYellow2 = 1;
   public static readonly paleRed2 = 2;
   public static readonly yellow2 = 3;
   public static readonly red2 = 4;
+
+  //record
+  public static readonly recPaleRed = 1;
+  public static readonly recPaleYellow = 2;
+  public static readonly recRed = 3;
+  public static readonly recYellow = 4;
 
   // Yellow-Green
   // pattern, play
@@ -74,7 +80,7 @@ export class CCInputs {
   public static readonly green3 = 3;
   public static readonly yellow3 = 4;
 
-  public on(id: number, value: number) {
+  static on(id: number, value: number) {
     return [
       0xB0, // midi control change code
       id,

@@ -27,14 +27,18 @@ export function testDraw() {
 export function testTransport() {
     const t = new TransportControls({
         midiInput: midiInput,
+        midiOutput: midiOutput,
         onPlay: () => {
             console.log('Play');
+            t.play();
         },
         onStop: () => {
             console.log('Stop');
+            t.stop();
         },
         onRecord: () => {
             console.log('Rec');
+            t.record();
         },
     });
 }
@@ -64,13 +68,32 @@ export function clearAll() {
     midiOutput.send([0xB0, 0x7F, 0]);
 }
 export class TransportControls {
-    constructor({ midiInput, onPlay, onStop, onRecord }) {
+    constructor({ midiInput, midiOutput, onPlay, onStop, onRecord }) {
         midiInput.onmidimessage = (e) => this.onMidiMessage(e);
+        this.midiOutput = midiOutput;
         this.playListener = onPlay;
         this.stopListener = onStop;
         this.recordListener = onRecord;
     }
+    play() {
+        this._allOff();
+        midiOutput.send(CCInputs.on(CCInputs.play, CCInputs.green3));
+    }
+    stop() {
+        this._allOff();
+        midiOutput.send(CCInputs.on(CCInputs.stop, CCInputs.yellow));
+    }
+    record() {
+        this._allOff();
+        midiOutput.send(CCInputs.on(CCInputs.record, CCInputs.recRed));
+    }
+    _allOff() {
+        midiOutput.send(CCInputs.on(CCInputs.play, CCInputs.off));
+        midiOutput.send(CCInputs.on(CCInputs.record, CCInputs.off));
+        midiOutput.send(CCInputs.on(CCInputs.stop, CCInputs.off));
+    }
     onMidiMessage(mesg) {
+        // only handle button down for now
         if (mesg.data[0] != CCInputs.buttonDown) {
             return;
         }
@@ -85,5 +108,58 @@ export class TransportControls {
                 this.recordListener();
                 break;
         }
+    }
+}
+var DialDirection;
+(function (DialDirection) {
+    DialDirection[DialDirection["Left"] = 0] = "Left";
+    DialDirection[DialDirection["Right"] = 1] = "Right";
+})(DialDirection || (DialDirection = {}));
+export class DialControls {
+    constructor({ midiInput, onVolume, onPan, onFilter, onResonance, onSelect }) {
+        midiInput.onmidimessage = (e) => this.onMidiMessage(e);
+        this.volumeListener = onVolume;
+        this.panListener = onPan;
+        this.filterListener = onFilter;
+        this.resonanceListener = onResonance;
+        this.selectListener = onSelect;
+    }
+    onMidiMessage(mesg) {
+        // only handle button down for now
+        if (mesg.data[0] != CCInputs.buttonDown) {
+            return;
+        }
+        const dir = CCInputs.rotateLeft ? DialDirection.Left : DialDirection.Right;
+        switch (mesg.data[1]) {
+            case CCInputs.volume:
+                this.volumeListener(dir);
+                break;
+            case CCInputs.pan:
+                this.panListener(dir);
+                break;
+            case CCInputs.filter:
+                this.filterListener(dir);
+                break;
+            case CCInputs.resonance:
+                this.resonanceListener(dir);
+                break;
+            case CCInputs.select:
+                this.selectListener(dir);
+                break;
+        }
+    }
+}
+export class PadControls {
+    constructor({ midiInput, midiOutput }) {
+        midiInput.onmidimessage = (e) => this.onMidiMessage(e);
+        this.midiOutput = midiOutput;
+    }
+    onMidiMessage(mesg) {
+        // only handle button down for now
+        if (mesg.data[0] != CCInputs.buttonDown) {
+            return;
+        }
+        // TODO
+        // if (mesg.data[1])
     }
 }

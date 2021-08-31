@@ -1,5 +1,5 @@
 export class CCInputs {
-    on(id, value) {
+    static on(id, value) {
         return [
             0xB0,
             id,
@@ -55,11 +55,16 @@ CCInputs.green = 2;
 CCInputs.paleYellow = 1;
 CCInputs.yellow = 2;
 // Yellow-Red
-// step, note, drum, perform, shift, record
+// step, note, drum, perform, shift
 CCInputs.paleYellow2 = 1;
 CCInputs.paleRed2 = 2;
 CCInputs.yellow2 = 3;
 CCInputs.red2 = 4;
+//record
+CCInputs.recPaleRed = 1;
+CCInputs.recPaleYellow = 2;
+CCInputs.recRed = 3;
+CCInputs.recYellow = 4;
 // Yellow-Green
 // pattern, play
 CCInputs.paleGreen3 = 1;
