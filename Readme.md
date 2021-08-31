@@ -30,7 +30,23 @@ function testBitmap() {
   sendSysexBitmap(oled);
 }
 ```
+---
 
+## Features:
+
+- [x] connect to Fire via webmidi
+- [x] send bitmap to OLED with sysex from webmidi
+- [ ] high level interface for Fire controlsurface
+- [ ] drum sequencer based on shiny-drum-machine
+- [ ] improved seq: upto 64 step, microtiming
+- [ ] control dx7 FM synth via Fire controls
+- [ ] OLED wave, spectrum visualiser
+- [ ] ADSR control-visualiser on OLED
+- [ ] midi sequencer
+- [ ] audio mixer
+- [ ] record/playback audio
+- [ ] audio looper
+- [ ] fx (using impulses from shiny-drum or tuna?)
 
 ---
 
