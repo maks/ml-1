@@ -2,6 +2,10 @@ import { CCInputs } from "../fire_raw/cc_inputs.js";
 import { colorPad, allPadsColor } from "../fire_raw/pads.js";
 import { MidiDispatcher } from "../midi_dispatcher.js";
 
+export enum RowButtonState {
+  Off, Mute, Solo
+}
+
 export class PadControls {
   private midi: MidiDispatcher;
   padListener: (index: number) => void;
@@ -17,8 +21,21 @@ export class PadControls {
     this.padListener = padListener;
   }
 
-  public ledOn(padIndex: number) {
+  public padLedOn(padIndex: number) {
     colorPad(this.midi, padIndex, this.defaultColor);
+  }
+
+  public rowButtonLed(row: number, state: RowButtonState) {
+    this.midi.send(CCInputs.on(CCInputs.muteButton1 + row, state));
+  }
+
+  public rowLedOn(row: number) {
+    const defaultColour = CCInputs.rowGreen;
+    this.midi.send(CCInputs.on(CCInputs.row0Led + row, defaultColour));
+  }
+
+  public rowLedOff(row: number) {
+    this.midi.send(CCInputs.on(CCInputs.row0Led + row, 0));
   }
 
   public allOff() {

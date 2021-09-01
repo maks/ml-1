@@ -28,6 +28,11 @@ export class CCInputs {
   public static readonly muteButton3 = 38;
   public static readonly muteButton4 = 39;
 
+  public static readonly row0Led = 40;
+  public static readonly row1Led = 41;
+  public static readonly row2Led = 42;
+  public static readonly row3Led = 43;
+
   public static readonly step = 44;
   public static readonly note = 45;
   public static readonly drum = 46;
@@ -55,8 +60,8 @@ export class CCInputs {
 
   // Green only
   // mute 1,2,3,4
-  public static readonly paleGreen = 1;
-  public static readonly green = 2;
+  public static readonly mutePaleGreen = 1;
+  public static readonly muteGreen = 2;
 
   // Yellow only
   // alt, stop
@@ -82,6 +87,12 @@ export class CCInputs {
   public static readonly paleYellow3 = 2;
   public static readonly green3 = 3;
   public static readonly yellow3 = 4;
+
+  // row leds
+  public static readonly rowPaleRed = 1;
+  public static readonly rowPalegreen = 2;
+  public static readonly rowRed = 3;
+  public static readonly rowGreen = 4;
 
   static on(id: number, value: number) {
     return [

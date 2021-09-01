@@ -2,11 +2,12 @@ export let midiOutput;
 export let midiInput;
 export * from "./fire_raw/controlbank_led.js";
 import { TransportControls } from "./fire_controls/transport.js";
-import { PadControls } from "./fire_controls/pads.js";
+import { PadControls, RowButtonState } from "./fire_controls/pads.js";
 import { clearAll } from "./fire_controls/device.js";
 import { MidiDispatcher } from "./midi_dispatcher.js";
 export function allOff() { clearAll(midiOutput); }
 export let dispatcher;
+export let pads;
 export function testTransport() {
     const t = new TransportControls({
         midi: dispatcher,
@@ -24,14 +25,17 @@ export function testTransport() {
         },
     });
     t.allOff();
-    const p = new PadControls({
+    pads = new PadControls({
         midi: dispatcher,
         onPad: (index) => {
             console.log('PAD:' + index);
-            p.ledOn(index);
+            pads.padLedOn(index);
         }
     });
-    p.allOff();
+    pads.allOff();
+}
+export function testsolo(track) {
+    pads.rowButtonLed(track, RowButtonState.Off);
 }
 export function getMidi() {
     navigator.requestMIDIAccess({ sysex: true })

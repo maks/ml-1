@@ -29,6 +29,10 @@ CCInputs.muteButton1 = 36;
 CCInputs.muteButton2 = 37;
 CCInputs.muteButton3 = 38;
 CCInputs.muteButton4 = 39;
+CCInputs.row0Led = 40;
+CCInputs.row1Led = 41;
+CCInputs.row2Led = 42;
+CCInputs.row3Led = 43;
 CCInputs.step = 44;
 CCInputs.note = 45;
 CCInputs.drum = 46;
@@ -50,8 +54,8 @@ CCInputs.paleRed = 1;
 CCInputs.red = 2;
 // Green only
 // mute 1,2,3,4
-CCInputs.paleGreen = 1;
-CCInputs.green = 2;
+CCInputs.mutePaleGreen = 1;
+CCInputs.muteGreen = 2;
 // Yellow only
 // alt, stop
 CCInputs.paleYellow = 1;
@@ -73,3 +77,8 @@ CCInputs.paleGreen3 = 1;
 CCInputs.paleYellow3 = 2;
 CCInputs.green3 = 3;
 CCInputs.yellow3 = 4;
+// row leds
+CCInputs.rowPaleRed = 1;
+CCInputs.rowPalegreen = 2;
+CCInputs.rowRed = 3;
+CCInputs.rowGreen = 4;
