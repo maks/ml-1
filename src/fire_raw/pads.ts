@@ -1,3 +1,4 @@
+import { MidiDispatcher } from "../midi_dispatcher";
 
 interface Color {
   r: number,
@@ -7,7 +8,7 @@ interface Color {
 
 /// turn on and set the colour of a pad button
 // export function colorPad(int padRow, int padColumn, PadColor color) {
-export function colorPad(midiOutput: WebMidi.MIDIOutput, padIndex: number, color: Color) {
+export function colorPad(midi: MidiDispatcher, padIndex: number, color: Color) {
   const sysexHeader = [
     0xF0, // System Exclusive
     0x47, // Akai Manufacturer ID
@@ -30,10 +31,10 @@ export function colorPad(midiOutput: WebMidi.MIDIOutput, padIndex: number, color
 
   const midiData = [...sysexHeader, ...ledData, ...sysexFooter];
 
-  midiOutput.send(midiData);
+  midi.send(midiData);
 }
 
-export function allPadsColor(midiOutput: WebMidi.MIDIOutput, color: Color) {
+export function allPadsColor(midi: MidiDispatcher, color: Color) {
   const sysexHeader = [
     0xF0, // System Exclusive
     0x47, // Akai Manufacturer ID
@@ -61,6 +62,5 @@ export function allPadsColor(midiOutput: WebMidi.MIDIOutput, color: Color) {
 
   const midiData = [...sysexHeader, ...allLeds, ...sysexFooter];
 
-  midiOutput.send(midiData);
-
+  midi.send(midiData);
 }

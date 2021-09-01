@@ -1,6 +1,6 @@
 /// turn on and set the colour of a pad button
 // export function colorPad(int padRow, int padColumn, PadColor color) {
-export function colorPad(midiOutput, padIndex, color) {
+export function colorPad(midi, padIndex, color) {
     const sysexHeader = [
         0xF0,
         0x47,
@@ -20,9 +20,9 @@ export function colorPad(midiOutput, padIndex, color) {
         color.b,
     ];
     const midiData = [...sysexHeader, ...ledData, ...sysexFooter];
-    midiOutput.send(midiData);
+    midi.send(midiData);
 }
-export function allPadsColor(midiOutput, color) {
+export function allPadsColor(midi, color) {
     const sysexHeader = [
         0xF0,
         0x47,
@@ -46,5 +46,5 @@ export function allPadsColor(midiOutput, color) {
         allLeds.push(...ledData);
     }
     const midiData = [...sysexHeader, ...allLeds, ...sysexFooter];
-    midiOutput.send(midiData);
+    midi.send(midiData);
 }
