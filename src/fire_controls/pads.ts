@@ -6,10 +6,12 @@ export enum RowButtonState {
   Off, Mute, Solo
 }
 
+interface PadColour { r: number, g: number, b: number };
+
 export class PadControls {
   private midi: MidiDispatcher;
   padListener: (index: number) => void;
-  private defaultColor = { r: 50, g: 50, b: 100 };
+  private defaultColor: PadColour = { r: 100, g: 100, b: 100 };
 
   constructor({ midi, onPad: padListener }:
     {
@@ -21,8 +23,8 @@ export class PadControls {
     this.padListener = padListener;
   }
 
-  public padLedOn(padIndex: number) {
-    colorPad(this.midi, padIndex, this.defaultColor);
+  public padLedOn(padIndex: number, colour?: PadColour) {
+    colorPad(this.midi, padIndex, colour ?? this.defaultColor);
   }
 
   public rowButtonLed(row: number, state: RowButtonState) {

@@ -6,15 +6,16 @@ export var RowButtonState;
     RowButtonState[RowButtonState["Mute"] = 1] = "Mute";
     RowButtonState[RowButtonState["Solo"] = 2] = "Solo";
 })(RowButtonState || (RowButtonState = {}));
+;
 export class PadControls {
     constructor({ midi, onPad: padListener }) {
-        this.defaultColor = { r: 50, g: 50, b: 100 };
+        this.defaultColor = { r: 100, g: 100, b: 100 };
         midi.addInputListener((data) => this.onMidiMessage(data));
         this.midi = midi;
         this.padListener = padListener;
     }
-    padLedOn(padIndex) {
-        colorPad(this.midi, padIndex, this.defaultColor);
+    padLedOn(padIndex, colour) {
+        colorPad(this.midi, padIndex, colour !== null && colour !== void 0 ? colour : this.defaultColor);
     }
     rowButtonLed(row, state) {
         this.midi.send(CCInputs.on(CCInputs.muteButton1 + row, state));

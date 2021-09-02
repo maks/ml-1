@@ -5,19 +5,35 @@ import { TransportControls } from "./fire_controls/transport.js";
 import { PadControls, RowButtonState } from "./fire_controls/pads.js";
 import { clearAll } from "./fire_controls/device.js";
 import { MidiDispatcher } from "./midi_dispatcher.js";
-export function allOff() { clearAll(midiOutput); }
+import { TrackHead } from "./fire_controls/track_head.js";
 export let dispatcher;
 export let pads;
 export function testTransport() {
+    let ticker = null;
     const t = new TransportControls({
         midi: dispatcher,
         onPlay: () => {
-            console.log('Play');
             t.play();
+            if (ticker) {
+                console.log('Pause');
+                clearInterval(ticker);
+                ticker = null;
+            }
+            else {
+                console.log('Play');
+                head.start();
+                ticker = setInterval(tick, 1000);
+            }
         },
         onStop: () => {
             console.log('Stop');
             t.stop();
+            head.reset();
+            head.start();
+            if (ticker) {
+                clearInterval(ticker);
+                ticker = null;
+            }
         },
         onRecord: () => {
             console.log('Rec');
@@ -29,10 +45,14 @@ export function testTransport() {
         midi: dispatcher,
         onPad: (index) => {
             console.log('PAD:' + index);
-            pads.padLedOn(index);
+            pads.padLedOn(index, { r: 0, g: 0, b: 100 });
         }
     });
     pads.allOff();
+    const head = new TrackHead(pads);
+    function tick() {
+        head.next();
+    }
 }
 export function testsolo(track) {
     pads.rowButtonLed(track, RowButtonState.Off);
@@ -56,3 +76,4 @@ export function getMidi() {
         dispatcher = new MidiDispatcher(midiInput, midiOutput);
     });
 }
+export function allOff() { clearAll(midiOutput); }

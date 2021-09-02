@@ -18,8 +18,7 @@ testing using devtools console:
 const m = await import('/dist/firemidi.js');
 m.getMidi();
 
-// test pad color
-m.colorPad(1,1,{r: 25, g:25, b:25});
+m.testTransport();
 
 // test OLED
 function testBitmap() {
