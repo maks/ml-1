@@ -3,63 +3,52 @@ export let midiInput: WebMidi.MIDIInput;
 
 export * from "./fire_raw/controlbank_led.js";
 
-import { TransportControls } from "./fire_controls/transport.js";
+export { TransportControls } from "./fire_controls/transport.js";
+
 import { PadControls, RowButtonState } from "./fire_controls/pads.js";
 import { clearAll } from "./fire_controls/device.js";
 import { OledScreen } from "./fire_controls/oled.js";
 import { MidiDispatcher } from "./midi_dispatcher.js";
 import { TrackHead } from "./fire_controls/track_head.js";
+import { TransportControls } from "./fire_controls/transport.js";
 
 export let dispatcher: MidiDispatcher;
 
-export let pads: PadControls;
+export let firePads: PadControls;
 
-export function testTransport() {
-  let ticker: number | null = null;
+type voidcallback = () => void;
 
-  const t = new TransportControls({
+export function setupTransport(onPlay: voidcallback, onStop: voidcallback, onRecord: voidcallback) {
+
+  const transport = new TransportControls({
     midi: dispatcher,
     onPlay: () => {
-      t.play();
-      if (ticker) {
-        console.log('Pause')
-        clearInterval(ticker);
-        ticker = null;
-      } else {
-        console.log('Play');
-        head.start();
-        ticker = setInterval(tick, 1000);
-      }
+      console.log('ts play');
+      transport.play()
+      onPlay()
     },
     onStop: () => {
-      console.log('Stop')
-      t.stop();
-      head.reset();
-      head.start();
-      if (ticker) {
-        clearInterval(ticker);
-        ticker = null;
-      }
+      transport.stop()
+      onStop()
     },
     onRecord: () => {
-      console.log('Rec');
-      t.record();
+      transport.record()
+      onRecord()
     },
   });
-  t.allOff();
 
-  pads = new PadControls(
+  firePads = new PadControls(
     {
       midi: dispatcher,
       onPad: (index) => {
         console.log('PAD:' + index)
-        pads.padLedOn(index, { r: 0, g: 0, b: 100 });
+        firePads.padLedOn(index, { r: 0, g: 0, b: 100 });
       }
     }
   );
-  pads.allOff();
+  firePads.allOff();
 
-  const head = new TrackHead(pads);
+  const head = new TrackHead(firePads);
 
   function tick() {
     head.next();
@@ -67,11 +56,11 @@ export function testTransport() {
 }
 
 export function testsolo(track: number) {
-  pads.rowButtonLed(track, RowButtonState.Off)
+  firePads.rowButtonLed(track, RowButtonState.Off)
 }
 
 
-export function getMidi() {
+export function getMidi(midiReadyCallback: () => void) {
   navigator.requestMIDIAccess({ sysex: true })
     .then(function (midiAccess) {
       const outputs = midiAccess.outputs.values();
@@ -91,6 +80,8 @@ export function getMidi() {
         console.log("state change:" + state);
 
       dispatcher = new MidiDispatcher(midiInput, midiOutput);
+
+      midiReadyCallback();
     });
 }
 

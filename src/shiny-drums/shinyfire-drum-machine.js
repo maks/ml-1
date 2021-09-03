@@ -7,6 +7,8 @@ import {
 
 import { Beat, Player, Kit, Effect } from './shiny-drum-machine-audio.js';
 
+import { getMidi, setupTransport, firePads, allOff } from '/dist/firemidi.js';
+
 
 // Events
 // init() once the page has finished loading.
@@ -19,23 +21,6 @@ let theBeat;
 let player;
 const KITS = [];
 const EFFECTS = [];
-
-const ui = Object.seal({
-  effectPicker: null,
-  kitPicker: null,
-  demoButtons: null,
-  swingSlider: null,
-  effectSlider: null,
-  pitchSliders: null,
-  tempoInput: null,
-  notes: null,
-  playButton: null,
-  resetButton: null,
-  playheads: null,
-  saveButton: null,
-  loadButton: null,
-  fileDropZone: null,
-});
 
 function loadAssets() {
   // Any assets which have previously started loading will be skipped over.
@@ -63,12 +48,10 @@ function loadDemos(onDemoLoaded) {
 
 // This gets rid of the loading spinner in each of the demo buttons.
 function onDemoLoaded(demoIndex) {
-  ui.demoButtons.markDemoAvailable(demoIndex);
+  console.log('Demo loaded:' + demoIndex);
 
   // Enable play button and assign it to demo 2.
   if (demoIndex == 1) {
-    // This gets rid of the loading spinner on the play button.
-    ui.playButton.state = 'stopped';
     loadBeat(DEMO_BEATS[1]);
   }
 }
@@ -97,80 +80,56 @@ function init() {
 }
 
 function initControls() {
-  // Initialize note buttons
-  ui.notes = new Notes();
-  ui.notes.onClick = (instrumentName, rhythm) => handleNoteClick(
-    instrumentName, rhythm);
+  getMidi(midiReady);
 
-  ui.kitPicker = new KitPicker();
-  ui.kitPicker.addOptions(KITS.map((kit) => kit.prettyName));
-  ui.kitPicker.onSelect = (i) => {
-    theBeat.kit = KITS[i];
-  };
+  function midiReady() {
+    console.log('MIDI IS READY');
+    setupTransport(
+      handlePlay, handleStop, null,
+    );
 
-  ui.effectPicker = new EffectPicker();
-  ui.effectPicker.addOptions(EFFECTS.map((e) => e.name));
-  ui.effectPicker.onSelect = (i) => {
-    setEffect(i);
-  };
+    allOff();
+    console.log('pads:' + firePads);
 
-  ui.effectSlider = new EffectSlider();
-  ui.effectSlider.onchange = (value) => {
-    // Change the volume of the convolution effect.
-    theBeat.effectMix = value;
-    player.updateEffect();
-  };
-
-  ui.swingSlider = new SwingSlider();
-  ui.swingSlider.onchange = (value) => {
-    theBeat.swingFactor = value;
-  };
-
-  ui.pitchSliders = new PitchSliders();
-  ui.pitchSliders.onPitchChange = (instrumentName, pitch) => theBeat.setPitch(
-    instrumentName, pitch);
-
-  ui.playButton = new PlayButton();
-  ui.playButton.onclick = () => {
-    if (ui.playButton.state === 'playing') {
-      handleStop();
-    } else if (ui.playButton.state === 'stopped') {
-      handlePlay();
-    }
-  };
-
-  ui.saveButton = new SaveButton(() => JSON.stringify(theBeat.toObject()));
-
-  const onLoad = (data) => {
-    loadBeat(JSON.parse(data));
-  };
-  ui.loadButton = new LoadButton(onLoad);
-  ui.fileDropZone = new FileDropZone(onLoad);
-
-  ui.resetButton = new ResetButton();
-  ui.resetButton.onclick = () => {
-    loadBeat(RESET_BEAT);
-  };
-
-  ui.demoButtons = new DemoButtons();
-  ui.demoButtons.onDemoClick = (demoIndex) => {
-    loadBeat(DEMO_BEATS[demoIndex]);
-    handlePlay();
-  };
-
-  ui.tempoInput = new TempoInput({ min: MIN_TEMPO, max: MAX_TEMPO, step: 4 });
-  ui.tempoInput.onTempoChange = (tempo) => {
-    theBeat.tempo = tempo;
-  };
-
-  ui.playheads = new Playheads();
+  }
 }
+
+function loadBeat(beat) {
+  handleStop();
+  theBeat.loadObject(beat);
+  player.updateEffect();
+  updateControls();
+}
+
+function onNextBeat() {
+  console.log('NEXT BEAT');
+}
+
+function updateControls() {
+  // for (const instrument of INSTRUMENTS) {
+  //   theBeat.getNotes(instrument.name).forEach((note, i) => {
+  //     ui.notes.setNote(instrument.name, i, note);
+  //   });
+  // }
+
+  // ui.kitPicker.select(theBeat.kit.index);
+  // ui.effectPicker.select(theBeat.effect.index);
+  // ui.tempoInput.value = theBeat.tempo;
+  // ui.effectSlider.value = theBeat.effectMix;
+  // ui.swingSlider.value = theBeat.swingFactor;
+
+  // for (const instrument of INSTRUMENTS) {
+  //   ui.pitchSliders.setPitch(instrument.name,
+  //       theBeat.getPitch(instrument.name));
+  // }
+}
+
 
 function handleNoteClick(instrumentName, rhythmIndex) {
   theBeat.toggleNote(instrumentName, rhythmIndex);
 
-  ui.notes.setNote(instrumentName, rhythmIndex,
-    theBeat.getNote(instrumentName, rhythmIndex));
+  // ui.notes.setNote(instrumentName, rhythmIndex,
+  //   theBeat.getNote(instrumentName, rhythmIndex));
 
   const instrument = INSTRUMENTS.find((instr) => instr.name === instrumentName);
   player.playNote(instrument, rhythmIndex);
@@ -186,42 +145,18 @@ async function setEffect(index) {
 }
 
 function handlePlay() {
+  console.log('handle play');
   player.play();
-  ui.playButton.state = 'playing';
+  // ui.playButton.state = 'playing';
 }
 
 function handleStop() {
+  console.log('handle stop');
   player.stop();
-  ui.playheads.off();
-  ui.playButton.state = 'stopped';
+  // ui.playheads.off();
+  // ui.playButton.state = 'stopped';
 }
 
-function loadBeat(beat) {
-  handleStop();
-  theBeat.loadObject(beat);
-  player.updateEffect();
-  updateControls();
-}
-
-function onNextBeat(rhythmIndex) {
-  ui.playheads.drawPlayhead(rhythmIndex);
-}
-
-function updateControls() {
-  for (const instrument of INSTRUMENTS) {
-    theBeat.getNotes(instrument.name).forEach((note, i) => {
-      ui.notes.setNote(instrument.name, i, note);
-    });
-  }
-
-  // ui.kitPicker.select(theBeat.kit.index);
-  // ui.effectPicker.select(theBeat.effect.index);
-  // ui.tempoInput.value = theBeat.tempo;
-  // ui.effectSlider.value = theBeat.effectMix;
-  // ui.swingSlider.value = theBeat.swingFactor;
-
-  // for (const instrument of INSTRUMENTS) {
-  //   ui.pitchSliders.setPitch(instrument.name,
-  //     theBeat.getPitch(instrument.name));
-  // }
+function handleRecord() {
+  console.log('handle record');
 }

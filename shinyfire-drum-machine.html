@@ -37,7 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     content="Create custom drum beats with a few clicks. Choose from 15 drum kits and 26 effects, and adjust the pitch of each drum. Save and share your beats… rock on!">
   <title>WebAudio Drum Machine</title>
 
-  <script src="src/shinyfire-drum-machine.js" type="module"></script>
+  <script src="./src/shiny-drums/shinyfire-drum-machine.js" type="module"></script>
+
+  <script>// click event
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('.play1')) {
+        document.audioContext.resume().then(() => {
+          console.log('context resumed by user');
+        });
+      }
+    })</script>
 
 
 </head>
@@ -45,6 +54,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <body id="body">
   <div id="title">
     WebAudio Drum Machine <span id="version">1.2</span>
+    <button class="play1" type="button">
+      Give permission
+    </button>
   </div>
 </body>
 

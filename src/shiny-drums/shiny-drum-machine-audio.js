@@ -4,6 +4,9 @@ import { INSTRUMENTS, freeze, clone } from './shiny-drum-machine-data.js';
 
 const context = new AudioContext();
 
+// temp hack to allow resuming audiocontext from user gesture in webpage
+document.audioContext = context;
+
 const LOOP_LENGTH = 16;
 const BEATS_PER_FULL_NOTE = 4;
 const VOLUMES = freeze([0, 0.3, 1]);
@@ -24,7 +27,7 @@ class Kit {
   }
 
   getSampleUrl(instrumentName) {
-    return `../archive/demos/sounds/drum-samples/${this.id}/${instrumentName.toLowerCase()}.wav`;
+    return `../assets/samples/drum-samples/${this.id}/${instrumentName.toLowerCase()}.wav`;
   }
 
   load() {
@@ -61,7 +64,7 @@ class Effect {
       return;
     }
 
-    this.buffer = await fetchAndDecodeAudio(`../archive/demos/${this.url}`);
+    this.buffer = await fetchAndDecodeAudio(`../assets/samples/${this.url}`);
   }
 }
 
