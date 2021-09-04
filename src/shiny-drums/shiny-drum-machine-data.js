@@ -150,8 +150,8 @@ const INSTRUMENTS = freeze([
   { name: 'Snare', pan: false, sendGain: 1, mainGain: 0.6 },
   { name: 'HiHat', pan: true, sendGain: 1, mainGain: 0.7 },
   { name: 'Tom1', pan: false, sendGain: 1, mainGain: 0.6 },
-  { name: 'Tom2', pan: false, sendGain: 1, mainGain: 0.6 },
-  { name: 'Tom3', pan: false, sendGain: 1, mainGain: 0.6 },
+  // { name: 'Tom2', pan: false, sendGain: 1, mainGain: 0.6 },
+  // { name: 'Tom3', pan: false, sendGain: 1, mainGain: 0.6 },
 ]);
 
 const KIT_DATA = freeze([

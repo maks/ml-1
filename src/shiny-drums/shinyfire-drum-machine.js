@@ -105,12 +105,56 @@ function onNextBeat() {
   console.log('NEXT BEAT');
 }
 
+const instrumentRows = {
+  "Kick": 0,
+  "Snare": 1,
+  "HiHat": 2,
+  "Tom1": 3
+}
+
+const noteColours = [
+  // kick
+  [
+    { r: 0, g: 0, b: 0 },
+    { r: 0, g: 10, b: 30 },
+    { r: 0, g: 0, b: 120 }
+  ],
+  [
+    // snare
+    { r: 0, g: 0, b: 0 },
+    { r: 30, g: 10, b: 0 },
+    { r: 120, g: 0, b: 0 }
+  ],
+  [
+    //hihat
+    { r: 0, g: 0, b: 0 },
+    { r: 0, g: 30, b: 10 },
+    { r: 0, g: 100, b: 0 }
+  ],
+  [
+    //tom1
+    { r: 0, g: 0, b: 0 },
+    { r: 30, g: 30, b: 0 },
+    { r: 120, g: 120, b: 0 }
+  ]
+];
+
+function colourToString(colour) {
+  return `${colour.r},${colour.g},${colour.b}`
+}
+
 function updateControls() {
-  // for (const instrument of INSTRUMENTS) {
-  //   theBeat.getNotes(instrument.name).forEach((note, i) => {
-  //     ui.notes.setNote(instrument.name, i, note);
-  //   });
-  // }
+  for (const instrument of INSTRUMENTS) {
+    theBeat.getNotes(instrument.name).forEach((note, i) => {
+      //ui.notes.setNote(instrument.name, i, note);
+      const row = instrumentRows[instrument.name];
+      const padColour = noteColours[row][note];
+      const index = (row * 16) + i;
+
+      console.log(`i:${i} row:${row} index:${index} colour:${colourToString(padColour)} instr:${instrument.name}  note:${note}`);
+      firePads.padLedOn(index, padColour);
+    });
+  }
 
   // ui.kitPicker.select(theBeat.kit.index);
   // ui.effectPicker.select(theBeat.effect.index);
