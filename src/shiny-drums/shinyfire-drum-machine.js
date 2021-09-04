@@ -85,12 +85,11 @@ function initControls() {
   function midiReady() {
     console.log('MIDI IS READY');
     setupTransport(
-      handlePlay, handleStop, null,
+      handlePlay, handleStop, null, handleNoteClick,
     );
 
     allOff();
     console.log('pads:' + firePads);
-
   }
 }
 
@@ -111,6 +110,7 @@ const instrumentRows = {
   "HiHat": 2,
   "Tom1": 3
 }
+const instrumentIndexed = ["Kick", "Snare", "HiHat", "Tom1"];
 
 const noteColours = [
   // kick
@@ -146,12 +146,11 @@ function colourToString(colour) {
 function updateControls() {
   for (const instrument of INSTRUMENTS) {
     theBeat.getNotes(instrument.name).forEach((note, i) => {
-      //ui.notes.setNote(instrument.name, i, note);
       const row = instrumentRows[instrument.name];
       const padColour = noteColours[row][note];
       const index = (row * 16) + i;
 
-      console.log(`i:${i} row:${row} index:${index} colour:${colourToString(padColour)} instr:${instrument.name}  note:${note}`);
+      //console.log(`i:${i} row:${row} index:${index} colour:${colourToString(padColour)} instr:${instrument.name}  note:${note}`);
       firePads.padLedOn(index, padColour);
     });
   }
@@ -169,11 +168,16 @@ function updateControls() {
 }
 
 
-function handleNoteClick(instrumentName, rhythmIndex) {
+function handleNoteClick(index) {
+  const instrumentName = instrumentIndexed[Math.floor(index / 16)];
+  const rhythmIndex = index % 16;
+
   theBeat.toggleNote(instrumentName, rhythmIndex);
 
-  // ui.notes.setNote(instrumentName, rhythmIndex,
-  //   theBeat.getNote(instrumentName, rhythmIndex));
+  const note = theBeat.getNote(instrumentName, rhythmIndex);
+  const row = instrumentRows[instrumentName];
+  const padColour = noteColours[row][note];
+  firePads.padLedOn(index, padColour);
 
   const instrument = INSTRUMENTS.find((instr) => instr.name === instrumentName);
   player.playNote(instrument, rhythmIndex);

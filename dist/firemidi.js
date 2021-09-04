@@ -9,7 +9,7 @@ import { TrackHead } from "./fire_controls/track_head.js";
 import { TransportControls } from "./fire_controls/transport.js";
 export let dispatcher;
 export let firePads;
-export function setupTransport(onPlay, onStop, onRecord) {
+export function setupTransport(onPlay, onStop, onRecord, onPad) {
     const transport = new TransportControls({
         midi: dispatcher,
         onPlay: () => {
@@ -26,42 +26,12 @@ export function setupTransport(onPlay, onStop, onRecord) {
             onRecord();
         },
     });
-    // let ticker: number | null = null;
-    // const t = new TransportControls({
-    //   midi: dispatcher,
-    //   onPlay: () => {
-    //     t.play();
-    //     if (ticker) {
-    //       console.log('Pause')
-    //       clearInterval(ticker);
-    //       ticker = null;
-    //     } else {
-    //       console.log('Play');
-    //       head.start();
-    //       ticker = setInterval(tick, 1000);
-    //     }
-    //   },
-    //   onStop: () => {
-    //     console.log('Stop')
-    //     t.stop();
-    //     head.reset();
-    //     head.start();
-    //     if (ticker) {
-    //       clearInterval(ticker);
-    //       ticker = null;
-    //     }
-    //   },
-    //   onRecord: () => {
-    //     console.log('Rec');
-    //     t.record();
-    //   },
-    // });
-    // t.allOff();
     firePads = new PadControls({
         midi: dispatcher,
         onPad: (index) => {
             console.log('PAD:' + index);
-            firePads.padLedOn(index, { r: 0, g: 0, b: 100 });
+            // firePads.padLedOn(index, { r: 0, g: 0, b: 100 });
+            onPad(index);
         }
     });
     firePads.allOff();

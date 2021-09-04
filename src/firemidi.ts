@@ -18,7 +18,8 @@ export let firePads: PadControls;
 
 type voidcallback = () => void;
 
-export function setupTransport(onPlay: voidcallback, onStop: voidcallback, onRecord: voidcallback) {
+export function setupTransport(onPlay: voidcallback, onStop: voidcallback,
+  onRecord: voidcallback, onPad: (padIndex: number) => void) {
 
   const transport = new TransportControls({
     midi: dispatcher,
@@ -42,7 +43,8 @@ export function setupTransport(onPlay: voidcallback, onStop: voidcallback, onRec
       midi: dispatcher,
       onPad: (index) => {
         console.log('PAD:' + index)
-        firePads.padLedOn(index, { r: 0, g: 0, b: 100 });
+        // firePads.padLedOn(index, { r: 0, g: 0, b: 100 });
+        onPad(index);
       }
     }
   );
