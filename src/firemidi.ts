@@ -15,6 +15,7 @@ import { TransportControls } from "./fire_controls/transport.js";
 export let dispatcher: MidiDispatcher;
 
 let firePads: PadControls;
+let oled: OledScreen;
 
 type voidcallback = () => void;
 
@@ -64,6 +65,10 @@ export function setupPads(onPad: (padIndex: number) => void) {
   };
 }
 
+export function oledShow(heading: string) {
+  oled.heading(heading);
+}
+
 // export function testsolo(track: number) {
 //   firePads.rowButtonLed(track, RowButtonState.Off)
 // }
@@ -89,6 +94,8 @@ export function getMidi(midiReadyCallback: () => void) {
         console.log("state change:" + state);
 
       dispatcher = new MidiDispatcher(midiInput, midiOutput);
+
+      oled = new OledScreen(midiOutput);
 
       midiReadyCallback();
     });

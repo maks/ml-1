@@ -7,8 +7,9 @@ import {
 
 import { Beat, Player, Kit, Effect } from './shiny-drum-machine-audio.js';
 
-import { getMidi, setupTransport, setupPads, allOff } from '/dist/firemidi.js';
+import { getMidi, setupTransport, setupPads, oledShow, allOff } from '/dist/firemidi.js';
 
+import { instrumentIndexed, instrumentRows, noteColours } from './ui_config.js'
 
 // Events
 // init() once the page has finished loading.
@@ -108,47 +109,15 @@ function onNextBeat() {
   padControl.nextBeat();
 }
 
-const instrumentRows = {
-  "Kick": 0,
-  "Snare": 1,
-  "HiHat": 2,
-  "Tom1": 3
-}
-const instrumentIndexed = ["Kick", "Snare", "HiHat", "Tom1"];
-
-const noteColours = [
-  // kick
-  [
-    { r: 0, g: 0, b: 0 },
-    { r: 0, g: 10, b: 30 },
-    { r: 0, g: 0, b: 120 }
-  ],
-  [
-    // snare
-    { r: 0, g: 0, b: 0 },
-    { r: 30, g: 10, b: 0 },
-    { r: 120, g: 0, b: 0 }
-  ],
-  [
-    //hihat
-    { r: 0, g: 0, b: 0 },
-    { r: 0, g: 30, b: 10 },
-    { r: 0, g: 100, b: 0 }
-  ],
-  [
-    //tom1
-    { r: 0, g: 0, b: 0 },
-    { r: 30, g: 30, b: 0 },
-    { r: 120, g: 120, b: 0 }
-  ]
-];
-
 function colourToString(colour) {
   return `${colour.r},${colour.g},${colour.b}`
 }
 
 function updateControls() {
   updatePadsFromPlayer();
+
+  console.log(`BPM:${theBeat.tempo}`)
+  oledShow(`BPM:${theBeat.tempo}`);
 
   // ui.kitPicker.select(theBeat.kit.index);
   // ui.effectPicker.select(theBeat.effect.index);
@@ -200,15 +169,12 @@ async function setEffect(index) {
 function handlePlay() {
   console.log('handle play');
   player.play();
-  // ui.playButton.state = 'playing';
 }
 
 function handleStop() {
   console.log('handle stop');
   player.stop();
   padControl.resetBeat();
-  // ui.playheads.off();
-  // ui.playButton.state = 'stopped';
 }
 
 function handleRecord() {

@@ -4,11 +4,13 @@ export * from "./fire_raw/controlbank_led.js";
 export { TransportControls } from "./fire_controls/transport.js";
 import { PadControls } from "./fire_controls/pads.js";
 import { clearAll } from "./fire_controls/device.js";
+import { OledScreen } from "./fire_controls/oled.js";
 import { MidiDispatcher } from "./midi_dispatcher.js";
 import { TrackHead } from "./fire_controls/track_head.js";
 import { TransportControls } from "./fire_controls/transport.js";
 export let dispatcher;
 let firePads;
+let oled;
 //TODO: make config param in future
 const BAR_LENGTH = 16;
 export function setupTransport(onPlay, onStop, onRecord) {
@@ -47,6 +49,9 @@ export function setupPads(onPad) {
         }
     };
 }
+export function oledShow(heading) {
+    oled.heading(heading);
+}
 // export function testsolo(track: number) {
 //   firePads.rowButtonLed(track, RowButtonState.Off)
 // }
@@ -67,6 +72,7 @@ export function getMidi(midiReadyCallback) {
         }
         midiOutput.onstatechange = (state) => console.log("state change:" + state);
         dispatcher = new MidiDispatcher(midiInput, midiOutput);
+        oled = new OledScreen(midiOutput);
         midiReadyCallback();
     });
 }
