@@ -6,7 +6,7 @@ export enum RowButtonState {
   Off, Mute, Solo
 }
 
-interface PadColour { r: number, g: number, b: number };
+export interface PadColour { r: number, g: number, b: number };
 
 export class PadControls {
   private midi: MidiDispatcher;

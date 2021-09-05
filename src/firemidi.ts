@@ -5,7 +5,7 @@ export * from "./fire_raw/controlbank_led.js";
 
 export { TransportControls } from "./fire_controls/transport.js";
 
-import { PadControls, RowButtonState } from "./fire_controls/pads.js";
+import { PadControls, PadColour } from "./fire_controls/pads.js";
 import { clearAll } from "./fire_controls/device.js";
 import { OledScreen } from "./fire_controls/oled.js";
 import { MidiDispatcher } from "./midi_dispatcher.js";
@@ -14,12 +14,15 @@ import { TransportControls } from "./fire_controls/transport.js";
 
 export let dispatcher: MidiDispatcher;
 
-export let firePads: PadControls;
+let firePads: PadControls;
 
 type voidcallback = () => void;
 
+//TODO: make config param in future
+const BAR_LENGTH = 16;
+
 export function setupTransport(onPlay: voidcallback, onStop: voidcallback,
-  onRecord: voidcallback, onPad: (padIndex: number) => void) {
+  onRecord: voidcallback) {
 
   const transport = new TransportControls({
     midi: dispatcher,
@@ -37,29 +40,33 @@ export function setupTransport(onPlay: voidcallback, onStop: voidcallback,
       onRecord()
     },
   });
+}
 
+export function setupPads(onPad: (padIndex: number) => void) {
   firePads = new PadControls(
     {
       midi: dispatcher,
       onPad: (index) => {
         console.log('PAD:' + index)
-        // firePads.padLedOn(index, { r: 0, g: 0, b: 100 });
         onPad(index);
       }
     }
   );
   firePads.allOff();
+  const head = new TrackHead(firePads, BAR_LENGTH);
 
-  const head = new TrackHead(firePads);
-
-  function tick() {
-    head.next();
-  }
+  return {
+    nextBeat: () => { head.next(); },
+    resetBeat: () => { head.reset(); },
+    padLedOn: (padIndex: number, colour?: PadColour) => {
+      firePads.padLedOn(padIndex, colour);
+    }
+  };
 }
 
-export function testsolo(track: number) {
-  firePads.rowButtonLed(track, RowButtonState.Off)
-}
+// export function testsolo(track: number) {
+//   firePads.rowButtonLed(track, RowButtonState.Off)
+// }
 
 
 export function getMidi(midiReadyCallback: () => void) {

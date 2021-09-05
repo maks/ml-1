@@ -7,7 +7,7 @@ import {
 
 import { Beat, Player, Kit, Effect } from './shiny-drum-machine-audio.js';
 
-import { getMidi, setupTransport, firePads, allOff } from '/dist/firemidi.js';
+import { getMidi, setupTransport, setupPads, allOff } from '/dist/firemidi.js';
 
 
 // Events
@@ -19,6 +19,7 @@ const MAX_TEMPO = 180;
 
 let theBeat;
 let player;
+let padControl;
 const KITS = [];
 const EFFECTS = [];
 
@@ -51,8 +52,8 @@ function onDemoLoaded(demoIndex) {
   console.log('Demo loaded:' + demoIndex);
 
   // Enable play button and assign it to demo 2.
-  if (demoIndex == 1) {
-    loadBeat(DEMO_BEATS[1]);
+  if (demoIndex == 3) {
+    loadBeat(DEMO_BEATS[3]);
   }
 }
 
@@ -85,11 +86,12 @@ function initControls() {
   function midiReady() {
     console.log('MIDI IS READY');
     setupTransport(
-      handlePlay, handleStop, null, handleNoteClick,
+      handlePlay, handleStop, null
     );
 
+    padControl = setupPads(handleNoteClick);
+    console.log('PADCONTROL:', padControl)
     allOff();
-    console.log('pads:' + firePads);
   }
 }
 
@@ -102,6 +104,8 @@ function loadBeat(beat) {
 
 function onNextBeat() {
   console.log('NEXT BEAT');
+  updatePadsFromPlayer();
+  padControl.nextBeat();
 }
 
 const instrumentRows = {
@@ -144,16 +148,7 @@ function colourToString(colour) {
 }
 
 function updateControls() {
-  for (const instrument of INSTRUMENTS) {
-    theBeat.getNotes(instrument.name).forEach((note, i) => {
-      const row = instrumentRows[instrument.name];
-      const padColour = noteColours[row][note];
-      const index = (row * 16) + i;
-
-      //console.log(`i:${i} row:${row} index:${index} colour:${colourToString(padColour)} instr:${instrument.name}  note:${note}`);
-      firePads.padLedOn(index, padColour);
-    });
-  }
+  updatePadsFromPlayer();
 
   // ui.kitPicker.select(theBeat.kit.index);
   // ui.effectPicker.select(theBeat.effect.index);
@@ -167,6 +162,16 @@ function updateControls() {
   // }
 }
 
+function updatePadsFromPlayer() {
+  for (const instrument of INSTRUMENTS) {
+    theBeat.getNotes(instrument.name).forEach((note, i) => {
+      const row = instrumentRows[instrument.name];
+      const padColour = noteColours[row][note];
+      const index = (row * 16) + i;
+      padControl.padLedOn(index, padColour);
+    });
+  }
+}
 
 function handleNoteClick(index) {
   const instrumentName = instrumentIndexed[Math.floor(index / 16)];
@@ -177,7 +182,7 @@ function handleNoteClick(index) {
   const note = theBeat.getNote(instrumentName, rhythmIndex);
   const row = instrumentRows[instrumentName];
   const padColour = noteColours[row][note];
-  firePads.padLedOn(index, padColour);
+  padControl.padLedOn(index, padColour);
 
   const instrument = INSTRUMENTS.find((instr) => instr.name === instrumentName);
   player.playNote(instrument, rhythmIndex);
@@ -201,6 +206,7 @@ function handlePlay() {
 function handleStop() {
   console.log('handle stop');
   player.stop();
+  padControl.resetBeat();
   // ui.playheads.off();
   // ui.playButton.state = 'stopped';
 }

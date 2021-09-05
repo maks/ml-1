@@ -3,9 +3,11 @@ import { PadControls } from "./pads";
 export class TrackHead {
   private index = 0;
   private pads: PadControls;
+  private length: number;
 
-  constructor(pads: PadControls) {
+  constructor(pads: PadControls, length: number) {
     this.pads = pads;
+    this.length = length;
   }
 
   start() {
@@ -13,17 +15,15 @@ export class TrackHead {
   }
 
   next() {
-    this.index++;
+    this.index = (this.index == this.length) ? 0 : this.index + 1;
     this.update();
   }
 
   reset() {
     this.index = 0;
-    this.pads.allOff();
   }
 
   private update() {
-    this.pads.allOff();
     this.pads.padLedOn(this.index);
     this.pads.padLedOn(this.index + 16);
     this.pads.padLedOn(this.index + 32);
