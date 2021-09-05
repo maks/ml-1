@@ -49,8 +49,11 @@ export function setupPads(onPad) {
         }
     };
 }
-export function oledShow(heading) {
+export function oledHeading(heading) {
     oled.heading(heading);
+}
+export function oledText(line, text) {
+    oled.textline(line, text);
 }
 // export function testsolo(track: number) {
 //   firePads.rowButtonLed(track, RowButtonState.Off)

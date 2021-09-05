@@ -2,7 +2,6 @@ import { font5x7 } from "../oled/oled_font57.js";
 import { Oled } from "../oled/mono_canvas.js";
 import { sendSysexBitmap } from "../fire_raw/fire_oled.js";
 
-
 const lineHeight = 8;
 const font = font5x7;
 
@@ -12,7 +11,6 @@ export class OledScreen {
 
   constructor(midiOutput: WebMidi.MIDIOutput) {
     this.midiOutput = midiOutput;
-
     this.oledBitmap = new Oled(64, 128);
   }
 
@@ -20,14 +18,27 @@ export class OledScreen {
     this.drawHeading(this.oledBitmap, heading);
   }
 
-  private drawHeading(oledBitmap: Oled, heading: string) {
-    oledBitmap.clear();
-    oledBitmap.setCursor(0, 0);
-    oledBitmap.writeString(font, 1, heading, true, true, 1);
-    oledBitmap.setCursor(0, lineHeight);
-    oledBitmap.writeString(font, 1, '='.repeat(heading.length), true, true, 1);
+  textline(line: number, text: string) {
+    this.drawText(this.oledBitmap, line, text);
+  }
 
-    sendSysexBitmap(this.midiOutput, oledBitmap.bitmap);
+  clear() {
+    this.oledBitmap.clear();
+  }
+
+  private drawHeading(oledBitmap: Oled, heading: string) {
+    this.oledBitmap.setCursor(0, 0);
+    this.oledBitmap.writeString(font, 1, heading, true, true, 1);
+    this.oledBitmap.setCursor(0, lineHeight);
+    this.oledBitmap.writeString(font, 1, '='.repeat(heading.length), true, true, 1);
+
+    sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
+  }
+
+  private drawText(oledBitmap: Oled, line: number = 0, text: string) {
+    this.oledBitmap.setCursor(0, (7 * line));
+    this.oledBitmap.writeString(font, 1, text, true, true, 1);
+    sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
   }
 
   // testDraw() {

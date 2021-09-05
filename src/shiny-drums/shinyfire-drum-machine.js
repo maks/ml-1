@@ -7,7 +7,7 @@ import {
 
 import { Beat, Player, Kit, Effect } from './shiny-drum-machine-audio.js';
 
-import { getMidi, setupTransport, setupPads, oledShow, allOff } from '/dist/firemidi.js';
+import { getMidi, setupTransport, setupPads, oledHeading, oledText, allOff } from '/dist/firemidi.js';
 
 import { instrumentIndexed, instrumentRows, noteColours } from './ui_config.js'
 
@@ -115,9 +115,7 @@ function colourToString(colour) {
 
 function updateControls() {
   updatePadsFromPlayer();
-
-  console.log(`BPM:${theBeat.tempo}`)
-  oledShow(`BPM:${theBeat.tempo}`);
+  updateOled();
 
   // ui.kitPicker.select(theBeat.kit.index);
   // ui.effectPicker.select(theBeat.effect.index);
@@ -140,6 +138,12 @@ function updatePadsFromPlayer() {
       padControl.padLedOn(index, padColour);
     });
   }
+}
+
+function updateOled() {
+  console.log(`fx:`, theBeat.effect)
+  oledText(0, `BPM:${theBeat.tempo}`);
+  oledText(1, `FX:${theBeat.effect.name}`);
 }
 
 function handleNoteClick(index) {

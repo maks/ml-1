@@ -11,12 +11,22 @@ export class OledScreen {
     heading(heading) {
         this.drawHeading(this.oledBitmap, heading);
     }
+    textline(line, text) {
+        this.drawText(this.oledBitmap, line, text);
+    }
+    clear() {
+        this.oledBitmap.clear();
+    }
     drawHeading(oledBitmap, heading) {
-        oledBitmap.clear();
-        oledBitmap.setCursor(0, 0);
-        oledBitmap.writeString(font, 1, heading, true, true, 1);
-        oledBitmap.setCursor(0, lineHeight);
-        oledBitmap.writeString(font, 1, '='.repeat(heading.length), true, true, 1);
-        sendSysexBitmap(this.midiOutput, oledBitmap.bitmap);
+        this.oledBitmap.setCursor(0, 0);
+        this.oledBitmap.writeString(font, 1, heading, true, true, 1);
+        this.oledBitmap.setCursor(0, lineHeight);
+        this.oledBitmap.writeString(font, 1, '='.repeat(heading.length), true, true, 1);
+        sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
+    }
+    drawText(oledBitmap, line = 0, text) {
+        this.oledBitmap.setCursor(0, (7 * line));
+        this.oledBitmap.writeString(font, 1, text, true, true, 1);
+        sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
     }
 }

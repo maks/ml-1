@@ -65,8 +65,12 @@ export function setupPads(onPad: (padIndex: number) => void) {
   };
 }
 
-export function oledShow(heading: string) {
+export function oledHeading(heading: string) {
   oled.heading(heading);
+}
+
+export function oledText(line: number, text: string) {
+  oled.textline(line, text);
 }
 
 // export function testsolo(track: number) {
