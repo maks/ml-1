@@ -54,7 +54,7 @@ export class Oled {
                 const charBuf = this._findCharBuf(font, stringArr[i]);
                 // read the bits in the bytes that make up the char
                 const charBytes = this._readCharBytes(charBuf);
-                // draw the entire charactei
+                // draw the entire character
                 this._drawChar(font, charBytes, size, color);
                 // fills in background behind the text pixels so that it's easier to read the text
                 this.fillRect(offset - padding, this.cursor_y, padding, (font.height * size), this._invertColor(color));

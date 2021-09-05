@@ -7,7 +7,7 @@ import {
 
 import { Beat, Player, Kit, Effect } from './shiny-drum-machine-audio.js';
 
-import { getMidi, setupTransport, setupPads, oledHeading, oledText, allOff } from '/dist/firemidi.js';
+import { getMidi, setupTransport, setupPads, setupOled, setupDials, allOff } from '/dist/firemidi.js';
 
 import { instrumentIndexed, instrumentRows, noteColours } from './ui_config.js'
 
@@ -21,6 +21,9 @@ const MAX_TEMPO = 180;
 let theBeat;
 let player;
 let padControl;
+let kit;
+let oled;
+let dials;
 const KITS = [];
 const EFFECTS = [];
 
@@ -39,7 +42,7 @@ function loadDemos(onDemoLoaded) {
   for (let demoIndex = 0; demoIndex < 5; demoIndex++) {
     const demo = DEMO_BEATS[demoIndex];
     const effect = EFFECTS[demo.effectIndex];
-    const kit = KITS[demo.kitIndex];
+    kit = KITS[demo.kitIndex];
 
     Promise.all([
       effect.load(),
@@ -89,9 +92,18 @@ function initControls() {
     setupTransport(
       handlePlay, handleStop, null
     );
-
     padControl = setupPads(handleNoteClick);
     console.log('PADCONTROL:', padControl)
+    oled = setupOled();
+    dials = setupDials(
+      {
+        onVolume: (dir) => { console.log('vol:' + dir) },
+        onPan: () => { },
+        onFilter: () => { },
+        onResonance: () => { },
+        onSelect: (dir) => { console.log('select:' + dir) }
+      }
+    );
     allOff();
   }
 }
@@ -141,9 +153,10 @@ function updatePadsFromPlayer() {
 }
 
 function updateOled() {
-  console.log(`fx:`, theBeat.effect)
-  oledText(0, `BPM:${theBeat.tempo}`);
-  oledText(1, `FX:${theBeat.effect.name}`);
+  console.log(`kit:`, kit)
+  oled.text(0, `BPM:${theBeat.tempo}`);
+  oled.text(1, `FX:${theBeat.effect.name}`);
+  oled.text(2, `Kit:${kit.prettyName}`);
 }
 
 function handleNoteClick(index) {

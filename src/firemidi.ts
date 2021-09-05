@@ -11,11 +11,13 @@ import { OledScreen } from "./fire_controls/oled.js";
 import { MidiDispatcher } from "./midi_dispatcher.js";
 import { TrackHead } from "./fire_controls/track_head.js";
 import { TransportControls } from "./fire_controls/transport.js";
+import { DialControls, dialCallback } from "./fire_controls/dials.js";
 
 export let dispatcher: MidiDispatcher;
 
 let firePads: PadControls;
 let oled: OledScreen;
+let dials: DialControls;
 
 type voidcallback = () => void;
 
@@ -65,12 +67,44 @@ export function setupPads(onPad: (padIndex: number) => void) {
   };
 }
 
-export function oledHeading(heading: string) {
+export function setupOled() {
+  oled = new OledScreen(midiOutput);
+  return {
+    heading: oledHeading,
+    text: oledText
+  };
+}
+
+export function setupDials({
+  onVolume,
+  onPan,
+  onFilter,
+  onResonance,
+  onSelect
+}: {
+  onVolume: dialCallback,
+  onPan: dialCallback,
+  onFilter: dialCallback,
+  onResonance: dialCallback,
+  onSelect: dialCallback
+}) {
+
+  dials = new DialControls({
+    midiInput: midiInput,
+    onVolume: onVolume,
+    onPan: onPan,
+    onFilter: onFilter,
+    onResonance: onResonance,
+    onSelect: onSelect
+  });
+}
+
+function oledHeading(heading: string) {
   oled.heading(heading);
 }
 
-export function oledText(line: number, text: string) {
-  oled.textline(line, text);
+function oledText(line: number, text: string, highlight?: boolean) {
+  oled.textline(line, highlight ?? false, text);
 }
 
 // export function testsolo(track: number) {
@@ -98,8 +132,6 @@ export function getMidi(midiReadyCallback: () => void) {
         console.log("state change:" + state);
 
       dispatcher = new MidiDispatcher(midiInput, midiOutput);
-
-      oled = new OledScreen(midiOutput);
 
       midiReadyCallback();
     });

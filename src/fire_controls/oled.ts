@@ -18,8 +18,8 @@ export class OledScreen {
     this.drawHeading(this.oledBitmap, heading);
   }
 
-  textline(line: number, text: string) {
-    this.drawText(this.oledBitmap, line, text);
+  textline(line: number, highlight: boolean, text: string) {
+    this.drawText(this.oledBitmap, line, false, text);
   }
 
   clear() {
@@ -35,9 +35,9 @@ export class OledScreen {
     sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
   }
 
-  private drawText(oledBitmap: Oled, line: number = 0, text: string) {
+  private drawText(oledBitmap: Oled, line: number = 0, highlight: boolean, text: string) {
     this.oledBitmap.setCursor(0, (7 * line));
-    this.oledBitmap.writeString(font, 1, text, true, true, 1);
+    this.oledBitmap.writeString(font, 1, text, !highlight, true, 1);
     sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
   }
 

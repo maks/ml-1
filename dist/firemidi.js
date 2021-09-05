@@ -8,9 +8,11 @@ import { OledScreen } from "./fire_controls/oled.js";
 import { MidiDispatcher } from "./midi_dispatcher.js";
 import { TrackHead } from "./fire_controls/track_head.js";
 import { TransportControls } from "./fire_controls/transport.js";
+import { DialControls } from "./fire_controls/dials.js";
 export let dispatcher;
 let firePads;
 let oled;
+let dials;
 //TODO: make config param in future
 const BAR_LENGTH = 16;
 export function setupTransport(onPlay, onStop, onRecord) {
@@ -49,11 +51,28 @@ export function setupPads(onPad) {
         }
     };
 }
-export function oledHeading(heading) {
+export function setupOled() {
+    oled = new OledScreen(midiOutput);
+    return {
+        heading: oledHeading,
+        text: oledText
+    };
+}
+export function setupDials({ onVolume, onPan, onFilter, onResonance, onSelect }) {
+    dials = new DialControls({
+        midiInput: midiInput,
+        onVolume: onVolume,
+        onPan: onPan,
+        onFilter: onFilter,
+        onResonance: onResonance,
+        onSelect: onSelect
+    });
+}
+function oledHeading(heading) {
     oled.heading(heading);
 }
-export function oledText(line, text) {
-    oled.textline(line, text);
+function oledText(line, text, highlight) {
+    oled.textline(line, highlight !== null && highlight !== void 0 ? highlight : false, text);
 }
 // export function testsolo(track: number) {
 //   firePads.rowButtonLed(track, RowButtonState.Off)
@@ -75,7 +94,6 @@ export function getMidi(midiReadyCallback) {
         }
         midiOutput.onstatechange = (state) => console.log("state change:" + state);
         dispatcher = new MidiDispatcher(midiInput, midiOutput);
-        oled = new OledScreen(midiOutput);
         midiReadyCallback();
     });
 }
