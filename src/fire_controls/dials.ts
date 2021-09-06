@@ -1,4 +1,5 @@
 import { CCInputs } from "../fire_raw/cc_inputs.js";
+import { MidiDispatcher } from "../midi_dispatcher.js";
 
 enum DialEvent {
   Left,
@@ -16,16 +17,16 @@ export class DialControls {
   resonanceListener: dialCallback;
   selectListener: dialCallback;
 
-  constructor({ midiInput, onVolume, onPan, onFilter, onResonance, onSelect }:
+  constructor({ midi, onVolume, onPan, onFilter, onResonance, onSelect }:
     {
-      midiInput: WebMidi.MIDIInput,
+      midi: MidiDispatcher,
       onVolume: dialCallback,
       onPan: dialCallback,
       onFilter: dialCallback,
       onResonance: dialCallback,
       onSelect: dialCallback
     }) {
-    midiInput.onmidimessage = (e) => this.onMidiMessage(e);
+    midi.addInputListener((e) => this.onMidiData(e));
     this.volumeListener = onVolume;
     this.panListener = onPan;
     this.filterListener = onFilter;
@@ -33,20 +34,20 @@ export class DialControls {
     this.selectListener = onSelect;
   }
 
-  private onMidiMessage(mesg: WebMidi.MIDIMessageEvent) {
-    if (mesg.data[0] != CCInputs.dialRotate &&
-      mesg.data[0] != CCInputs.buttonDown &&
-      mesg.data[0] != CCInputs.buttonUp) {
+  private onMidiData(data: Uint8Array) {
+    if (data[0] != CCInputs.dialRotate &&
+      data[0] != CCInputs.buttonDown &&
+      data[0] != CCInputs.buttonUp) {
       return;
     }
     let event: DialEvent;
-    if (mesg.data[0] == CCInputs.dialRotate) {
-      event = mesg.data[2] == CCInputs.rotateLeft ? DialEvent.Left : DialEvent.Right;
+    if (data[0] == CCInputs.dialRotate) {
+      event = data[2] == CCInputs.rotateLeft ? DialEvent.Left : DialEvent.Right;
     } else {
-      event = mesg.data[2] == CCInputs.dialTouchOn ? DialEvent.Touch : DialEvent.Release;
+      event = data[2] == CCInputs.dialTouchOn ? DialEvent.Touch : DialEvent.Release;
     }
 
-    switch (mesg.data[1]) {
+    switch (data[1]) {
       case CCInputs.volume:
         this.volumeListener(event);
         break;

@@ -1,5 +1,4 @@
 export let midiOutput: WebMidi.MIDIOutput;
-export let midiInput: WebMidi.MIDIInput;
 
 export * from "./fire_raw/controlbank_led.js";
 
@@ -24,7 +23,9 @@ type voidcallback = () => void;
 //TODO: make config param in future
 const BAR_LENGTH = 16;
 
-export function setupTransport(onPlay: voidcallback, onStop: voidcallback,
+export function setupTransport(
+  onPlay: voidcallback,
+  onStop: voidcallback,
   onRecord: voidcallback) {
 
   const transport = new TransportControls({
@@ -90,7 +91,7 @@ export function setupDials({
 }) {
 
   dials = new DialControls({
-    midiInput: midiInput,
+    midi: dispatcher,
     onVolume: onVolume,
     onPan: onPan,
     onFilter: onFilter,
@@ -124,6 +125,7 @@ export function getMidi(midiReadyCallback: () => void) {
         midiOutput = output;
       }
       console.log(inputs);
+      let midiInput;
       for (const input of inputs) {
         console.log(input);
         midiInput = input;
@@ -131,7 +133,11 @@ export function getMidi(midiReadyCallback: () => void) {
       midiOutput.onstatechange = (state) =>
         console.log("state change:" + state);
 
-      dispatcher = new MidiDispatcher(midiInput, midiOutput);
+      if (midiInput != null) {
+        dispatcher = new MidiDispatcher(midiInput, midiOutput);
+      } else {
+        console.error("== MISSING midiInput cannot create Dispatcher ==");
+      }
 
       midiReadyCallback();
     });

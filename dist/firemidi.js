@@ -1,5 +1,4 @@
 export let midiOutput;
-export let midiInput;
 export * from "./fire_raw/controlbank_led.js";
 export { TransportControls } from "./fire_controls/transport.js";
 import { PadControls } from "./fire_controls/pads.js";
@@ -60,7 +59,7 @@ export function setupOled() {
 }
 export function setupDials({ onVolume, onPan, onFilter, onResonance, onSelect }) {
     dials = new DialControls({
-        midiInput: midiInput,
+        midi: dispatcher,
         onVolume: onVolume,
         onPan: onPan,
         onFilter: onFilter,
@@ -88,12 +87,18 @@ export function getMidi(midiReadyCallback) {
             midiOutput = output;
         }
         console.log(inputs);
+        let midiInput;
         for (const input of inputs) {
             console.log(input);
             midiInput = input;
         }
         midiOutput.onstatechange = (state) => console.log("state change:" + state);
-        dispatcher = new MidiDispatcher(midiInput, midiOutput);
+        if (midiInput != null) {
+            dispatcher = new MidiDispatcher(midiInput, midiOutput);
+        }
+        else {
+            console.error("== MISSING midiInput cannot create Dispatcher ==");
+        }
         midiReadyCallback();
     });
 }
