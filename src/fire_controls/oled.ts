@@ -19,7 +19,7 @@ export class OledScreen {
   }
 
   textline(line: number, highlight: boolean, text: string) {
-    this.drawText(this.oledBitmap, line, false, text);
+    this.drawText(this.oledBitmap, line, highlight, text);
   }
 
   clear() {

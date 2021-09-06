@@ -7,7 +7,7 @@ export class MidiDispatcher {
         midiInput.onmidimessage = function (mesg) { me.listenMidi(mesg); };
     }
     listenMidi(mesg) {
-        console.log(`Midi mesg data: ${mesg.data}`);
+        //console.log(`Midi mesg data: ${mesg.data}`);
         this.listeners.forEach(listener => {
             listener(mesg.data);
         });

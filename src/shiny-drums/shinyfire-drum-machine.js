@@ -24,6 +24,7 @@ let padControl;
 let kit;
 let oled;
 let dials;
+let menu;
 const KITS = [];
 const EFFECTS = [];
 
@@ -93,15 +94,21 @@ function initControls() {
       handlePlay, handleStop, null
     );
     padControl = setupPads(handleNoteClick);
-    console.log('PADCONTROL:', padControl)
     oled = setupOled();
+    menu = new MenuController();
     dials = setupDials(
       {
         onVolume: (dir) => { console.log('vol:' + dir) },
         onPan: () => { },
         onFilter: () => { },
         onResonance: () => { },
-        onSelect: (dir) => { console.log('select:' + dir) }
+        onSelect: (dir) => {
+          if (dir == 2 || dir == 3) {
+            menu.onSelect();
+          } else {
+            menu.onDial(dir);
+          }
+        }
       }
     );
     allOff();
@@ -127,7 +134,7 @@ function colourToString(colour) {
 
 function updateControls() {
   updatePadsFromPlayer();
-  updateOled();
+  menu.updateOled();
 
   // ui.kitPicker.select(theBeat.kit.index);
   // ui.effectPicker.select(theBeat.effect.index);
@@ -150,13 +157,6 @@ function updatePadsFromPlayer() {
       padControl.padLedOn(index, padColour);
     });
   }
-}
-
-function updateOled() {
-  console.log(`kit:`, kit)
-  oled.text(0, `BPM:${theBeat.tempo}`);
-  oled.text(1, `FX:${theBeat.effect.name}`);
-  oled.text(2, `Kit:${kit.prettyName}`);
 }
 
 function handleNoteClick(index) {
@@ -196,4 +196,55 @@ function handleStop() {
 
 function handleRecord() {
   console.log('handle record');
+}
+
+class MenuController {
+  _editIndex = -1;
+  _selectedIndex = 0;
+
+  get _topMenuItems() {
+    return [
+      `BPM:${theBeat.tempo}`,
+      `FX:${theBeat.effect.name}`,
+      `Kit:${kit.prettyName}`
+    ];
+  }
+
+  onDial(dir) {
+    const left = (dir == 0);
+    console.log('menu left:' + left);
+    if (this._editIndex != -1) {
+      // hard bpm for now
+      if (left) {
+        theBeat.tempo -= 1;
+      } else {
+        theBeat.tempo += 1;
+      }
+    } else {
+      if (left) {
+        this._selectedIndex = (this._selectedIndex == 0) ? 0 : this._selectedIndex - 1;
+      } else {
+        this._selectedIndex = (this._selectedIndex == this._topMenuItems.length - 1) ? this._topMenuItems.length - 1
+          : this._selectedIndex + 1;
+      }
+    }
+    this.updateOled();
+  }
+
+  onSelect() {
+    console.log('menu select:' + this._selectedIndex);
+    this._editIndex = this._selectedIndex;
+  }
+
+  onBack() {
+    console.log('menu back');
+    this._editIndex = -1;
+  }
+
+  updateOled() {
+    for (let i = 0; i < this._topMenuItems.length; i++) {
+      let highlight = (i == this._selectedIndex)
+      oled.text(i, this._topMenuItems[i], highlight);
+    }
+  }
 }

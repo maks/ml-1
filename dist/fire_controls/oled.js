@@ -12,7 +12,7 @@ export class OledScreen {
         this.drawHeading(this.oledBitmap, heading);
     }
     textline(line, highlight, text) {
-        this.drawText(this.oledBitmap, line, false, text);
+        this.drawText(this.oledBitmap, line, highlight, text);
     }
     clear() {
         this.oledBitmap.clear();
