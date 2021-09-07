@@ -29,6 +29,8 @@ let buttons;
 const KITS = [];
 const EFFECTS = [];
 
+let shiftON = false;
+
 function loadAssets() {
   // Any assets which have previously started loading will be skipped over.
   for (const kit of KITS) {
@@ -100,7 +102,15 @@ function initControls() {
     dials = setupDials(
       {
         onVolume: (dir) => { console.log('vol:' + dir) },
-        onPan: () => { },
+        onPan: (dir) => {
+          if (dir == 0) {
+            theBeat.effectMix = Math.max(0, theBeat.effectMix - 0.01);
+          } else if (dir == 1) {
+            theBeat.effectMix = Math.min(1.0, theBeat.effectMix + 0.01);
+          }
+          console.log('fx:' + theBeat.effectMix);
+          player.updateEffect();
+        },
         onFilter: () => { },
         onResonance: () => { },
         onSelect: (dir) => {
@@ -225,10 +235,11 @@ class MenuController {
     if (this._editIndex != -1) {
       // hard bpm for now
       if (left) {
-        theBeat.tempo -= 1;
+        theBeat.tempo = Math.max(MIN_TEMPO, theBeat.tempo - 1);
       } else {
-        theBeat.tempo += 1;
+        theBeat.tempo = Math.min(MAX_TEMPO, theBeat.tempo + 1);
       }
+      console.log('tempo:' + theBeat.tempo)
     } else {
       if (left) {
         this._selectedIndex = (this._selectedIndex == 0) ? 0 : this._selectedIndex - 1;
