@@ -4,6 +4,8 @@ export * from "./fire_raw/controlbank_led.js";
 
 export { TransportControls } from "./fire_controls/transport.js";
 
+export { ButtonCode } from "./fire_controls/buttons.js";
+
 import { PadControls, PadColour } from "./fire_controls/pads.js";
 import { clearAll } from "./fire_controls/device.js";
 import { OledScreen } from "./fire_controls/oled.js";
@@ -11,12 +13,16 @@ import { MidiDispatcher } from "./midi_dispatcher.js";
 import { TrackHead } from "./fire_controls/track_head.js";
 import { TransportControls } from "./fire_controls/transport.js";
 import { DialControls, dialCallback } from "./fire_controls/dials.js";
+import { ButtonControls, ButtonCode } from "./fire_controls/buttons.js";
 
 export let dispatcher: MidiDispatcher;
+
+
 
 let firePads: PadControls;
 let oled: OledScreen;
 let dials: DialControls;
+let buttons: ButtonControls;
 
 type voidcallback = () => void;
 
@@ -99,6 +105,90 @@ export function setupDials({
     onSelect: onSelect
   });
 }
+
+export function setupButtons(
+  {
+    browser,
+    patternUp,
+    patternDown,
+    gridLeft,
+    gridRight,
+    step,
+    note,
+    drum,
+    perform,
+    shift,
+    alt,
+    pattern
+  }:
+    {
+      browser: voidcallback,
+      patternUp: voidcallback,
+      patternDown: voidcallback,
+      gridLeft: voidcallback,
+      gridRight: voidcallback,
+      step: voidcallback,
+      note: voidcallback,
+      drum: voidcallback,
+      perform: voidcallback,
+      shift: voidcallback,
+      alt: voidcallback,
+      pattern: voidcallback
+    }
+) {
+
+  buttons = new ButtonControls(
+    {
+      midi: dispatcher,
+      onButton: (code: ButtonCode) => {
+        switch (code) {
+          case ButtonCode.Browser:
+            browser();
+            break;
+          case ButtonCode.PatternUp:
+            patternUp();
+            break;
+          case ButtonCode.PatternDown:
+            patternDown();
+            break;
+          case ButtonCode.GridLeft:
+            gridLeft();
+            break;
+          case ButtonCode.GridRight:
+            gridRight();
+            break;
+          case ButtonCode.Step:
+            step();
+            break;
+          case ButtonCode.Note:
+            note();
+            break;
+          case ButtonCode.Drum:
+            drum();
+            break;
+          case ButtonCode.Perform:
+            perform();
+            break;
+          case ButtonCode.Shift:
+            shift();
+            break;
+          case ButtonCode.Alt:
+            alt();
+            break;
+          case ButtonCode.Pattern:
+            pattern();
+            break;
+        }
+      }
+    }
+  );
+  return {
+    buttonLedOn: (button: number, colour?: number) => {
+      buttons.buttonOn(button, colour);
+    }
+  };
+}
+
 
 function oledHeading(heading: string) {
   oled.heading(heading);

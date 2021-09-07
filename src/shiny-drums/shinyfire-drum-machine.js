@@ -7,7 +7,7 @@ import {
 
 import { Beat, Player, Kit, Effect } from './shiny-drum-machine-audio.js';
 
-import { getMidi, setupTransport, setupPads, setupOled, setupDials, allOff } from '/dist/firemidi.js';
+import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons, allOff } from '/dist/firemidi.js';
 
 import { instrumentIndexed, instrumentRows, noteColours } from './ui_config.js'
 
@@ -25,6 +25,7 @@ let kit;
 let oled;
 let dials;
 let menu;
+let buttons;
 const KITS = [];
 const EFFECTS = [];
 
@@ -111,6 +112,14 @@ function initControls() {
         }
       }
     );
+    buttons = setupButtons(
+      {
+        browser: () => console.log('shiny browser button'),
+        patternUp: () => console.log('shiny patternup button'),
+        shift: () => console.log('shiny shift button')
+      }
+    );
+
     allOff();
   }
 }
