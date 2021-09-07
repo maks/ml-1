@@ -108,7 +108,6 @@ function initControls() {
           } else if (dir == 1) {
             theBeat.effectMix = Math.min(1.0, theBeat.effectMix + 0.01);
           }
-          console.log('fx:' + theBeat.effectMix);
           player.updateEffect();
         },
         onFilter: () => { },
@@ -242,7 +241,6 @@ class MenuController {
       } else {
         theBeat.tempo = Math.min(MAX_TEMPO, theBeat.tempo + increment);
       }
-      console.log('tempo:' + theBeat.tempo)
     } else {
       if (left) {
         this._selectedIndex = (this._selectedIndex == 0) ? 0 : this._selectedIndex - 1;
