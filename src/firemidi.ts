@@ -140,43 +140,43 @@ export function setupButtons(
   buttons = new ButtonControls(
     {
       midi: dispatcher,
-      onButton: (code: ButtonCode) => {
+      onButton: (code: ButtonCode, up: boolean) => {
         switch (code) {
           case ButtonCode.Browser:
-            browser();
+            browser(up);
             break;
           case ButtonCode.PatternUp:
-            patternUp();
+            patternUp(up);
             break;
           case ButtonCode.PatternDown:
-            patternDown();
+            patternDown(up);
             break;
           case ButtonCode.GridLeft:
-            gridLeft();
+            gridLeft(up);
             break;
           case ButtonCode.GridRight:
-            gridRight();
+            gridRight(up);
             break;
           case ButtonCode.Step:
-            step();
+            step(up);
             break;
           case ButtonCode.Note:
-            note();
+            note(up);
             break;
           case ButtonCode.Drum:
-            drum();
+            drum(up);
             break;
           case ButtonCode.Perform:
-            perform();
+            perform(up);
             break;
           case ButtonCode.Shift:
-            shift();
+            shift(up);
             break;
           case ButtonCode.Alt:
-            alt();
+            alt(up);
             break;
           case ButtonCode.Pattern:
-            pattern();
+            pattern(up);
             break;
         }
       }

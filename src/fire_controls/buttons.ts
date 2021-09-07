@@ -16,7 +16,7 @@ export enum ButtonCode {
   Pattern = CCInputs.pattern
 }
 
-type OnButtonCallback = (button: ButtonCode) => void;
+type OnButtonCallback = (button: ButtonCode, up: boolean) => void;
 
 // all the buttons not transport controls or pad grid
 export class ButtonControls {
@@ -44,7 +44,9 @@ export class ButtonControls {
     if (data[1] >= CCInputs.patternUp && data[1] <= CCInputs.pattern) {
       // only handle button down for now
       if (data[0] == CCInputs.buttonDown) {
-        this.buttonListener(data[1]);
+        this.buttonListener(data[1], false);
+      } else {
+        this.buttonListener(data[1], true);
       }
     }
   }

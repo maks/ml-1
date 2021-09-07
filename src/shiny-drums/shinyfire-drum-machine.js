@@ -124,9 +124,12 @@ function initControls() {
     );
     buttons = setupButtons(
       {
-        browser: () => console.log('shiny browser button'),
-        patternUp: () => console.log('shiny patternup button'),
-        shift: () => console.log('shiny shift button')
+        browser: (_) => console.log('shiny browser button'),
+        patternUp: (_) => console.log('shiny patternup button'),
+        shift: (up) => {
+          console.log('shiny shift button up:' + up)
+          shiftON = !up;
+        }
       }
     );
 
@@ -233,11 +236,11 @@ class MenuController {
     const left = (dir == 0);
     console.log('menu left:' + left);
     if (this._editIndex != -1) {
-      // hard bpm for now
+      const increment = shiftON ? 10 : 1;
       if (left) {
-        theBeat.tempo = Math.max(MIN_TEMPO, theBeat.tempo - 1);
+        theBeat.tempo = Math.max(MIN_TEMPO, theBeat.tempo - increment);
       } else {
-        theBeat.tempo = Math.min(MAX_TEMPO, theBeat.tempo + 1);
+        theBeat.tempo = Math.min(MAX_TEMPO, theBeat.tempo + increment);
       }
       console.log('tempo:' + theBeat.tempo)
     } else {
