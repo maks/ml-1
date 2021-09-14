@@ -29,7 +29,11 @@ let buttons;
 const KITS = [];
 const EFFECTS = [];
 
-let shiftON = false;
+
+// Drum machine UI and control state
+let _shiftON = false;
+let _isPlaying = false;
+
 
 function loadAssets() {
   // Any assets which have previously started loading will be skipped over.
@@ -72,7 +76,6 @@ function init() {
   KITS.push(...KIT_DATA.map(({ id, name }, i) => new Kit(id, name, i)));
 
   theBeat = new Beat(RESET_BEAT, KITS, EFFECTS);
-
   player = new Player(theBeat, onNextBeat);
 
   initControls();
@@ -127,7 +130,7 @@ function initControls() {
         patternUp: (_) => console.log('shiny patternup button'),
         shift: (up) => {
           console.log('shiny shift button up:' + up)
-          shiftON = !up;
+          _shiftON = !up;
         }
       }
     );
@@ -205,8 +208,13 @@ async function setEffect(index) {
 }
 
 function handlePlay() {
-  console.log('handle play');
-  player.play();
+  if (_isPlaying) {
+    player.stop();
+    _isPlaying = false;
+  } else {
+    player.play();
+    _isPlaying = true;
+  }
 }
 
 function handleStop() {
@@ -235,7 +243,7 @@ class MenuController {
     const left = (dir == 0);
     console.log('menu left:' + left);
     if (this._editIndex != -1) {
-      const increment = shiftON ? 10 : 1;
+      const increment = _shiftON ? 10 : 1;
       if (left) {
         theBeat.tempo = Math.max(MIN_TEMPO, theBeat.tempo - increment);
       } else {
