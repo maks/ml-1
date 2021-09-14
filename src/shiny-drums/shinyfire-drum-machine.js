@@ -33,6 +33,7 @@ const EFFECTS = [];
 // Drum machine UI and control state
 let _shiftON = false;
 let _isPlaying = false;
+let _editTempoMode = false;
 
 
 function loadAssets() {
@@ -117,7 +118,9 @@ function initControls() {
         onResonance: () => { },
         onSelect: (dir) => {
           if (dir == 2 || dir == 3) {
-            menu.onSelect();
+            if (dir == 2) {
+              menu.onSelect();
+            }
           } else {
             menu.onDial(dir);
           }
@@ -126,11 +129,15 @@ function initControls() {
     );
     buttons = setupButtons(
       {
-        browser: (_) => console.log('shiny browser button'),
+        browser: (_) => menu.onBack(),
         patternUp: (_) => console.log('shiny patternup button'),
         shift: (up) => {
           console.log('shiny shift button up:' + up)
           _shiftON = !up;
+        },
+        pattern: (up) => {
+          console.log('pattern:' + up)
+          _editTempoMode = !up;
         }
       }
     );
@@ -228,7 +235,6 @@ function handleRecord() {
 }
 
 class MenuController {
-  _editIndex = -1;
   _selectedIndex = 0;
 
   get _topMenuItems() {
@@ -242,7 +248,7 @@ class MenuController {
   onDial(dir) {
     const left = (dir == 0);
     console.log('menu left:' + left);
-    if (this._editIndex != -1) {
+    if (_editTempoMode) {
       const increment = _shiftON ? 10 : 1;
       if (left) {
         theBeat.tempo = Math.max(MIN_TEMPO, theBeat.tempo - increment);
@@ -262,7 +268,11 @@ class MenuController {
 
   onSelect() {
     console.log('menu select:' + this._selectedIndex);
-    this._editIndex = this._selectedIndex;
+    if (this._selectedIndex == 0 && !_editTempoMode) {
+      _editTempoMode = true;
+    } else {
+      _editTempoMode = false;
+    }
   }
 
   onBack() {
