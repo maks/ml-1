@@ -37,14 +37,11 @@ export class OledScreen {
 
   private drawText(oledBitmap: Oled, line: number = 0, highlight: boolean, text: string) {
     this.oledBitmap.setCursor(0, (7 * line));
+
+    // line background to highlight whole of selected line
+    this.oledBitmap.fillRect(0, (7 * line), 128, 7, highlight);
+
     this.oledBitmap.writeString(font, 1, text, !highlight, true, 1);
     sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
   }
-
-  // testDraw() {
-  //   oledBitmap.clear();
-  //   oledBitmap.setCursor(20, 20);
-  //   oledBitmap.drawRect(0, 0, 30, 40, true);
-  //   sendSysexBitmap(this.midiOutput, oledBitmap.bitmap);
-  // }
 }

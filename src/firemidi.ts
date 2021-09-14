@@ -25,6 +25,7 @@ let dials: DialControls;
 let buttons: ButtonControls;
 
 type voidcallback = () => void;
+type boolcallback = (dir: boolean) => void;
 
 //TODO: make config param in future
 const BAR_LENGTH = 16;
@@ -122,18 +123,18 @@ export function setupButtons(
     pattern
   }:
     {
-      browser: voidcallback,
-      patternUp: voidcallback,
-      patternDown: voidcallback,
-      gridLeft: voidcallback,
-      gridRight: voidcallback,
-      step: voidcallback,
-      note: voidcallback,
-      drum: voidcallback,
-      perform: voidcallback,
-      shift: voidcallback,
-      alt: voidcallback,
-      pattern: voidcallback
+      browser: boolcallback,
+      patternUp: boolcallback,
+      patternDown: boolcallback,
+      gridLeft: boolcallback,
+      gridRight: boolcallback,
+      step: boolcallback,
+      note: boolcallback,
+      drum: boolcallback,
+      perform: boolcallback,
+      shift: boolcallback,
+      alt: boolcallback,
+      pattern: boolcallback
     }
 ) {
 
