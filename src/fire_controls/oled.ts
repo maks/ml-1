@@ -22,6 +22,10 @@ export class OledScreen {
     this.drawText(this.oledBitmap, line, highlight, text);
   }
 
+  bigText(text: string) {
+    this.drawBigCenteredText(this.oledBitmap, text);
+  }
+
   clear() {
     this.oledBitmap.clear();
   }
@@ -42,6 +46,12 @@ export class OledScreen {
     this.oledBitmap.fillRect(0, (7 * line), 128, 7, highlight);
 
     this.oledBitmap.writeString(font, 1, text, !highlight, true, 1);
+    sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
+  }
+
+  private drawBigCenteredText(oledBitmap: Oled, text: string) {
+    this.oledBitmap.setCursor(20, 20);
+    this.oledBitmap.writeString(font, 4, text, true, false, 1);
     sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
   }
 }

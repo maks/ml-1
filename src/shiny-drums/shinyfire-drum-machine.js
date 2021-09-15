@@ -138,6 +138,10 @@ function initControls() {
         pattern: (up) => {
           console.log('pattern:' + up)
           _editTempoMode = !up;
+          if (up) {
+            // need to repaint showing menu
+            menu.updateOled();
+          }
         }
       }
     );
@@ -281,9 +285,14 @@ class MenuController {
   }
 
   updateOled() {
-    for (let i = 0; i < this._topMenuItems.length; i++) {
-      let highlight = (i == this._selectedIndex)
-      oled.text(i, this._topMenuItems[i], highlight);
+    oled.clear();
+    if (_editTempoMode) {
+      oled.big(`${theBeat.tempo}`);
+    } else {
+      for (let i = 0; i < this._topMenuItems.length; i++) {
+        let highlight = (i == this._selectedIndex)
+        oled.text(i, this._topMenuItems[i], highlight);
+      }
     }
   }
 }

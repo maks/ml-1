@@ -57,7 +57,9 @@ export function setupOled() {
     oled = new OledScreen(midiOutput);
     return {
         heading: oledHeading,
-        text: oledText
+        text: oledText,
+        clear: oledClear,
+        big: oledBigText
     };
 }
 export function setupDials({ onVolume, onPan, onFilter, onResonance, onSelect }) {
@@ -125,6 +127,12 @@ function oledHeading(heading) {
 }
 function oledText(line, text, highlight) {
     oled.textline(line, highlight !== null && highlight !== void 0 ? highlight : false, text);
+}
+function oledClear() {
+    oled.clear();
+}
+function oledBigText(text) {
+    oled.bigText(text);
 }
 // export function testsolo(track: number) {
 //   firePads.rowButtonLed(track, RowButtonState.Off)

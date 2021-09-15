@@ -14,6 +14,9 @@ export class OledScreen {
     textline(line, highlight, text) {
         this.drawText(this.oledBitmap, line, highlight, text);
     }
+    bigText(text) {
+        this.drawBigCenteredText(this.oledBitmap, text);
+    }
     clear() {
         this.oledBitmap.clear();
     }
@@ -29,6 +32,11 @@ export class OledScreen {
         // line background to highlight whole of selected line
         this.oledBitmap.fillRect(0, (7 * line), 128, 7, highlight);
         this.oledBitmap.writeString(font, 1, text, !highlight, true, 1);
+        sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
+    }
+    drawBigCenteredText(oledBitmap, text) {
+        this.oledBitmap.setCursor(20, 20);
+        this.oledBitmap.writeString(font, 4, text, true, false, 1);
         sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
     }
 }

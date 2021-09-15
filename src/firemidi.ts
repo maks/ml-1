@@ -79,7 +79,9 @@ export function setupOled() {
   oled = new OledScreen(midiOutput);
   return {
     heading: oledHeading,
-    text: oledText
+    text: oledText,
+    clear: oledClear,
+    big: oledBigText
   };
 }
 
@@ -197,6 +199,14 @@ function oledHeading(heading: string) {
 
 function oledText(line: number, text: string, highlight?: boolean) {
   oled.textline(line, highlight ?? false, text);
+}
+
+function oledClear() {
+  oled.clear();
+}
+
+function oledBigText(text: string) {
+  oled.bigText(text);
 }
 
 // export function testsolo(track: number) {
