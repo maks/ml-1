@@ -60,13 +60,11 @@ function loadDemos(onDemoLoaded) {
   }
 }
 
-// This gets rid of the loading spinner in each of the demo buttons.
 function onDemoLoaded(demoIndex) {
   console.log('Demo loaded:' + demoIndex);
 
-  // Enable play button and assign it to demo 2.
-  if (demoIndex == 3) {
-    loadBeat(DEMO_BEATS[3]);
+  if (demoIndex == 1) {
+    loadBeat(DEMO_BEATS[demoIndex]);
   }
 }
 
@@ -107,15 +105,25 @@ function initControls() {
       {
         onVolume: (dir) => { console.log('vol:' + dir) },
         onPan: (dir) => {
+
+        },
+        onFilter: (dir) => { },
+        onResonance: (dir) => {
           if (dir == 0) {
             theBeat.effectMix = Math.max(0, theBeat.effectMix - 0.01);
           } else if (dir == 1) {
             theBeat.effectMix = Math.min(1.0, theBeat.effectMix + 0.01);
           }
           player.updateEffect();
+
+          oled.clear();
+          oled.big(`${theBeat.effectMix.toFixed(2)}`);
+
+          // button up
+          if (dir == 3) {
+            menu.updateOled();
+          }
         },
-        onFilter: () => { },
-        onResonance: () => { },
         onSelect: (dir) => {
           if (dir == 2 || dir == 3) {
             if (dir == 2) {
@@ -132,7 +140,6 @@ function initControls() {
         browser: (_) => menu.onBack(),
         patternUp: (_) => console.log('shiny patternup button'),
         shift: (up) => {
-          console.log('shiny shift button up:' + up)
           _shiftON = !up;
         },
         pattern: (up) => {
@@ -146,6 +153,7 @@ function initControls() {
       }
     );
 
+    // clear all now that we have finished init
     allOff();
   }
 }
