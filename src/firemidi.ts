@@ -17,8 +17,6 @@ import { ButtonControls, ButtonCode } from "./fire_controls/buttons.js";
 
 export let dispatcher: MidiDispatcher;
 
-
-
 let firePads: PadControls;
 let oled: OledScreen;
 let dials: DialControls;
@@ -81,7 +79,8 @@ export function setupOled() {
     heading: oledHeading,
     text: oledText,
     clear: oledClear,
-    big: oledBigText
+    big: oledBigText,
+    bigTitled: oledBigWithTitle,
   };
 }
 
@@ -207,6 +206,11 @@ function oledClear() {
 
 function oledBigText(text: string) {
   oled.bigText(text);
+}
+
+function oledBigWithTitle(title: string, value: string) {
+  oled.heading(title);
+  oled.bigText(value);
 }
 
 // export function testsolo(track: number) {

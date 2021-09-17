@@ -59,7 +59,8 @@ export function setupOled() {
         heading: oledHeading,
         text: oledText,
         clear: oledClear,
-        big: oledBigText
+        big: oledBigText,
+        bigTitled: oledBigWithTitle,
     };
 }
 export function setupDials({ onVolume, onPan, onFilter, onResonance, onSelect }) {
@@ -133,6 +134,10 @@ function oledClear() {
 }
 function oledBigText(text) {
     oled.bigText(text);
+}
+function oledBigWithTitle(title, value) {
+    oled.heading(title);
+    oled.bigText(value);
 }
 // export function testsolo(track: number) {
 //   firePads.rowButtonLed(track, RowButtonState.Off)

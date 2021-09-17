@@ -117,7 +117,7 @@ function initControls() {
           player.updateEffect();
 
           oled.clear();
-          oled.big(`${theBeat.effectMix.toFixed(2)}`);
+          oled.bigTitled("FX", `${theBeat.effectMix.toFixed(2)}`);
 
           // button up
           if (dir == 3) {
@@ -295,7 +295,7 @@ class MenuController {
   updateOled() {
     oled.clear();
     if (_editTempoMode) {
-      oled.big(`${theBeat.tempo}`);
+      oled.bigTitled("BPM", `${theBeat.tempo}`);
     } else {
       for (let i = 0; i < this._topMenuItems.length; i++) {
         let highlight = (i == this._selectedIndex)
