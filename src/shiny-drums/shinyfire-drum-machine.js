@@ -103,7 +103,20 @@ function initControls() {
     menu = new MenuController();
     dials = setupDials(
       {
-        onVolume: (dir) => { console.log('vol:' + dir) },
+        onVolume: (dir) => {
+          // console.log('d:' + dir);
+          if (dir == 0) {
+            player.masterGainNode.gain.value = Math.max(0, player.masterGainNode.gain.value - 0.01);
+          } else if (dir == 1) {
+            player.masterGainNode.gain.value = Math.min(1.0, player.masterGainNode.gain.value + 0.01);
+          }
+          oled.clear();
+          oled.bigTitled("VOL", `${player.masterGainNode.gain.value.toFixed(2)}`);
+          // button up
+          if (dir == 3) {
+            menu.updateOled();
+          }
+        },
         onPan: (dir) => {
 
         },
@@ -187,7 +200,7 @@ function updateControls() {
 
   // for (const instrument of INSTRUMENTS) {
   //   ui.pitchSliders.setPitch(instrument.name,
-  //       theBeat.getPitch(instrument.name));
+  //       theBeat.getPitch(instrument.name));m
   // }
 }
 
@@ -217,7 +230,7 @@ function handleNoteClick(index) {
   player.playNote(instrument, rhythmIndex);
 }
 
-async function setEffect(index) {
+async function setCurrentEffect(index) {
   const effect = EFFECTS[index];
   await effect.load();
 
@@ -237,7 +250,6 @@ function handlePlay() {
 }
 
 function handleStop() {
-  console.log('handle stop');
   player.stop();
   padControl.resetBeat();
 }
@@ -252,14 +264,14 @@ class MenuController {
   get _topMenuItems() {
     return [
       `BPM:${theBeat.tempo}`,
-      `FX:${theBeat.effect.name}`,
-      `Kit:${kit.prettyName}`
+      `Kit:${kit.prettyName}`,
+      `Swing:${theBeat.swingFactor}`,
+      `FX:${theBeat.effect.name}`
     ];
   }
 
   onDial(dir) {
     const left = (dir == 0);
-    console.log('menu left:' + left);
     if (_editTempoMode) {
       const increment = _shiftON ? 10 : 1;
       if (left) {
