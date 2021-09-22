@@ -14,6 +14,7 @@ import { TrackHead } from "./fire_controls/track_head.js";
 import { TransportControls } from "./fire_controls/transport.js";
 import { DialControls, dialCallback } from "./fire_controls/dials.js";
 import { ButtonControls, ButtonCode } from "./fire_controls/buttons.js";
+import { sendSysexBitmap } from "./fire_raw/fire_oled.js";
 
 export let dispatcher: MidiDispatcher;
 
@@ -81,6 +82,7 @@ export function setupOled() {
     clear: oledClear,
     big: oledBigText,
     bigTitled: oledBigWithTitle,
+    send: oledSendBitmap,
   };
 }
 
@@ -121,7 +123,11 @@ export function setupButtons(
     perform,
     shift,
     alt,
-    pattern
+    pattern,
+    solomute1,
+    solomute2,
+    solomute3,
+    solomute4
   }:
     {
       browser: boolcallback,
@@ -135,7 +141,11 @@ export function setupButtons(
       perform: boolcallback,
       shift: boolcallback,
       alt: boolcallback,
-      pattern: boolcallback
+      pattern: boolcallback,
+      solomute1: boolcallback,
+      solomute2: boolcallback,
+      solomute3: boolcallback,
+      solomute4: boolcallback,
     }
 ) {
 
@@ -180,6 +190,18 @@ export function setupButtons(
           case ButtonCode.Pattern:
             pattern(up);
             break;
+          case ButtonCode.SoloMute1:
+            solomute1(up);
+            break;
+          case ButtonCode.SoloMute2:
+            solomute2(up);
+            break;
+          case ButtonCode.SoloMute3:
+            solomute3(up);
+            break;
+          case ButtonCode.SoloMute4:
+            solomute4(up);
+            break;
         }
       }
     }
@@ -190,7 +212,6 @@ export function setupButtons(
     }
   };
 }
-
 
 function oledHeading(heading: string) {
   oled.heading(heading);
@@ -208,15 +229,14 @@ function oledBigText(text: string) {
   oled.bigText(text);
 }
 
+function oledSendBitmap() {
+  oled.sendBitmap();
+}
+
 function oledBigWithTitle(title: string, value: string) {
   oled.heading(title);
   oled.bigText(value);
 }
-
-// export function testsolo(track: number) {
-//   firePads.rowButtonLed(track, RowButtonState.Off)
-// }
-
 
 export function getMidi(midiReadyCallback: () => void) {
   navigator.requestMIDIAccess({ sysex: true })

@@ -61,6 +61,7 @@ export function setupOled() {
         clear: oledClear,
         big: oledBigText,
         bigTitled: oledBigWithTitle,
+        send: oledSendBitmap,
     };
 }
 export function setupDials({ onVolume, onPan, onFilter, onResonance, onSelect }) {
@@ -73,7 +74,7 @@ export function setupDials({ onVolume, onPan, onFilter, onResonance, onSelect })
         onSelect: onSelect
     });
 }
-export function setupButtons({ browser, patternUp, patternDown, gridLeft, gridRight, step, note, drum, perform, shift, alt, pattern }) {
+export function setupButtons({ browser, patternUp, patternDown, gridLeft, gridRight, step, note, drum, perform, shift, alt, pattern, solomute1, solomute2, solomute3, solomute4 }) {
     buttons = new ButtonControls({
         midi: dispatcher,
         onButton: (code, up) => {
@@ -114,6 +115,18 @@ export function setupButtons({ browser, patternUp, patternDown, gridLeft, gridRi
                 case ButtonCode.Pattern:
                     pattern(up);
                     break;
+                case ButtonCode.SoloMute1:
+                    solomute1(up);
+                    break;
+                case ButtonCode.SoloMute2:
+                    solomute2(up);
+                    break;
+                case ButtonCode.SoloMute3:
+                    solomute3(up);
+                    break;
+                case ButtonCode.SoloMute4:
+                    solomute4(up);
+                    break;
             }
         }
     });
@@ -135,13 +148,13 @@ function oledClear() {
 function oledBigText(text) {
     oled.bigText(text);
 }
+function oledSendBitmap() {
+    oled.sendBitmap();
+}
 function oledBigWithTitle(title, value) {
     oled.heading(title);
     oled.bigText(value);
 }
-// export function testsolo(track: number) {
-//   firePads.rowButtonLed(track, RowButtonState.Off)
-// }
 export function getMidi(midiReadyCallback) {
     navigator.requestMIDIAccess({ sysex: true })
         .then(function (midiAccess) {

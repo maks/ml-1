@@ -13,6 +13,10 @@ export var ButtonCode;
     ButtonCode[ButtonCode["Shift"] = CCInputs.shift] = "Shift";
     ButtonCode[ButtonCode["Alt"] = CCInputs.alt] = "Alt";
     ButtonCode[ButtonCode["Pattern"] = CCInputs.pattern] = "Pattern";
+    ButtonCode[ButtonCode["SoloMute1"] = CCInputs.muteButton1] = "SoloMute1";
+    ButtonCode[ButtonCode["SoloMute2"] = CCInputs.muteButton2] = "SoloMute2";
+    ButtonCode[ButtonCode["SoloMute3"] = CCInputs.muteButton3] = "SoloMute3";
+    ButtonCode[ButtonCode["SoloMute4"] = CCInputs.muteButton4] = "SoloMute4";
 })(ButtonCode || (ButtonCode = {}));
 // all the buttons not transport controls or pad grid
 export class ButtonControls {

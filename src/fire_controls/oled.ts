@@ -1,17 +1,27 @@
 import { font5x7 } from "../oled/oled_font57.js";
-import { Oled } from "../oled/mono_canvas.js";
+import { MonoCanvas } from "../oled/mono_canvas.js";
 import { sendSysexBitmap } from "../fire_raw/fire_oled.js";
+
+export interface CustomWindow extends Window {
+  setOledSim: any;
+}
+
+declare let window: CustomWindow;
 
 const lineHeight = 8;
 const font = font5x7;
+const HIEGHT = 64;
+const WIDTH = 128;
+
+const debugOledHtml = true;
 
 export class OledScreen {
   midiOutput: WebMidi.MIDIOutput;
-  oledBitmap: Oled;
+  oledBitmap: MonoCanvas;
 
   constructor(midiOutput: WebMidi.MIDIOutput) {
     this.midiOutput = midiOutput;
-    this.oledBitmap = new Oled(64, 128);
+    this.oledBitmap = new MonoCanvas(HIEGHT, WIDTH);
   }
 
   heading(heading: string) {
@@ -19,40 +29,46 @@ export class OledScreen {
   }
 
   textline(line: number, highlight: boolean, text: string) {
-    this.drawText(this.oledBitmap, line, highlight, text);
+    const lineY = (font.height * line);
+    this.oledBitmap.setCursor(0, lineY);
+    // line background to highlight whole of selected line
+    this.oledBitmap.fillRect(0, lineY, WIDTH, font.height, highlight);
+    this.oledBitmap.writeString(font, 1, text, !highlight);
+    const bitmap = this.oledBitmap.bitmap();
   }
 
   bigText(text: string) {
-    this.drawBigCenteredText(this.oledBitmap, text);
+    const bigFontSize = 4;
+    this.oledBitmap.setCursor(20, (font.height * 3) + 2);
+    this.oledBitmap.writeString(font, bigFontSize, text, true);
+    sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap());
+    this._sendToHtmlOled();
+  }
+
+  sendBitmap() {
+    const bitmap = this.oledBitmap.bitmap();
+    sendSysexBitmap(this.midiOutput, bitmap);
+    this._sendToHtmlOled();
   }
 
   clear() {
     this.oledBitmap.clear();
   }
 
-  private drawHeading(oledBitmap: Oled, heading: string) {
+  drawHeading(oledBitmap: MonoCanvas, heading: string) {
     let vertical_padding = 1;
     this.oledBitmap.setCursor(0, vertical_padding);
-    this.oledBitmap.fillRect(0, 0, 128, (font.height * 2) + (vertical_padding * 3), true);
-    this.oledBitmap.writeString(font, 2, heading, false, true, 1);
+    this.oledBitmap.fillRect(0, 0, WIDTH, (font.height * 2) + (vertical_padding * 3), true);
+    this.oledBitmap.writeString(font, 2, heading, false);
     this.oledBitmap.setCursor(0, lineHeight);
 
-    sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
+    sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap());
+    this._sendToHtmlOled();
   }
 
-  private drawText(oledBitmap: Oled, line: number = 0, highlight: boolean, text: string) {
-    this.oledBitmap.setCursor(0, (font.height * line));
-
-    // line background to highlight whole of selected line
-    this.oledBitmap.fillRect(0, (font.height * line), 128, font.height, highlight);
-
-    this.oledBitmap.writeString(font, 1, text, !highlight, true, 1);
-    sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
-  }
-
-  private drawBigCenteredText(oledBitmap: Oled, text: string) {
-    this.oledBitmap.setCursor(20, (font.height * 3) + 2);
-    this.oledBitmap.writeString(font, 4, text, true, false, 1);
-    sendSysexBitmap(this.midiOutput, this.oledBitmap.bitmap);
+  private _sendToHtmlOled() {
+    if (debugOledHtml) {
+      window.setOledSim(this.oledBitmap.bitmap());
+    }
   }
 }

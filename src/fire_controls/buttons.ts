@@ -13,7 +13,11 @@ export enum ButtonCode {
   Perform = CCInputs.perform,
   Shift = CCInputs.shift,
   Alt = CCInputs.alt,
-  Pattern = CCInputs.pattern
+  Pattern = CCInputs.pattern,
+  SoloMute1 = CCInputs.muteButton1,
+  SoloMute2 = CCInputs.muteButton2,
+  SoloMute3 = CCInputs.muteButton3,
+  SoloMute4 = CCInputs.muteButton4,
 }
 
 type OnButtonCallback = (button: ButtonCode, up: boolean) => void;

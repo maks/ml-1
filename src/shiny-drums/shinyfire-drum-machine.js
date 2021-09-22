@@ -34,7 +34,8 @@ const EFFECTS = [];
 let _shiftON = false;
 let _isPlaying = false;
 let _editTempoMode = false;
-
+let _editKitMode = false;
+let _selectedInstrumentIndex;
 
 function loadAssets() {
   // Any assets which have previously started loading will be skipped over.
@@ -104,38 +105,33 @@ function initControls() {
     dials = setupDials(
       {
         onVolume: (dir) => {
-          // console.log('d:' + dir);
-          if (dir == 0) {
-            player.masterGainNode.gain.value = Math.max(0, player.masterGainNode.gain.value - 0.01);
-          } else if (dir == 1) {
-            player.masterGainNode.gain.value = Math.min(1.0, player.masterGainNode.gain.value + 0.01);
-          }
-          oled.clear();
-          oled.bigTitled("VOL", `${player.masterGainNode.gain.value.toFixed(2)}`);
-          // button up
-          if (dir == 3) {
-            menu.updateOled();
-          }
+          console.log('d:' + dir);
+          handleDialInput(dir, player.masterGainNode.gain, "value", "VOL");
         },
         onPan: (dir) => {
 
         },
-        onFilter: (dir) => { },
-        onResonance: (dir) => {
-          if (dir == 0) {
-            theBeat.effectMix = Math.max(0, theBeat.effectMix - 0.01);
-          } else if (dir == 1) {
-            theBeat.effectMix = Math.min(1.0, theBeat.effectMix + 0.01);
+        onFilter: (dir) => {
+          let instrumentName = instrumentIndexed[_selectedInstrumentIndex];
+          if (instrumentName == null) {
+            return;
           }
-          player.updateEffect();
-
-          oled.clear();
-          oled.bigTitled("FX", `${theBeat.effectMix.toFixed(2)}`);
-
-          // button up
+          let pitch = theBeat.getPitch(instrumentName);
+          if (dir == 0) {
+            pitch = Math.max(0, pitch - 0.01);
+            theBeat.setPitch(instrumentName, pitch);
+          } else if (dir == 1) {
+            pitch = Math.min(3.0, pitch + 0.01);
+            theBeat.setPitch(instrumentName, pitch);
+          }
+          showOledLargeOverride(`${instrumentName}`, `${pitch.toFixed(2)}`);
           if (dir == 3) {
             menu.updateOled();
           }
+        },
+        onResonance: (dir) => {
+          handleDialInput(dir, theBeat, "effectMix", "FX");
+          player.updateEffect();
         },
         onSelect: (dir) => {
           if (dir == 2 || dir == 3) {
@@ -162,6 +158,18 @@ function initControls() {
             // need to repaint showing menu
             menu.updateOled();
           }
+        },
+        solomute1: (up) => {
+          _selectedInstrumentIndex = up ? null : 0;
+        },
+        solomute2: (up) => {
+          _selectedInstrumentIndex = up ? null : 1;
+        },
+        solomute3: (up) => {
+          _selectedInstrumentIndex = up ? null : 2;
+        },
+        solomute4: (up) => {
+          _selectedInstrumentIndex = up ? null : 3;
         }
       }
     );
@@ -200,7 +208,7 @@ function updateControls() {
 
   // for (const instrument of INSTRUMENTS) {
   //   ui.pitchSliders.setPitch(instrument.name,
-  //       theBeat.getPitch(instrument.name));m
+  //       theBeat.getPitch(instrument.name));
   // }
 }
 
@@ -258,6 +266,28 @@ function handleRecord() {
   console.log('handle record');
 }
 
+// handle dial input for a given param value, eg. volume, fx, etc
+// will clamp at 0 and 1.0, increments of 0.01
+function handleDialInput(dir, obj, prop, paramName) {
+  // button up
+  if (dir == 3) {
+    menu.updateOled();
+    return;
+  }
+
+  if (dir == 0) {
+    obj[prop] = Math.max(0, obj[prop] - 0.01);
+  } else if (dir == 1) {
+    obj[prop] = Math.min(1.0, obj[prop] + 0.01);
+  }
+  showOledLargeOverride(paramName, `${obj[prop].toFixed(2)}`);
+}
+
+function showOledLargeOverride(title, value) {
+  oled.clear();
+  oled.bigTitled(title, value);
+}
+
 class MenuController {
   _selectedIndex = 0;
 
@@ -266,7 +296,9 @@ class MenuController {
       `BPM:${theBeat.tempo}`,
       `Kit:${kit.prettyName}`,
       `Swing:${theBeat.swingFactor}`,
-      `FX:${theBeat.effect.name}`
+      `FX:${theBeat.effect.name}`,
+      'test1',
+      'test2'
     ];
   }
 
@@ -281,10 +313,9 @@ class MenuController {
       }
     } else {
       if (left) {
-        this._selectedIndex = (this._selectedIndex == 0) ? 0 : this._selectedIndex - 1;
+        this._selectedIndex = Math.max(0, this._selectedIndex - 1);
       } else {
-        this._selectedIndex = (this._selectedIndex == this._topMenuItems.length - 1) ? this._topMenuItems.length - 1
-          : this._selectedIndex + 1;
+        this._selectedIndex = Math.min(this._topMenuItems.length - 1, this._selectedIndex + 1);
       }
     }
     this.updateOled();
@@ -297,22 +328,43 @@ class MenuController {
     } else {
       _editTempoMode = false;
     }
+    if (this._selectedIndex == 1 && !_editKitMode) {
+      _editKitMode = true;
+      //TODO: use actual current kit index
+      this._selectedIndex = 0;
+    }
+    this.updateOled();
   }
 
   onBack() {
     console.log('menu back');
-    this._editIndex = -1;
+    _editKitMode = false;
+    _editTempoMode = false;
+    this.updateOled();
   }
 
   updateOled() {
     oled.clear();
+    console.log('editkit:' + _editKitMode);
+
     if (_editTempoMode) {
       oled.bigTitled("BPM", `${theBeat.tempo}`);
+    } else if (_editKitMode) {
+      const len = KITS.length;
+      for (let i = 0; i < len; i++) {
+        let highlight = (i == this._selectedIndex)
+        console.log(KITS[i])
+        oled.text(i, KITS[i].prettyName, highlight);
+      }
+      // make sure to send outside loop as too many send via sysex can overwhelm the Fire
+      oled.send();
     } else {
       for (let i = 0; i < this._topMenuItems.length; i++) {
         let highlight = (i == this._selectedIndex)
         oled.text(i, this._topMenuItems[i], highlight);
       }
+      // make sure to send outside loop as too many send via sysex can overwhelm the Fire
+      oled.send();
     }
   }
 }

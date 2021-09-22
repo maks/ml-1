@@ -1,5 +1,3 @@
-
-
 type Black = 0x00
 type White = 0x01
 type MonoChrome = Black | White

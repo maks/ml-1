@@ -13,51 +13,89 @@ type Monochrome = boolean
 type Pixel = [number, number, Monochrome]
 
 
-export class Oled {
+export class MonoCanvas {
   // Configuration
   private readonly HEIGHT: number
   private readonly WIDTH: number
 
   // State
-  public bitmap: Monochrome[];
+  private _bitmap: Monochrome[];
   private cursor_x: number
   private cursor_y: number
 
   public constructor(height: number, width: number) {
-    this.HEIGHT = height || 32
-    this.WIDTH = width || 128
+    this.HEIGHT = height
+    this.WIDTH = width
 
     this.cursor_x = 0
     this.cursor_y = 0
 
-    this.bitmap = new Array<Monochrome>(this.WIDTH * this.HEIGHT);
+    this._bitmap = new Array<Monochrome>(this.WIDTH * this.HEIGHT);
 
     const screenSize = `${this.WIDTH}x${this.HEIGHT}`
+    console.log('oled:' + screenSize);
+  }
+
+  public bitmap() {
+    return this._bitmap.map(x => x);
   }
 
   public clear() {
-    for (var i = 0; i < this.bitmap.length; i++) {
-      this.bitmap[i] = false;
+    for (let i = 0; i < this._bitmap.length; i++) {
+      this._bitmap[i] = false;
     }
   }
 
   /// draw single pixel
   private drawPixel(pixel: [number, number, Monochrome]) {
-    this.bitmap[pixel[0] + (this.WIDTH * pixel[1])] = pixel[2];
+    this._bitmap[pixel[0] + (this.WIDTH * pixel[1])] = pixel[2];
   }
 
   // set starting position of a text string on the oled
   public setCursor(x: number, y: number): void {
-    this.cursor_x = x
-    this.cursor_y = y
+    this.cursor_x = Math.round(Math.min(x, 127));
+    this.cursor_y = Math.round(Math.min(y, 63));
   }
 
   private _invertColor(color: Monochrome): Monochrome {
     return !color
   }
 
+  // write string to single line, truncate if exceeds screen width
+  public writeString(font: Font, size: number, string: string, color: Monochrome): void {
+    const letspace = 1;
+    let offset = this.cursor_x;
+    let padding = 0;
+    const lineY = this.cursor_y;
+
+    // loop through the array of each char to draw
+    for (let i = 0; i < string.length; i++) {
+      // look up the position of the char, pull out the buffer slice
+      const charBuf = this._findCharBuf(font, string[i])
+      // read the bits in the bytes that make up the char
+      const charBytes = this._readCharBytes(charBuf)
+      // draw the entire character
+      this._drawChar(font, charBytes, size, color)
+
+      // fills in background behind the text pixels so that it's easier to read the text
+      this.fillRect(offset - padding, this.cursor_y, padding, (font.height * size), this._invertColor(color))
+
+      // calc new x position for the next char, add a touch of padding too if it's a non space char
+      padding = (string[i] === ' ') ? 0 : size + letspace
+      offset += (font.width * size) + padding
+
+      // clip to max width
+      if (offset >= this.WIDTH - (font.width * size)) {
+        return;
+      }
+      // set the 'cursor' for the next char to be drawn, then loop again for next char
+      this.setCursor(offset, lineY);
+    }
+  }
+
+
   // write text to the oled
-  public writeString(font: Font, size: number, string: string, color: Monochrome, wrap: boolean, linespacing: number | null): void {
+  public writeStringFormatted(font: Font, size: number, string: string, color: Monochrome, wrap: boolean, linespacing: number | null): void {
     const wordArr = string.split(' ')
 
     const len = wordArr.length
@@ -100,7 +138,6 @@ export class Oled {
         // calc new x position for the next char, add a touch of padding too if it's a non space char
         padding = (stringArr[i] === ' ') ? 0 : size + letspace
         offset += (font.width * size) + padding
-
 
         // wrap letters if necessary
         if (wrap && (offset >= (this.WIDTH - font.width - letspace))) {
