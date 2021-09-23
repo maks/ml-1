@@ -290,6 +290,7 @@ function showOledLargeOverride(title, value) {
 
 class MenuController {
   _selectedIndex = 0;
+  _currentMaxIndex = this._topMenuItems.length;
 
   get _topMenuItems() {
     return [
@@ -315,7 +316,7 @@ class MenuController {
       if (left) {
         this._selectedIndex = Math.max(0, this._selectedIndex - 1);
       } else {
-        this._selectedIndex = Math.min(this._topMenuItems.length - 1, this._selectedIndex + 1);
+        this._selectedIndex = Math.min(this._currentMaxIndex - 1, this._selectedIndex + 1);
       }
     }
     this.updateOled();
@@ -332,6 +333,12 @@ class MenuController {
       _editKitMode = true;
       //TODO: use actual current kit index
       this._selectedIndex = 0;
+      this._currentMaxIndex = 8;
+    }
+    if (_editKitMode) {
+      kit = KITS[this._selectedIndex];
+      theBeat.kit = kit;
+      console.log('sel kit:' + kit);
     }
     this.updateOled();
   }
@@ -340,6 +347,8 @@ class MenuController {
     console.log('menu back');
     _editKitMode = false;
     _editTempoMode = false;
+    this._currentMaxIndex = this._topMenuItems.length;
+    this._selectedIndex = 1;
     this.updateOled();
   }
 
@@ -347,13 +356,16 @@ class MenuController {
     oled.clear();
     console.log('editkit:' + _editKitMode);
 
+    const MAX_LINES = 9;
+
     if (_editTempoMode) {
       oled.bigTitled("BPM", `${theBeat.tempo}`);
     } else if (_editKitMode) {
-      const len = KITS.length;
-      for (let i = 0; i < len; i++) {
+      const startIndex = 0;
+      const endIndex = 8;
+      for (let i = startIndex; i < endIndex; i++) {
         let highlight = (i == this._selectedIndex)
-        console.log(KITS[i])
+        // console.log(KITS[i])
         oled.text(i, KITS[i].prettyName, highlight);
       }
       // make sure to send outside loop as too many send via sysex can overwhelm the Fire
