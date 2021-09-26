@@ -241,6 +241,7 @@ function oledBigWithTitle(title: string, value: string) {
 export function getMidi(midiReadyCallback: () => void) {
   navigator.requestMIDIAccess({ sysex: true })
     .then(function (midiAccess) {
+      console.log("MIDI Access Ready, getting input, outputs...")
       const outputs = midiAccess.outputs.values();
       const inputs = midiAccess.inputs.values();
 
