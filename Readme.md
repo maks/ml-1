@@ -1,3 +1,36 @@
+# ML-1
+
+This is intended to be a "diy-groove" box project, using a RPI4 and a Akai Fire midicontroller.
+
+The intention is to run Chromium headless (using puppeteer to launch & control) on a headless RPI4, connected to the Fire and using a USB battery for power to make the complete setup standalong and easily transportable.
+
+Using Chromium gives easy access to Midi to interface with the Akai Fire (as well as other midi devices in future) as well as WebAudio API and WASM support in the new AudioWorklet API.
+
+## Status
+
+The initial version is implementing all the controls for the shiny-drum-machine and then to extend it a little, mainly around improving the sequencer functionality. Once the "drum machine" functionality is working, will move on to 
+
+
+## Features:
+
+- [x] connect to Fire via webmidi
+- [x] send bitmap to OLED with sysex from webmidi
+- [x] high level interface for Fire controlsurface
+- [ ] drum sequencer based on shiny-drum-machine
+- [ ] improved seq: upto 64 step, microtiming
+- [ ] control dx7 FM synth via Fire controls
+- [ ] OLED wave, spectrum visualiser
+- [ ] ADSR control-visualiser on OLED
+- [ ] midi sequencer
+- [ ] audio mixer
+- [ ] record/playback audio
+- [ ] audio looper
+- [ ] fx (using impulses from shiny-drum or tuna?)
+
+---
+## Trying it out
+
+
 To install dev server:
 ```
 yarn add --dev live-server
@@ -29,24 +62,6 @@ function testBitmap() {
   sendSysexBitmap(oled);
 }
 ```
----
-
-## Features:
-
-- [x] connect to Fire via webmidi
-- [x] send bitmap to OLED with sysex from webmidi
-- [x] high level interface for Fire controlsurface
-- [ ] drum sequencer based on shiny-drum-machine
-- [ ] improved seq: upto 64 step, microtiming
-- [ ] control dx7 FM synth via Fire controls
-- [ ] OLED wave, spectrum visualiser
-- [ ] ADSR control-visualiser on OLED
-- [ ] midi sequencer
-- [ ] audio mixer
-- [ ] record/playback audio
-- [ ] audio looper
-- [ ] fx (using impulses from shiny-drum or tuna?)
-
 ---
 
 ## Refs and notes
@@ -95,3 +110,7 @@ https://github.com/Tonejs/Tone.js/wiki/Performance
 
 https://github.com/googlecreativelab/chrome-music-lab
 https://googlechromelabs.github.io/web-audio-samples/dj/
+
+### License
+
+Various parts of this project are licensed per their original projects licenses. Original code for ML-1 is licensed under BSD license per the license file included in this git repo.
