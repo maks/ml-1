@@ -1,8 +1,8 @@
 # ML-1
 
-This is intended to be a "diy-groove" box project, using a RPI4 and a Akai Fire midicontroller.
+This is intended to be a "diy-groovebox" project, using a RPI4 and a Akai Fire midicontroller.
 
-The intention is to run Chromium headless (using puppeteer to launch & control) on a headless RPI4, connected to the Fire and using a USB battery for power to make the complete setup standalong and easily transportable.
+The intention is to run Chromium headless (using puppeteer to launch & control) on a headless RPI4, connected to the Fire and using a USB battery for power to make the complete setup standalone and portable.
 
 Using Chromium gives easy access to Midi to interface with the Akai Fire (as well as other midi devices in future) as well as WebAudio API and WASM support in the new AudioWorklet API.
 
@@ -12,6 +12,8 @@ The initial version is implementing all the controls for the shiny-drum-machine 
 
 
 ## Features:
+
+A rough roadmap of planned features:
 
 - [x] connect to Fire via webmidi
 - [x] send bitmap to OLED with sysex from webmidi

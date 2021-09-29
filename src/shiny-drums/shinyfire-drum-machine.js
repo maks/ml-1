@@ -11,6 +11,8 @@ import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons
 
 import { instrumentIndexed, instrumentRows, noteColours } from './ui_config.js'
 
+import { ListScreen } from '/dist/shiny-drums/screen_widgets.js'
+
 // Events
 // init() once the page has finished loading.
 window.onload = init;
@@ -289,19 +291,20 @@ function showOledLargeOverride(title, value) {
 }
 
 class MenuController {
-  _selectedIndex = 0;
-  _currentMaxIndex = this._topMenuItems.length;
+  _topMenu = new ListScreen(9, [
+    `BPM:${theBeat.tempo}`,
+    `Kit:${kit.prettyName}`,
+    `Swing:${theBeat.swingFactor}`,
+    `FX:${theBeat.effect.name}`,
+    'test1',
+    'test2',
+    'test3',
+    'test4',
+    'test5',
+    'test6'
+  ]);
 
-  get _topMenuItems() {
-    return [
-      `BPM:${theBeat.tempo}`,
-      `Kit:${kit.prettyName}`,
-      `Swing:${theBeat.swingFactor}`,
-      `FX:${theBeat.effect.name}`,
-      'test1',
-      'test2'
-    ];
-  }
+  get _currentMenu() { return this._topMenu; };
 
   onDial(dir) {
     const left = (dir == 0);
@@ -314,9 +317,9 @@ class MenuController {
       }
     } else {
       if (left) {
-        this._selectedIndex = Math.max(0, this._selectedIndex - 1);
+        this._currentMenu.prev();
       } else {
-        this._selectedIndex = Math.min(this._currentMaxIndex - 1, this._selectedIndex + 1);
+        this._currentMenu.next();
       }
     }
     this.updateOled();
@@ -332,8 +335,8 @@ class MenuController {
     if (this._selectedIndex == 1 && !_editKitMode) {
       _editKitMode = true;
       //TODO: use actual current kit index
-      this._selectedIndex = 0;
-      this._currentMaxIndex = 8;
+      // this._selectedIndex = 0;
+      // this._currentMaxIndex = 8;
     }
     if (_editKitMode) {
       kit = KITS[this._selectedIndex];
@@ -371,9 +374,10 @@ class MenuController {
       // make sure to send outside loop as too many send via sysex can overwhelm the Fire
       oled.send();
     } else {
-      for (let i = 0; i < this._topMenuItems.length; i++) {
-        let highlight = (i == this._selectedIndex)
-        oled.text(i, this._topMenuItems[i], highlight);
+      const items = this._currentMenu.visibleItems;
+      for (let i = 0; i < items.length; i++) {
+        let highlight = (i == this._currentMenu.viewportSelected)
+        oled.text(i, items[i], highlight);
       }
       // make sure to send outside loop as too many send via sysex can overwhelm the Fire
       oled.send();

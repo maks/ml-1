@@ -58,30 +58,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       Give permission
     </button>
   </div>
-<!-- based on code from https://eloquentjavascript.net/17_canvas.html -->
-<p>OLED:</p>
-<canvas width="512" height="256"></canvas>
-<script>
-  let canvas = document.querySelector("canvas");
-  let context = canvas.getContext("2d");
-  context.fillStyle = "black";
-  context.fillRect(0, 0, 512, 256);
+  <!-- based on code from https://eloquentjavascript.net/17_canvas.html -->
+  <p>OLED:</p>
+  <canvas width="512" height="256"></canvas>
+  <script>
+    let canvas = document.querySelector("canvas");
+    let context = canvas.getContext("2d");
+    context.fillStyle = "black";
+    context.fillRect(0, 0, 512, 256);
 
-  function setOledSim(bitmap) {
-    for (let i = 0; i < 8192; i++) {
-      let px = bitmap[i];
-      let x = i % 128;
-      let y = i / 128;
-      if (!px) {
-        context.fillStyle = "black";
-      } else {
-        context.fillStyle = "white";
+    function setOledSim(bitmap) {
+      for (let i = 0; i < 8192; i++) {
+        let px = bitmap[i];
+        let x = i % 128;
+        let y = Math.floor(i / 128);
+        if (!px) {
+          context.fillStyle = "black";
+        } else {
+          context.fillStyle = "white";
+        }
+        context.fillRect(x * 4, y * 4, 4, 4);
       }
-      context.fillRect(x * 4, y * 4, 4, 4);
     }
-  }
 
-</script>
+  </script>
 </body>
 
 </html>
