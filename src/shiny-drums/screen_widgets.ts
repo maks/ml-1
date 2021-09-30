@@ -1,4 +1,4 @@
-export type NumberCallback = (index: number) => void;
+export type NumberCallback = (val: number) => void;
 export type VoidCallback = () => void;
 
 export interface MenuScreen {
@@ -9,6 +9,50 @@ export interface MenuScreen {
   updateItems(items: string[]): void;
   get visibleItems(): string[];
   get viewportSelected(): number;
+}
+
+export class NumberOverlayScreen {
+  private _title: string;
+  private _value: number;
+  readonly _max: number;
+  readonly _min: number;
+  readonly _interval: number;
+  readonly _largeInterval: number;
+  private _onUpdate: NumberCallback;
+
+  constructor(title: string, value: number, max: number, min: number, interval: number, largeInterval: number, onUpdate: NumberCallback) {
+    this._title = title;
+    this._value = value;
+    this._max = max;
+    this._min = min;
+    this._interval = interval;
+    this._largeInterval = largeInterval;
+    this._onUpdate = onUpdate;
+  }
+
+  prev(mod?: boolean): void {
+    const increment = mod ? this._largeInterval : this._interval;
+    this._value = Math.max(this._min, this._value - increment);
+    this._onUpdate(this._value);
+  }
+
+  next(mod?: boolean): void {
+    const increment = mod ? this._largeInterval : this._interval;
+    this._value = Math.min(this._max, this._value + increment);
+    this._onUpdate(this._value);
+  }
+
+  get title(): string {
+    return this._title;
+  }
+
+  get value(): string {
+    return `${this._value.toFixed(2)}`;
+  }
+
+  set value(v) {
+    this.value = v;
+  }
 }
 
 export class ListScreen implements MenuScreen {
@@ -46,17 +90,17 @@ export class ListScreen implements MenuScreen {
     this._onRefresh();
   }
 
-  next() {
+  next(mod?: boolean) {
     this._selectedIndex = Math.min(this._items.length - 1, this._selectedIndex + 1);
     this._updateOffset();
   }
 
-  prev() {
+  prev(mod?: boolean) {
     this._selectedIndex = Math.max(0, this._selectedIndex - 1);
     this._updateOffset();
   }
 
-  select() {
+  select(mod?: boolean) {
     this._onSelected(this._selectedIndex);
   }
 

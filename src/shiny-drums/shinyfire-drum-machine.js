@@ -13,7 +13,7 @@ import { instrumentIndexed, instrumentRows, noteColours } from './ui_config.js'
 
 import { MenuController } from '/dist/menu/menu_controller.js'
 
-import { ListScreen } from '/dist/shiny-drums/screen_widgets.js'
+import { ListScreen, NumberOverlayScreen } from '/dist/shiny-drums/screen_widgets.js'
 
 
 // Events
@@ -144,11 +144,17 @@ function initControls() {
     menu = new MenuController(oled);
     menu.pushMenu(_topMenu);
 
+    const overlays = {
+      'volume': new NumberOverlayScreen(
+        "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; }
+      )
+    };
+
     dials = setupDials(
       {
         onVolume: (dir) => {
           console.log('d:' + dir);
-          handleDialInput(dir, player.masterGainNode.gain, "value", "VOL");
+          handleDialInput(dir, overlays["volume"]);
         },
         onPan: (dir) => {
 
@@ -308,24 +314,18 @@ function handleRecord() {
   console.log('handle record');
 }
 
-// handle dial input for a given param value, eg. volume, fx, etc
-// will clamp at 0 and 1.0, increments of 0.01
-function handleDialInput(dir, obj, prop, paramName) {
+
+function handleDialInput(dir, overlay) {
   // button up
   if (dir == 3) {
-    menu.updateOled();
+    menu.clearOverlay();
     return;
   }
 
   if (dir == 0) {
-    obj[prop] = Math.max(0, obj[prop] - 0.01);
+    overlay.prev();
   } else if (dir == 1) {
-    obj[prop] = Math.min(1.0, obj[prop] + 0.01);
+    overlay.next();
   }
-  showOledLargeOverride(paramName, `${obj[prop].toFixed(2)}`);
-}
-
-function showOledLargeOverride(title, value) {
-  oled.clear();
-  oled.bigTitled(title, value);
+  menu.setOverlay(overlay)
 }

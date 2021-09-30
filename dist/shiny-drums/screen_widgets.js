@@ -1,3 +1,33 @@
+export class NumberOverlayScreen {
+    constructor(title, value, max, min, interval, largeInterval, onUpdate) {
+        this._title = title;
+        this._value = value;
+        this._max = max;
+        this._min = min;
+        this._interval = interval;
+        this._largeInterval = largeInterval;
+        this._onUpdate = onUpdate;
+    }
+    prev(mod) {
+        const increment = mod ? this._largeInterval : this._interval;
+        this._value = Math.max(this._min, this._value - increment);
+        this._onUpdate(this._value);
+    }
+    next(mod) {
+        const increment = mod ? this._largeInterval : this._interval;
+        this._value = Math.min(this._max, this._value + increment);
+        this._onUpdate(this._value);
+    }
+    get title() {
+        return this._title;
+    }
+    get value() {
+        return `${this._value.toFixed(2)}`;
+    }
+    set value(v) {
+        this.value = v;
+    }
+}
 export class ListScreen {
     constructor(viewportLength, items, onSelected, onRefresh) {
         this.viewportLength = viewportLength;
@@ -20,15 +50,15 @@ export class ListScreen {
     refresh() {
         this._onRefresh();
     }
-    next() {
+    next(mod) {
         this._selectedIndex = Math.min(this._items.length - 1, this._selectedIndex + 1);
         this._updateOffset();
     }
-    prev() {
+    prev(mod) {
         this._selectedIndex = Math.max(0, this._selectedIndex - 1);
         this._updateOffset();
     }
-    select() {
+    select(mod) {
         this._onSelected(this._selectedIndex);
     }
     get visibleItems() {
