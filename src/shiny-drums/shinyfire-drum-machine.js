@@ -11,7 +11,10 @@ import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons
 
 import { instrumentIndexed, instrumentRows, noteColours } from './ui_config.js'
 
+import { MenuController } from '/dist/menu/menu_controller.js'
+
 import { ListScreen } from '/dist/shiny-drums/screen_widgets.js'
+
 
 // Events
 // init() once the page has finished loading.
@@ -93,6 +96,21 @@ function init() {
   updateControls();
 }
 
+const MENU_LIST_ITEMS = 9;
+
+function onTopMenuSelect(index) {
+  console.log('top menu sel:' + index);
+  if (index == 1) {
+    const kitNames = KITS.map((k) => k.prettyName);
+    const kitMenu = new ListScreen(MENU_LIST_ITEMS, kitNames, (idx) => {
+      kit = KITS[idx];
+      theBeat.kit = kit;
+      console.log('sel kit:' + kit.prettyName);
+    });
+    menu.pushMenu(kitMenu);
+  }
+}
+
 function initControls() {
   getMidi(midiReady);
 
@@ -103,7 +121,29 @@ function initControls() {
     );
     padControl = setupPads(handleNoteClick);
     oled = setupOled();
-    menu = new MenuController();
+
+    const _topMenu = new ListScreen(MENU_LIST_ITEMS, [
+      `BPM:${theBeat.tempo}`,
+      `Kit:${theBeat.kit.prettyName}`,
+      `Swing:${theBeat.swingFactor}`,
+      `FX:${theBeat.effect.name}`,
+      'test1',
+    ], onTopMenuSelect,
+      () => {
+        const kit = theBeat.kit;
+        const items = [
+          `BPM:${theBeat.tempo}`,
+          `Kit:${kit.prettyName}`,
+          `Swing:${theBeat.swingFactor}`,
+          `FX:${theBeat.effect.name}`,
+          'test1',
+        ]
+        _topMenu.updateItems(items);
+      });
+
+    menu = new MenuController(oled);
+    menu.pushMenu(_topMenu);
+
     dials = setupDials(
       {
         onVolume: (dir) => {
@@ -288,99 +328,4 @@ function handleDialInput(dir, obj, prop, paramName) {
 function showOledLargeOverride(title, value) {
   oled.clear();
   oled.bigTitled(title, value);
-}
-
-class MenuController {
-  _topMenu = new ListScreen(9, [
-    `BPM:${theBeat.tempo}`,
-    `Kit:${kit.prettyName}`,
-    `Swing:${theBeat.swingFactor}`,
-    `FX:${theBeat.effect.name}`,
-    'test1',
-    'test2',
-    'test3',
-    'test4',
-    'test5',
-    'test6'
-  ]);
-
-  get _currentMenu() { return this._topMenu; };
-
-  onDial(dir) {
-    const left = (dir == 0);
-    if (_editTempoMode) {
-      const increment = _shiftON ? 10 : 1;
-      if (left) {
-        theBeat.tempo = Math.max(MIN_TEMPO, theBeat.tempo - increment);
-      } else {
-        theBeat.tempo = Math.min(MAX_TEMPO, theBeat.tempo + increment);
-      }
-    } else {
-      if (left) {
-        this._currentMenu.prev();
-      } else {
-        this._currentMenu.next();
-      }
-    }
-    this.updateOled();
-  }
-
-  onSelect() {
-    console.log('menu select:' + this._selectedIndex);
-    if (this._selectedIndex == 0 && !_editTempoMode) {
-      _editTempoMode = true;
-    } else {
-      _editTempoMode = false;
-    }
-    if (this._selectedIndex == 1 && !_editKitMode) {
-      _editKitMode = true;
-      //TODO: use actual current kit index
-      // this._selectedIndex = 0;
-      // this._currentMaxIndex = 8;
-    }
-    if (_editKitMode) {
-      kit = KITS[this._selectedIndex];
-      theBeat.kit = kit;
-      console.log('sel kit:' + kit);
-    }
-    this.updateOled();
-  }
-
-  onBack() {
-    console.log('menu back');
-    _editKitMode = false;
-    _editTempoMode = false;
-    this._currentMaxIndex = this._topMenuItems.length;
-    this._selectedIndex = 1;
-    this.updateOled();
-  }
-
-  updateOled() {
-    oled.clear();
-    console.log('editkit:' + _editKitMode);
-
-    const MAX_LINES = 9;
-
-    if (_editTempoMode) {
-      oled.bigTitled("BPM", `${theBeat.tempo}`);
-    } else if (_editKitMode) {
-      const startIndex = 0;
-      const endIndex = 8;
-      for (let i = startIndex; i < endIndex; i++) {
-        let highlight = (i == this._selectedIndex)
-        // console.log(KITS[i])
-        oled.text(i, KITS[i].prettyName, highlight);
-      }
-      // make sure to send outside loop as too many send via sysex can overwhelm the Fire
-      oled.send();
-    } else {
-      const items = this._currentMenu.visibleItems;
-      for (let i = 0; i < items.length; i++) {
-        let highlight = (i == this._currentMenu.viewportSelected)
-        oled.text(i, items[i], highlight);
-      }
-      // make sure to send outside loop as too many send via sysex can overwhelm the Fire
-      oled.send();
-    }
-  }
 }

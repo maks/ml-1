@@ -74,7 +74,20 @@ export function setupPads(onPad: (padIndex: number) => void) {
   };
 }
 
-export function setupOled() {
+export type ShowStringFunction = (a: string) => void;
+export type ShowStringStringFunction = (a: string, b: string) => void;
+export type VoidFunction = () => void;
+
+export interface OledControl {
+  heading: ShowStringFunction,
+  text: (line: number, text: string, highlight?: boolean) => void,
+  clear: VoidFunction,
+  big: ShowStringFunction,
+  bigTitled: ShowStringStringFunction,
+  send: VoidFunction,
+}
+
+export function setupOled(): OledControl {
   oled = new OledScreen(midiOutput);
   return {
     heading: oledHeading,

@@ -39,3 +39,11 @@ test('viewport scrolls up when item offscreen on top', () => {
   expect(menu.viewportSelected).toBe(0);
   expect(menu.visibleItems).toEqual(['a', 'b']);
 });
+
+test('selection calls onSelected with correct index', () => {
+  let selIndex;
+  const menu = new ListScreen(2, ['a', 'b', 'c'], (index) => { selIndex = index });
+  menu.next();
+  menu.select();
+  expect(selIndex).toBe(1);
+});

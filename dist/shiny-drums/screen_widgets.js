@@ -1,9 +1,11 @@
 export class ListScreen {
-    constructor(viewportLength, items) {
+    constructor(viewportLength, items, onSelected, onRefresh) {
         this.viewportLength = viewportLength;
-        this.items = items;
+        this._items = items;
         this._selectedIndex = 0;
         this._viewportTopOffset = 0;
+        this._onSelected = onSelected;
+        this._onRefresh = onRefresh;
     }
     get selected() {
         return this._selectedIndex;
@@ -12,16 +14,25 @@ export class ListScreen {
     get viewportSelected() {
         return this._selectedIndex - this._viewportTopOffset;
     }
+    updateItems(items) {
+        this._items = items;
+    }
+    refresh() {
+        this._onRefresh();
+    }
     next() {
-        this._selectedIndex = Math.min(this.items.length - 1, this._selectedIndex + 1);
+        this._selectedIndex = Math.min(this._items.length - 1, this._selectedIndex + 1);
         this._updateOffset();
     }
     prev() {
         this._selectedIndex = Math.max(0, this._selectedIndex - 1);
         this._updateOffset();
     }
+    select() {
+        this._onSelected(this._selectedIndex);
+    }
     get visibleItems() {
-        return this.items.slice(this._viewportTopOffset, this._viewportTopOffset + this.viewportLength);
+        return this._items.slice(this._viewportTopOffset, this._viewportTopOffset + this.viewportLength);
     }
     _updateOffset() {
         while (this._selectedIndex > (this._viewportTopOffset + this.viewportLength - 1)) {
