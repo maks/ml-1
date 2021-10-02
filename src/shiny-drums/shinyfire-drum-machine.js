@@ -160,7 +160,10 @@ function initControls() {
         `P:`, -1, 1, 0, 0.01, 0.1, (pitch) => {
           theBeat.setPitch(machineState.currentInstrumentName, pitch);
         },
-      )
+      ),
+      'effects': new NumberOverlayScreen(
+        "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
+      ),
     };
 
     dials = setupDials(
@@ -184,8 +187,7 @@ function initControls() {
           handleDialInput(dir, overlay);
         },
         onResonance: (dir) => {
-          handleDialInput(dir, theBeat, "effectMix", "FX");
-          player.updateEffect();
+          handleDialInput(dir, overlays["effects"]);
         },
         onSelect: (dir) => {
           if (dir == 2 || dir == 3) {
