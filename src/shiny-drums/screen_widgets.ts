@@ -46,12 +46,16 @@ export class NumberOverlayScreen {
     return this._title;
   }
 
-  get value(): string {
+  set title(t) {
+    this._title = t;
+  }
+
+  get stringValue(): string {
     return `${this._value.toFixed(2)}`;
   }
 
-  set value(v) {
-    this.value = v;
+  set value(v: number) {
+    this._value = v;
   }
 }
 

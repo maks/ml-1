@@ -21,11 +21,14 @@ export class NumberOverlayScreen {
     get title() {
         return this._title;
     }
-    get value() {
+    set title(t) {
+        this._title = t;
+    }
+    get stringValue() {
         return `${this._value.toFixed(2)}`;
     }
     set value(v) {
-        this.value = v;
+        this._value = v;
     }
 }
 export class ListScreen {

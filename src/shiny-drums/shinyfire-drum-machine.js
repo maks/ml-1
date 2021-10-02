@@ -42,6 +42,7 @@ let _editTempoMode = false;
 let _editKitMode = false;
 let _selectedInstrumentIndex;
 
+
 function loadAssets() {
   // Any assets which have previously started loading will be skipped over.
   for (const kit of KITS) {
@@ -111,7 +112,14 @@ function onTopMenuSelect(index) {
   }
 }
 
+const machineState = {
+  get currentInstrumentName() {
+    return instrumentIndexed[_selectedInstrumentIndex];
+  }
+}
+
 function initControls() {
+
   getMidi(midiReady);
 
   function midiReady() {
@@ -146,7 +154,12 @@ function initControls() {
 
     const overlays = {
       'volume': new NumberOverlayScreen(
-        "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; }
+        "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
+      ),
+      'pitch': new NumberOverlayScreen(
+        `P:`, -1, 1, 0, 0.01, 0.1, (pitch) => {
+          theBeat.setPitch(machineState.currentInstrumentName, pitch);
+        },
       )
     };
 
@@ -160,22 +173,15 @@ function initControls() {
 
         },
         onFilter: (dir) => {
-          let instrumentName = instrumentIndexed[_selectedInstrumentIndex];
+          const instrumentName = machineState.currentInstrumentName;
+          const overlay = overlays["pitch"];
           if (instrumentName == null) {
             return;
           }
           let pitch = theBeat.getPitch(instrumentName);
-          if (dir == 0) {
-            pitch = Math.max(0, pitch - 0.01);
-            theBeat.setPitch(instrumentName, pitch);
-          } else if (dir == 1) {
-            pitch = Math.min(3.0, pitch + 0.01);
-            theBeat.setPitch(instrumentName, pitch);
-          }
-          showOledLargeOverride(`${instrumentName}`, `${pitch.toFixed(2)}`);
-          if (dir == 3) {
-            menu.updateOled();
-          }
+          overlay.title = `P:${instrumentName}`;
+          overlay.value = pitch;
+          handleDialInput(dir, overlay);
         },
         onResonance: (dir) => {
           handleDialInput(dir, theBeat, "effectMix", "FX");

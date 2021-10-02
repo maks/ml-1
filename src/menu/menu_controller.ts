@@ -61,7 +61,7 @@ export class MenuController {
     this._oled.clear();
     if (this._overlay != null) {
       this._oled.clear();
-      this._oled.bigTitled(this._overlay.title, this._overlay.value);
+      this._oled.bigTitled(this._overlay.title, this._overlay.stringValue);
     } else {
       const items = this._currentScreen.visibleItems;
       for (let i = 0; i < items.length; i++) {
