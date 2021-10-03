@@ -130,12 +130,29 @@ function onSwingMenuSelected() {
   ));
 }
 
+function onFXMenuSelected() {
+  console.log(EFFECTS);
+  const fxList = EFFECTS.map((fx) => new ListScreenItem(fx.name, async (item) => {
+    console.log("selected fx", item.data);
+    const selectedFx = item.data;
+    await selectedFx.load(selectedFx);
+    theBeat.effect = selectedFx;
+    player.updateEffect();
+  }, fx)
+  );
+
+  const fxMenu = new ListScreen(MENU_LIST_ITEMS_COUNT,
+    fxList, () => { });
+
+  menu.pushMenuScreen(fxMenu);
+}
+
 function _topMenuListItems() {
   return [
     new ListScreenItem(`BPM:${theBeat.tempo}`, (item) => { onBPMMenuSelected(); }),
     new ListScreenItem(`Kit:${theBeat.kit.prettyName}`, (item) => { onKitMenuSelected(); }),
     new ListScreenItem(`Swing:${theBeat.swingFactor}`, (item) => { onSwingMenuSelected(); }),
-    new ListScreenItem(`FX:${theBeat.effect.name}`, (item) => { console.log('sel:' + item._label); }),
+    new ListScreenItem(`FX:${theBeat.effect.name}`, (item) => { console.log('sel:' + item._label); onFXMenuSelected(); }),
     new ListScreenItem('test1', (item) => { console.log('sel:' + item._label); }),
   ];
 }
