@@ -6,7 +6,7 @@ export class MenuController {
     }
     get _currentScreen() { return this._screenStack[this._screenStack.length - 1]; }
     ;
-    pushMenu(menu) {
+    pushMenuScreen(menu) {
         var _a;
         this._screenStack.push(menu);
         console.log('menu' + ((_a = this._screenStack[1]) === null || _a === void 0 ? void 0 : _a.visibleItems[0]));
@@ -14,7 +14,7 @@ export class MenuController {
     }
     setOverlay(overlay) {
         this._overlay = overlay;
-        // console.log('set overlaay', overlay)
+        // console.log('set overlay', overlay)
         this.updateOled();
     }
     clearOverlay() {

@@ -1,12 +1,13 @@
 export type NumberCallback = (val: number) => void;
 export type VoidCallback = () => void;
+export type ObjectCallback = (obj: any) => void;
 
 export interface MenuScreen {
   next(): void;
   prev(): void;
   select(): void;
   refresh(): void;
-  updateItems(items: string[]): void;
+  updateItems(items: ListScreenItem[]): void;
   get visibleItems(): string[];
   get viewportSelected(): number;
 }
@@ -59,13 +60,31 @@ export class NumberOverlayScreen {
   }
 }
 
+export class ListScreenItem {
+  readonly _label: string;
+  readonly _onSelected: ObjectCallback;
+  readonly _data: any;
+
+  get label(): string { return this._label; }
+
+  get data(): any { return this._data; }
+
+  constructor(label: string, onSelected: ObjectCallback, data: any) {
+    this._label = label;
+    this._onSelected = onSelected;
+    this._data = data;
+  }
+
+  selected() {
+    this._onSelected(this);
+  }
+}
+
 export class ListScreen implements MenuScreen {
   readonly viewportLength: number;
-  private _items: string[];
+  private _items: ListScreenItem[];
   private _selectedIndex: number;
   private _viewportTopOffset: number;
-  // callback when a menu item is selected
-  private _onSelected: NumberCallback;
   // callback when menu is redisplayed, eg, after another menu was displayed
   private _onRefresh: VoidCallback;
 
@@ -78,15 +97,14 @@ export class ListScreen implements MenuScreen {
     return this._selectedIndex - this._viewportTopOffset;
   }
 
-  constructor(viewportLength: number, items: string[], onSelected: NumberCallback, onRefresh: VoidCallback) {
+  constructor(viewportLength: number, items: ListScreenItem[], onRefresh: VoidCallback) {
     this.viewportLength = viewportLength;
     this._items = items;
     this._selectedIndex = 0;
     this._viewportTopOffset = 0;
-    this._onSelected = onSelected;
     this._onRefresh = onRefresh;
   }
-  updateItems(items: string[]): void {
+  updateItems(items: ListScreenItem[]): void {
     this._items = items;
   }
 
@@ -105,11 +123,11 @@ export class ListScreen implements MenuScreen {
   }
 
   select(mod?: boolean) {
-    this._onSelected(this._selectedIndex);
+    this._items[this._selectedIndex].selected();
   }
 
   get visibleItems(): string[] {
-    return this._items.slice(this._viewportTopOffset, this._viewportTopOffset + this.viewportLength);
+    return this._items.slice(this._viewportTopOffset, this._viewportTopOffset + this.viewportLength).map((item) => item.label);
   }
 
   private _updateOffset() {

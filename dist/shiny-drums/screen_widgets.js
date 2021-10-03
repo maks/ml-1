@@ -31,13 +31,24 @@ export class NumberOverlayScreen {
         this._value = v;
     }
 }
+export class ListScreenItem {
+    constructor(label, onSelected, data) {
+        this._label = label;
+        this._onSelected = onSelected;
+        this._data = data;
+    }
+    get label() { return this._label; }
+    get data() { return this._data; }
+    selected() {
+        this._onSelected(this);
+    }
+}
 export class ListScreen {
-    constructor(viewportLength, items, onSelected, onRefresh) {
+    constructor(viewportLength, items, onRefresh) {
         this.viewportLength = viewportLength;
         this._items = items;
         this._selectedIndex = 0;
         this._viewportTopOffset = 0;
-        this._onSelected = onSelected;
         this._onRefresh = onRefresh;
     }
     get selected() {
@@ -62,10 +73,10 @@ export class ListScreen {
         this._updateOffset();
     }
     select(mod) {
-        this._onSelected(this._selectedIndex);
+        this._items[this._selectedIndex].selected();
     }
     get visibleItems() {
-        return this._items.slice(this._viewportTopOffset, this._viewportTopOffset + this.viewportLength);
+        return this._items.slice(this._viewportTopOffset, this._viewportTopOffset + this.viewportLength).map((item) => item.label);
     }
     _updateOffset() {
         while (this._selectedIndex > (this._viewportTopOffset + this.viewportLength - 1)) {

@@ -15,7 +15,7 @@ export class MenuController {
     this._oled = oled;
   }
 
-  pushMenu(menu: MenuScreen): void {
+  pushMenuScreen(menu: MenuScreen): void {
     this._screenStack.push(menu);
     console.log('menu' + this._screenStack[1]?.visibleItems[0])
     this.updateOled();
@@ -23,7 +23,7 @@ export class MenuController {
 
   setOverlay(overlay: NumberOverlayScreen): void {
     this._overlay = overlay;
-    // console.log('set overlaay', overlay)
+    // console.log('set overlay', overlay)
     this.updateOled();
   }
 

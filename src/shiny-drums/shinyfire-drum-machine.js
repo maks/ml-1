@@ -13,7 +13,7 @@ import { instrumentIndexed, instrumentRows, noteColours } from './ui_config.js'
 
 import { MenuController } from '/dist/menu/menu_controller.js'
 
-import { ListScreen, NumberOverlayScreen } from '/dist/shiny-drums/screen_widgets.js'
+import { ListScreen, ListScreenItem, NumberOverlayScreen } from '/dist/shiny-drums/screen_widgets.js'
 
 
 // Events
@@ -97,25 +97,25 @@ function init() {
   updateControls();
 }
 
-const MENU_LIST_ITEMS = 9;
-
-function onTopMenuSelect(index) {
-  console.log('top menu sel:' + index);
-  if (index == 1) {
-    const kitNames = KITS.map((k) => k.prettyName);
-    const kitMenu = new ListScreen(MENU_LIST_ITEMS, kitNames, (idx) => {
-      kit = KITS[idx];
-      theBeat.kit = kit;
-      console.log('sel kit:' + kit.prettyName);
-    });
-    menu.pushMenu(kitMenu);
-  }
-}
+const MENU_LIST_ITEMS_COUNT = 9;
 
 const machineState = {
   get currentInstrumentName() {
     return instrumentIndexed[_selectedInstrumentIndex];
   }
+}
+
+function onKitMenuSelected() {
+  const kits = KITS.map((kit) => new ListScreenItem(kit.prettyName, (item) => {
+    console.log("selected kit", item.data);
+    theBeat.kit = item.data; // assign selected kit to current beat
+  }, kit)
+  );
+
+  const kitMenu = new ListScreen(MENU_LIST_ITEMS_COUNT,
+    kits, () => { });
+
+  menu.pushMenuScreen(kitMenu);
 }
 
 function initControls() {
@@ -130,13 +130,13 @@ function initControls() {
     padControl = setupPads(handleNoteClick);
     oled = setupOled();
 
-    const _topMenu = new ListScreen(MENU_LIST_ITEMS, [
-      `BPM:${theBeat.tempo}`,
-      `Kit:${theBeat.kit.prettyName}`,
-      `Swing:${theBeat.swingFactor}`,
-      `FX:${theBeat.effect.name}`,
-      'test1',
-    ], onTopMenuSelect,
+    const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, [
+      new ListScreenItem(`BPM:${theBeat.tempo}`, (item) => { console.log('sel:' + item._label); }),
+      new ListScreenItem(`Kit:${theBeat.kit.prettyName}`, (item) => { onKitMenuSelected(); }),
+      new ListScreenItem(`Swing:${theBeat.swingFactor}`, (item) => { console.log('sel:' + item._label); }),
+      new ListScreenItem(`FX:${theBeat.effect.name}`, (item) => { console.log('sel:' + item._label); }),
+      new ListScreenItem('test1', (item) => { console.log('sel:' + item._label); }),
+    ],
       () => {
         const kit = theBeat.kit;
         const items = [
@@ -150,7 +150,7 @@ function initControls() {
       });
 
     menu = new MenuController(oled);
-    menu.pushMenu(_topMenu);
+    menu.pushMenuScreen(_topMenu);
 
     const overlays = {
       'volume': new NumberOverlayScreen(
@@ -169,7 +169,6 @@ function initControls() {
     dials = setupDials(
       {
         onVolume: (dir) => {
-          console.log('d:' + dir);
           handleDialInput(dir, overlays["volume"]);
         },
         onPan: (dir) => {
