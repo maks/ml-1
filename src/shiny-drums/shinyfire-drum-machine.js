@@ -124,11 +124,17 @@ function onBPMMenuSelected() {
   ));
 }
 
+function onSwingMenuSelected() {
+  menu.pushMenuScreen(new NumberOverlayScreen(
+    "Swing", theBeat.swingFactor, 1, 0, 0.1, 0.1, (val) => { theBeat.swingFactor = val; }, 2
+  ));
+}
+
 function _topMenuListItems() {
   return [
     new ListScreenItem(`BPM:${theBeat.tempo}`, (item) => { onBPMMenuSelected(); }),
     new ListScreenItem(`Kit:${theBeat.kit.prettyName}`, (item) => { onKitMenuSelected(); }),
-    new ListScreenItem(`Swing:${theBeat.swingFactor}`, (item) => { console.log('sel:' + item._label); }),
+    new ListScreenItem(`Swing:${theBeat.swingFactor}`, (item) => { onSwingMenuSelected(); }),
     new ListScreenItem(`FX:${theBeat.effect.name}`, (item) => { console.log('sel:' + item._label); }),
     new ListScreenItem('test1', (item) => { console.log('sel:' + item._label); }),
   ];
