@@ -155,7 +155,7 @@ function oledBigWithTitle(title, value) {
     oled.heading(title);
     oled.bigText(value);
 }
-export function getMidi(midiReadyCallback) {
+export function getMidi(midiReadyCallback, midiStateChange) {
     navigator.requestMIDIAccess({ sysex: true })
         .then(function (midiAccess) {
         console.log("MIDI Access Ready, getting input, outputs...");
@@ -172,7 +172,11 @@ export function getMidi(midiReadyCallback) {
             console.log(input);
             midiInput = input;
         }
-        midiOutput.onstatechange = (state) => console.log("state change:" + state);
+        midiOutput.onstatechange = (state) => {
+            console.log("state change:", state);
+            //TODO: callback if connect event for a Fire
+            //midiStateChange((state.isTrusted && state.target instanceof  WebMidi.MIDIOutput));
+        };
         if (midiInput != null) {
             dispatcher = new MidiDispatcher(midiInput, midiOutput);
         }

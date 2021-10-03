@@ -12,22 +12,25 @@ export interface MenuScreen {
   get viewportSelected(): number;
 }
 
-export class NumberOverlayScreen {
+export class NumberOverlayScreen implements MenuScreen {
   private _title: string;
   private _value: number;
   readonly _max: number;
   readonly _min: number;
   readonly _interval: number;
   readonly _largeInterval: number;
+  readonly _decimals;
   private _onUpdate: NumberCallback;
 
-  constructor(title: string, value: number, max: number, min: number, interval: number, largeInterval: number, onUpdate: NumberCallback) {
+  constructor(title: string, value: number, max: number, min: number, interval: number, largeInterval: number,
+    onUpdate: NumberCallback, decimalDisplay: number = 2) {
     this._title = title;
     this._value = value;
     this._max = max;
     this._min = min;
     this._interval = interval;
     this._largeInterval = largeInterval;
+    this._decimals = decimalDisplay;
     this._onUpdate = onUpdate;
   }
 
@@ -52,13 +55,32 @@ export class NumberOverlayScreen {
   }
 
   get stringValue(): string {
-    return `${this._value.toFixed(2)}`;
+    return `${this._value.toFixed(this._decimals)}`;
   }
 
   set value(v: number) {
     this._value = v;
   }
+
+
+  get visibleItems(): string[] {
+    return [];
+  }
+  get viewportSelected(): number {
+    return 0;
+  }
+
+  select(): void {
+    //NA
+  }
+  refresh(): void {
+    //NA
+  }
+  updateItems(items: ListScreenItem[]): void {
+    //NA
+  }
 }
+
 
 export class ListScreenItem {
   readonly _label: string;

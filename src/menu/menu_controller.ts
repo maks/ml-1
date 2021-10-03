@@ -63,6 +63,12 @@ export class MenuController {
       this._oled.clear();
       this._oled.bigTitled(this._overlay.title, this._overlay.stringValue);
     } else {
+      if (this._currentScreen instanceof NumberOverlayScreen) {
+        console.log('NUMEBR SCREEN')
+        this._oled.clear();
+        this._oled.bigTitled(this._currentScreen.title, this._currentScreen.stringValue);
+      }
+
       const items = this._currentScreen.visibleItems;
       for (let i = 0; i < items.length; i++) {
         let highlight = (i == this._currentScreen.viewportSelected)

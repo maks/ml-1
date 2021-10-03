@@ -1,11 +1,12 @@
 export class NumberOverlayScreen {
-    constructor(title, value, max, min, interval, largeInterval, onUpdate) {
+    constructor(title, value, max, min, interval, largeInterval, onUpdate, decimalDisplay = 2) {
         this._title = title;
         this._value = value;
         this._max = max;
         this._min = min;
         this._interval = interval;
         this._largeInterval = largeInterval;
+        this._decimals = decimalDisplay;
         this._onUpdate = onUpdate;
     }
     prev(mod) {
@@ -25,10 +26,25 @@ export class NumberOverlayScreen {
         this._title = t;
     }
     get stringValue() {
-        return `${this._value.toFixed(2)}`;
+        return `${this._value.toFixed(this._decimals)}`;
     }
     set value(v) {
         this._value = v;
+    }
+    get visibleItems() {
+        return [];
+    }
+    get viewportSelected() {
+        return 0;
+    }
+    select() {
+        //NA
+    }
+    refresh() {
+        //NA
+    }
+    updateItems(items) {
+        //NA
     }
 }
 export class ListScreenItem {

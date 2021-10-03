@@ -118,35 +118,38 @@ function onKitMenuSelected() {
   menu.pushMenuScreen(kitMenu);
 }
 
-function initControls() {
+function onBPMMenuSelected() {
+  menu.pushMenuScreen(new NumberOverlayScreen(
+    "BPM", theBeat.tempo, 300, 20, 1, 10, (val) => { theBeat.tempo = val; }, 0
+  ));
+}
 
-  getMidi(midiReady);
+function _topMenuListItems() {
+  return [
+    new ListScreenItem(`BPM:${theBeat.tempo}`, (item) => { onBPMMenuSelected(); }),
+    new ListScreenItem(`Kit:${theBeat.kit.prettyName}`, (item) => { onKitMenuSelected(); }),
+    new ListScreenItem(`Swing:${theBeat.swingFactor}`, (item) => { console.log('sel:' + item._label); }),
+    new ListScreenItem(`FX:${theBeat.effect.name}`, (item) => { console.log('sel:' + item._label); }),
+    new ListScreenItem('test1', (item) => { console.log('sel:' + item._label); }),
+  ];
+}
+
+function initControls() {
+  getMidi(midiReady, (isConnected) => { if (isConnected) { console.log('reconnected'); midiReady(); } });
 
   function midiReady() {
     console.log('MIDI IS READY');
+
     setupTransport(
       handlePlay, handleStop, null
     );
     padControl = setupPads(handleNoteClick);
     oled = setupOled();
 
-    const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, [
-      new ListScreenItem(`BPM:${theBeat.tempo}`, (item) => { console.log('sel:' + item._label); }),
-      new ListScreenItem(`Kit:${theBeat.kit.prettyName}`, (item) => { onKitMenuSelected(); }),
-      new ListScreenItem(`Swing:${theBeat.swingFactor}`, (item) => { console.log('sel:' + item._label); }),
-      new ListScreenItem(`FX:${theBeat.effect.name}`, (item) => { console.log('sel:' + item._label); }),
-      new ListScreenItem('test1', (item) => { console.log('sel:' + item._label); }),
-    ],
+    const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(),
       () => {
         const kit = theBeat.kit;
-        const items = [
-          `BPM:${theBeat.tempo}`,
-          `Kit:${kit.prettyName}`,
-          `Swing:${theBeat.swingFactor}`,
-          `FX:${theBeat.effect.name}`,
-          'test1',
-        ]
-        _topMenu.updateItems(items);
+        _topMenu.updateItems(_topMenuListItems());
       });
 
     menu = new MenuController(oled);
