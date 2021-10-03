@@ -36,10 +36,7 @@ const EFFECTS = [];
 
 
 // Drum machine UI and control state
-let _shiftON = false;
 let _isPlaying = false;
-let _editTempoMode = false;
-let _editKitMode = false;
 let _selectedInstrumentIndex;
 
 
@@ -70,9 +67,7 @@ function loadDemos(onDemoLoaded) {
 function onDemoLoaded(demoIndex) {
   console.log('Demo loaded:' + demoIndex);
 
-  if (demoIndex == 1) {
-    loadBeat(DEMO_BEATS[demoIndex]);
-  }
+  loadBeat(DEMO_BEATS[demoIndex]);
 }
 
 function init() {
@@ -107,7 +102,6 @@ const machineState = {
 
 function onKitMenuSelected() {
   const kits = KITS.map((kit) => new ListScreenItem(kit.prettyName, (item) => {
-    console.log("selected kit", item.data);
     theBeat.kit = item.data; // assign selected kit to current beat
   }, kit)
   );
@@ -153,7 +147,7 @@ function _topMenuListItems() {
     new ListScreenItem(`Kit:${theBeat.kit.prettyName}`, (item) => { onKitMenuSelected(); }),
     new ListScreenItem(`Swing:${theBeat.swingFactor}`, (item) => { onSwingMenuSelected(); }),
     new ListScreenItem(`FX:${theBeat.effect.name}`, (item) => { console.log('sel:' + item._label); onFXMenuSelected(); }),
-    new ListScreenItem('test1', (item) => { console.log('sel:' + item._label); }),
+    new ListScreenItem('Preset', (item) => { console.log('sel:' + item._label); }),
   ];
 }
 
@@ -257,6 +251,9 @@ function initControls() {
 
     // clear all now that we have finished init
     allOff();
+
+    // update OLED with loaded preset
+    menu.updateOled();
   }
 }
 
@@ -280,17 +277,6 @@ function colourToString(colour) {
 function updateControls() {
   updatePadsFromPlayer();
   menu.updateOled();
-
-  // ui.kitPicker.select(theBeat.kit.index);
-  // ui.effectPicker.select(theBeat.effect.index);
-  // ui.tempoInput.value = theBeat.tempo;
-  // ui.effectSlider.value = theBeat.effectMix;
-  // ui.swingSlider.value = theBeat.swingFactor;
-
-  // for (const instrument of INSTRUMENTS) {
-  //   ui.pitchSliders.setPitch(instrument.name,
-  //       theBeat.getPitch(instrument.name));
-  // }
 }
 
 function updatePadsFromPlayer() {
