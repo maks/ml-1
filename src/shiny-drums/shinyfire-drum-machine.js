@@ -125,9 +125,7 @@ function onSwingMenuSelected() {
 }
 
 function onFXMenuSelected() {
-  console.log(EFFECTS);
   const fxList = EFFECTS.map((fx) => new ListScreenItem(fx.name, async (item) => {
-    console.log("selected fx", item.data);
     const selectedFx = item.data;
     await selectedFx.load(selectedFx);
     theBeat.effect = selectedFx;
@@ -141,13 +139,29 @@ function onFXMenuSelected() {
   menu.pushMenuScreen(fxMenu);
 }
 
+function onPresetMenuSelected() {
+  console.log(DEMO_BEATS);
+  let count = 0;
+  const presetsList = DEMO_BEATS.map((preset) => new ListScreenItem(`Preset${count++}`, (item) => {
+    loadBeat(item.data);
+    _isPlaying = false;
+    handlePlay();
+  }, preset)
+  );
+
+  const fxMenu = new ListScreen(MENU_LIST_ITEMS_COUNT,
+    presetsList, () => { });
+
+  menu.pushMenuScreen(fxMenu);
+}
+
 function _topMenuListItems() {
   return [
     new ListScreenItem(`BPM:${theBeat.tempo}`, (item) => { onBPMMenuSelected(); }),
     new ListScreenItem(`Kit:${theBeat.kit.prettyName}`, (item) => { onKitMenuSelected(); }),
     new ListScreenItem(`Swing:${theBeat.swingFactor}`, (item) => { onSwingMenuSelected(); }),
-    new ListScreenItem(`FX:${theBeat.effect.name}`, (item) => { console.log('sel:' + item._label); onFXMenuSelected(); }),
-    new ListScreenItem('Preset', (item) => { console.log('sel:' + item._label); }),
+    new ListScreenItem(`FX:${theBeat.effect.name}`, (item) => { onFXMenuSelected(); }),
+    new ListScreenItem('Preset', (item) => { onPresetMenuSelected(); }),
   ];
 }
 
@@ -325,6 +339,7 @@ function handlePlay() {
 }
 
 function handleStop() {
+  _isPlaying = false;
   player.stop();
   padControl.resetBeat();
 }
