@@ -4,7 +4,7 @@ import { INSTRUMENTS, freeze, clone } from './shiny-drum-machine-data.js';
 
 const context = new AudioContext();
 
-// temp hack to allow resuming audiocontext from user gesture in webpage
+// To allow resuming audiocontext from user gesture in webpage when not headless
 document.audioContext = context;
 
 const LOOP_LENGTH = 16;
