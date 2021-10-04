@@ -113,6 +113,21 @@ https://github.com/Tonejs/Tone.js/wiki/Performance
 https://github.com/googlecreativelab/chrome-music-lab
 https://googlechromelabs.github.io/web-audio-samples/dj/
 
+https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Advanced_techniques
+
+https://codepen.io/DonKarlssonSan/post/fun-with-web-audio-api
+https://codepen.io/DonKarlssonSan/post/drum-loops-and-effects-with-web-audio-api
+https://codepen.io/DonKarlssonSan/post/more-fun-with-web-audio-api
+
+https://teropa.info/blog/2016/07/28/javascript-systems-music.html
+https://jakearchibald.com/2016/sounds-fun/
+
+https://www.phpied.com/webaudio-deep-note-part-3-loop-and-change-pitch/
+
+### WebAudio Sampler
+
+https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop
+
 ### License
 
 Various parts of this project are licensed per their original projects licenses. Original code for ML-1 is licensed under BSD license per the license file included in this git repo.

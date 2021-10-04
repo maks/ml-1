@@ -140,7 +140,6 @@ function onFXMenuSelected() {
 }
 
 function onPresetMenuSelected() {
-  console.log(DEMO_BEATS);
   let count = 0;
   const presetsList = DEMO_BEATS.map((preset) => new ListScreenItem(`Preset${count++}`, (item) => {
     loadBeat(item.data);
@@ -236,13 +235,12 @@ function initControls() {
     buttons = setupButtons(
       {
         browser: (_) => menu.onBack(),
-        patternUp: (_) => console.log('shiny patternup button'),
+        patternUp: (_) => console.log('patternup button'),
         shift: (up) => {
           _shiftON = !up;
         },
         pattern: (up) => {
           console.log('pattern:' + up)
-          _editTempoMode = !up;
           if (up) {
             // need to repaint showing menu
             menu.updateOled();
@@ -279,7 +277,6 @@ function loadBeat(beat) {
 }
 
 function onNextBeat() {
-  console.log('NEXT BEAT');
   updatePadsFromPlayer();
   padControl.nextBeat();
 }
