@@ -124,6 +124,8 @@ https://jakearchibald.com/2016/sounds-fun/
 
 https://www.phpied.com/webaudio-deep-note-part-3-loop-and-change-pitch/
 
+https://github.com/danigb/synth-kit
+
 ### WebAudio Sampler
 
 https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop

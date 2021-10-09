@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Sampler">
+  <title>ML-1 Sampler</title>
+
+  <script src="./src/sampler/sampler.js" type="module"></script>
+
+  <script>// click event
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('.permission')) {
+        document.audioContext.resume().then(() => {
+          console.log('context resumed by user');
+        });
+      }
+      if (e.target.closest('.play1')) {
+        document.testplay();
+      }
+    })
+  </script>
+
+
+</head>
+
+<body id="body">
+  <div id="title">
+    Sampler <span id="version">1.0</span>
+    <button class="permission" type="button">
+      Give permission
+    </button>
+    <button class="play1" type="button">
+      Play
+    </button>
+  </div>
+</body>
+
+</html>
