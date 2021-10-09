@@ -1,8 +1,10 @@
 export class DSPreset {
   _xml: XMLDocument;
+  readonly name: string;
 
-  constructor(dspreset: XMLDocument) {
+  constructor(dspreset: XMLDocument, name: string) {
     this._xml = dspreset;
+    this.name = name;
   }
 
   get group(): DSSample[] {

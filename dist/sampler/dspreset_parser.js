@@ -1,6 +1,7 @@
 export class DSPreset {
-    constructor(dspreset) {
+    constructor(dspreset, name) {
         this._xml = dspreset;
+        this.name = name;
     }
     get group() {
         var _a, _b;

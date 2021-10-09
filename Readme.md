@@ -18,7 +18,9 @@ A rough roadmap of planned features:
 - [x] connect to Fire via webmidi
 - [x] send bitmap to OLED with sysex from webmidi
 - [x] high level interface for Fire controlsurface
-- [ ] drum sequencer based on shiny-drum-machine
+- [x] drum sequencer based on shiny-drum-machine
+- [ ] sampler playback using decent sampler instrument preset files
+- [ ] seq based on shiny-drums, using sampler instruments
 - [ ] improved seq: upto 64 step, microtiming
 - [ ] control dx7 FM synth via Fire controls
 - [ ] OLED wave, spectrum visualiser
@@ -45,6 +47,12 @@ and then:
 ```
 yarn run live-server
 ```
+
+running the server to serve sample content:
+```
+node src/file_server/servedir.js 8008 path/to/samples/
+```
+
 
 ### Devtools
 
