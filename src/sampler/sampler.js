@@ -1,8 +1,8 @@
 import SamplePlayer from "https://cdn.skypack.dev/sample-player@^0.5.5";
+import { DSPreset } from "/dist/sampler/dspreset_parser.js";
 
-// Events
 // init() once the page has finished loading.
-window.onload = init;
+window.onload = dsInit;
 
 let context;
 let sample;
@@ -12,26 +12,22 @@ window.document.testplay = function () {
   sample.start();
 }
 
+async function dsInit() {
+  console.log('init ds');
+  const baseUrl = "http://127.0.0.1:8008/6m0d6/";
+  const url = "http://127.0.0.1:8008/6m0d6/Loopop-6m0d6.dspreset";
+  const response = await fetch(url);
+  const body = await response.text();
 
-async function init() {
-  console.log('hello sampler', SamplePlayer)
+  const ds = new DSPreset(new window.DOMParser().parseFromString(body, "text/xml"));
+  const group = ds.group;
+  console.log('group', group);
 
   context = new AudioContext()
   // To allow resuming audiocontext from user gesture in webpage when not headless
   document.audioContext = context;
-
-  let audioBuf;// = AudioBuffer();
-
-  const packName = "4OP-FM";
-  const instrumentName = "tom1";
-
-  const wavUrl = `/assets/samples/drum-samples/${packName}/${instrumentName.toLowerCase()}.wav`;
-
-  audioBuf = await fetchAndDecodeAudio(wavUrl);
-
+  let audioBuf = await fetchAndDecodeAudio(`${baseUrl}${group[24].path}`);
   sample = SamplePlayer(context, audioBuf).connect(context.destination)
-
-  // sample.stop()
 }
 
 async function fetchAndDecodeAudio(url) {
