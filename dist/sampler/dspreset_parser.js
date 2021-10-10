@@ -1,12 +1,13 @@
 export class DSPreset {
-    constructor(dspreset, name) {
+    constructor(dspreset, name, path) {
         this._xml = dspreset;
         this.name = name;
+        this.path = path;
     }
     get group() {
         var _a, _b;
+        //TODO: for now only handling a single, first group found
         const group = this._xml.getElementsByTagName("group")[0];
-        console.log('group', group);
         let res = [];
         if (group != null) {
             for (let i = 0; i < group.children.length; i++) {

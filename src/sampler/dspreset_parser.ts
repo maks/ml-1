@@ -1,15 +1,17 @@
 export class DSPreset {
   _xml: XMLDocument;
   readonly name: string;
+  readonly path: string;
 
-  constructor(dspreset: XMLDocument, name: string) {
+  constructor(dspreset: XMLDocument, name: string, path: string) {
     this._xml = dspreset;
     this.name = name;
+    this.path = path;
   }
 
   get group(): DSSample[] {
+    //TODO: for now only handling a single, first group found
     const group = this._xml.getElementsByTagName("group")[0];
-    console.log('group', group);
 
     let res: DSSample[] = [];
     if (group != null) {
@@ -25,7 +27,6 @@ export class DSPreset {
     }
     return res;
   }
-
 }
 
 export class DSSample {
@@ -39,5 +40,4 @@ export class DSSample {
   constructor(init?: Partial<DSSample>) {
     Object.assign(this, init);
   }
-
 }
