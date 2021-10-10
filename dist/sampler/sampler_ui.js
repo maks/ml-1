@@ -7,7 +7,7 @@ let menu;
 let buttons;
 let dials;
 let padControl;
-export function initControls(instrumentNames, handlePlay) {
+export function initControls(instrumentNames, handlePlay, control) {
     getMidi(midiReady, (isConnected) => {
         if (isConnected) {
             console.log('reconnected');
@@ -15,12 +15,12 @@ export function initControls(instrumentNames, handlePlay) {
         }
     });
     function midiReady() {
-        console.log('MIDI IS READY');
-        setupTransport(handlePlay, function () { }, function () { });
-        padControl = setupPads(handleNoteClick);
+        console.log('SAMPLER MIDI IS READY');
+        setupTransport(handlePlay, control.stop, function () { });
+        padControl = setupPads(control.playNote);
         oled = setupOled();
-        const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(instrumentNames), () => {
-            _topMenu.updateItems(_topMenuListItems(instrumentNames));
+        const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(instrumentNames, control.selectInstrument), () => {
+            _topMenu.updateItems(_topMenuListItems(instrumentNames, control.selectInstrument));
         });
         menu = new MenuController(oled);
         menu.pushMenuScreen(_topMenu);
@@ -113,18 +113,19 @@ export function initControls(instrumentNames, handlePlay) {
         menu.updateOled();
     }
 }
-function _topMenuListItems(entries) {
-    return entries.map((x) => new ListScreenItem(x, (item) => onInstrumentSelected(item), {}));
+function _topMenuListItems(entries, selectedFn) {
+    return entries.map((x) => new ListScreenItem(x, (item) => selectedFn(item.label), {}));
 }
-function onInstrumentSelected(item) {
-    console.log("SELECTED:", item.label);
-}
-function handleNoteClick(index) {
-    const rowIndex = Math.floor(index / 16);
-    const columnIndex = index % 16;
-    const padColour = { r: 0, g: 10, b: 30 };
-    padControl.padLedOn(index, padColour);
-    // const instrument = INSTRUMENTS.find((instr) => instr.name === instrumentName);
-    // player.playNote(instrument, rhythmIndex);
-    console.log('PLAY NOTE:' + index);
-}
+// function onInstrumentSelected(item: ListScreenItem) {
+//   console.log("SELECTED:", item.label)
+// }
+// function handleNoteClick(index: number, callback: (note: number) => void) {
+//   const rowIndex = Math.floor(index / 16);
+//   const columnIndex = index % 16;
+//   const padColour = { r: 0, g: 10, b: 30 };
+//   padControl.padLedOn(index, padColour);
+//   // const instrument = INSTRUMENTS.find((instr) => instr.name === instrumentName);
+//   // player.playNote(instrument, rhythmIndex);
+//   console.log('PLAY NOTE:' + index);
+//   callback(index + 60);
+// }

@@ -4,7 +4,6 @@ import { FileStore } from '/dist/sampler/file_browser.js';
 import { samplePlayerFromDS } from '/dist/sampler/audio_handling.js';
 import { initControls } from '/dist/sampler/sampler_ui.js';
 
-
 export { SamplePlayer };
 
 const baseUrl = "http://127.0.0.1:8008/";
@@ -19,6 +18,8 @@ let fileStore;
 // array of packs as DSPreset objects
 let packs = [];
 let players = []
+
+let selectedPack;
 
 window.document.testplay = function () {
   console.log('play', sample);
@@ -53,14 +54,24 @@ async function init() {
 
   console.log('Packs', packs)
 
-  initControls(packs.map((p) => p.name), window.document.testplay);
+  const controls = {
+    selectInstrument: selectPack,
+    playNote: (note) => sample.start(note + 60),
+    stop: () => sample.stop()
+  };
+
+  initControls(packs.map((p) => p.name), window.document.testplay, controls);
 
   // hardcode first pack found for now for debugging
-  const pack = packs[0];
-  sample = await samplePlayerFromDS(`${baseUrl}${pack.path}/`, context, pack);
+  selectedPack = packs[0];
+  sample = await samplePlayerFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
 }
 
-
+async function selectPack(name) {
+  selectedPack = packs.find((p) => p.name === name);
+  console.log('seleced:', selectedPack);
+  sample = await samplePlayerFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
+}
 
 // Load a multisample pack using a DecentSampler .dspresets file format at given url
 async function loadDSPreset(url, name, path) {
