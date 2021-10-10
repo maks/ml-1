@@ -20,10 +20,14 @@ let players = []
 
 window.document.testplay = function () {
   console.log('play', sample);
-  sample.start(69);
+  sample.start(60);
 }
 
 async function init() {
+  context = new AudioContext()
+  // To allow resuming audiocontext from user gesture in webpage when not headless
+  document.audioContext = context;
+
   fileStore = new FileStore(baseUrl);
 
   // top level dir file list
@@ -46,22 +50,15 @@ async function init() {
   }
 
   console.log('Packs', packs)
+  // hardcode first pack found for now for debugging
   const pack = packs[0];
-
-  context = new AudioContext()
-  // // To allow resuming audiocontext from user gesture in webpage when not headless
-  document.audioContext = context;
-
-  sample = await samplePlayerFromDS(baseUrl + pack.path + "/", context, pack);
-  console.log(sample);
+  sample = await samplePlayerFromDS(`${baseUrl}${pack.path}/`, context, pack);
 }
 
 // Load a multisample pack using a DecentSampler .dspresets file format at given url
 async function loadDSPreset(url, name, path) {
-  // console.log('url:' + url)
   const response = await fetch(url);
   const body = await response.text();
   const ds = new DSPreset(new window.DOMParser().parseFromString(body, "text/xml"), name, path);
-  // console.log('loaded group', ds.group)
   return ds;
 }

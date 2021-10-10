@@ -1,4 +1,4 @@
-import { SamplePlayer } from "/src/sampler/sampler.js";
+import { SamplePlayer } from "/src/sampler/sampler.js"; //TODO: dont hardcode path to sampler.js
 import { DSPreset, DSSample } from "./dspreset_parser";
 
 // returns a SamplePlayer created from a dspreset group
@@ -9,17 +9,14 @@ export async function samplePlayerFromDS(baseUrl: string, context: AudioContext,
   return player;
 }
 
-
 // returns map of { notename: AudioBuffer } for every entry in dspresets group
 async function loadSamples(baseUrl: string, ac: AudioContext, group: DSSample[]): Promise<Record<string, AudioBuffer>> {
   const mapping: Record<string, AudioBuffer> = {};
-  console.log(group)
   for (const sample of group) {
     mapping[sample.rootNote] = await fetchAndDecodeAudio(baseUrl, ac, sample.path);
   }
   return mapping;
 }
-
 
 // returns a AudioBuffer for audio file at given url
 export async function fetchAndDecodeAudio(baseUrl: string, context: AudioContext, url: string) {

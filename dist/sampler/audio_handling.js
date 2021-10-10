@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { SamplePlayer } from "/src/sampler/sampler.js";
+import { SamplePlayer } from "/src/sampler/sampler.js"; //TODO: dont hardcode path to sampler.js
 // returns a SamplePlayer created from a dspreset group
 export function samplePlayerFromDS(baseUrl, context, dspreset) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -21,7 +21,6 @@ export function samplePlayerFromDS(baseUrl, context, dspreset) {
 function loadSamples(baseUrl, ac, group) {
     return __awaiter(this, void 0, void 0, function* () {
         const mapping = {};
-        console.log(group);
         for (const sample of group) {
             mapping[sample.rootNote] = yield fetchAndDecodeAudio(baseUrl, ac, sample.path);
         }
