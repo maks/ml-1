@@ -5,7 +5,9 @@ const lineHeight = 8;
 const font = font5x7;
 const HIEGHT = 64;
 const WIDTH = 128;
-const debugOledHtml = true;
+
+const debugOledHtml = false;
+
 export class OledScreen {
     constructor(midiOutput) {
         this.midiOutput = midiOutput;

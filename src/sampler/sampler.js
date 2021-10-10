@@ -2,6 +2,8 @@ import SamplePlayer from "https://cdn.skypack.dev/sample-player@^0.5.5";
 import { DSPreset } from "/dist/sampler/dspreset_parser.js";
 import { FileStore } from '/dist/sampler/file_browser.js';
 import { samplePlayerFromDS } from '/dist/sampler/audio_handling.js';
+import { initControls } from '/dist/sampler/sampler_ui.js';
+
 
 export { SamplePlayer };
 
@@ -50,10 +52,15 @@ async function init() {
   }
 
   console.log('Packs', packs)
+
+  initControls(packs.map((p) => p.name), window.document.testplay);
+
   // hardcode first pack found for now for debugging
   const pack = packs[0];
   sample = await samplePlayerFromDS(`${baseUrl}${pack.path}/`, context, pack);
 }
+
+
 
 // Load a multisample pack using a DecentSampler .dspresets file format at given url
 async function loadDSPreset(url, name, path) {

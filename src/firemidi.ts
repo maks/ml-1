@@ -52,7 +52,13 @@ export function setupTransport(
   });
 }
 
-export function setupPads(onPad: (padIndex: number) => void) {
+export interface PadsControl {
+  nextBeat: VoidFunction,
+  resetBeat: VoidFunction,
+  padLedOn: (padIndex: number, colour?: PadColour) => void,
+}
+
+export function setupPads(onPad: (padIndex: number) => void): PadsControl {
   firePads = new PadControls(
     {
       midi: dispatcher,
@@ -123,6 +129,25 @@ export function setupDials({
   });
 }
 
+export interface ButtonsSetup {
+  browser: boolcallback,
+  patternUp: boolcallback,
+  patternDown: boolcallback,
+  gridLeft: boolcallback,
+  gridRight: boolcallback,
+  step: boolcallback,
+  note: boolcallback,
+  drum: boolcallback,
+  perform: boolcallback,
+  shift: boolcallback,
+  alt: boolcallback,
+  pattern: boolcallback,
+  solomute1: boolcallback,
+  solomute2: boolcallback,
+  solomute3: boolcallback,
+  solomute4: boolcallback,
+}
+
 export function setupButtons(
   {
     browser,
@@ -141,25 +166,7 @@ export function setupButtons(
     solomute2,
     solomute3,
     solomute4
-  }:
-    {
-      browser: boolcallback,
-      patternUp: boolcallback,
-      patternDown: boolcallback,
-      gridLeft: boolcallback,
-      gridRight: boolcallback,
-      step: boolcallback,
-      note: boolcallback,
-      drum: boolcallback,
-      perform: boolcallback,
-      shift: boolcallback,
-      alt: boolcallback,
-      pattern: boolcallback,
-      solomute1: boolcallback,
-      solomute2: boolcallback,
-      solomute3: boolcallback,
-      solomute4: boolcallback,
-    }
+  }: ButtonsSetup
 ) {
 
   buttons = new ButtonControls(
