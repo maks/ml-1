@@ -1,10 +1,8 @@
-import SamplePlayer from "https://cdn.skypack.dev/sample-player@^0.5.5";
 import { DSPreset } from "/dist/sampler/dspreset_parser.js";
 import { FileStore } from '/dist/sampler/file_browser.js';
 import { samplePlayerFromDS } from '/dist/sampler/audio_handling.js';
 import { initControls } from '/dist/sampler/sampler_ui.js';
 
-export { SamplePlayer };
 
 const baseUrl = "http://127.0.0.1:8008/";
 
@@ -56,7 +54,7 @@ async function init() {
 
   const controls = {
     selectInstrument: selectPack,
-    playNote: (note) => sample.start(note + 60),
+    playNote: (note) => sample.schedule(context.currentTime, [0, note]),
     stop: () => sample.stop()
   };
 
@@ -69,8 +67,9 @@ async function init() {
 
 async function selectPack(name) {
   selectedPack = packs.find((p) => p.name === name);
-  console.log('seleced:', selectedPack);
+  console.log('selected:', selectedPack);
   sample = await samplePlayerFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
+  console.log('current sample', sample);
 }
 
 // Load a multisample pack using a DecentSampler .dspresets file format at given url

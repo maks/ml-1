@@ -7,7 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { SamplePlayer } from "/src/sampler/sampler.js"; //TODO: dont hardcode path to sampler.js
+// @ts-ignore
+import { SamplePlayer } from "/src/sampler/sample-player/index.js";
 // returns a SamplePlayer created from a dspreset group
 export function samplePlayerFromDS(baseUrl, context, dspreset) {
     return __awaiter(this, void 0, void 0, function* () {

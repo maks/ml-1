@@ -1,4 +1,5 @@
-import { SamplePlayer } from "/src/sampler/sampler.js"; //TODO: dont hardcode path to sampler.js
+// @ts-ignore
+import { SamplePlayer } from "/src/sampler/sample-player/index.js";
 import { DSPreset, DSSample } from "./dspreset_parser";
 
 // returns a SamplePlayer created from a dspreset group
