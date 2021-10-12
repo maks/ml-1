@@ -3,7 +3,6 @@ import { FileStore } from '/dist/sampler/file_browser.js';
 import { samplePlayerFromDS } from '/dist/sampler/audio_handling.js';
 import { initControls } from '/dist/sampler/sampler_ui.js';
 
-
 const baseUrl = "http://127.0.0.1:8008/";
 
 // init() once the page has finished loading.
@@ -54,7 +53,8 @@ async function init() {
 
   const controls = {
     selectInstrument: selectPack,
-    playNote: (note) => sample.schedule(context.currentTime, [0, note]),
+    // TODO: dont hardcode note offset, allow selecting octave range on Fire
+    playNote: (note) => sample.start(note + 30), //start at midinote 30 for range on pads midi notes: 30-94
     stop: () => sample.stop()
   };
 

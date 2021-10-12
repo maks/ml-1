@@ -21,7 +21,9 @@ export class DSPreset {
           path: g.getAttribute("path")?.toString(),
           start: parseInt(g.getAttribute("start") as string),
           end: parseInt(g.getAttribute("end") as string),
-          rootNote: g.getAttribute("rootNote")?.toString()
+          rootNote: g.getAttribute("rootNote")?.toString(),
+          loNote: g.getAttribute("loNote")?.toString(),
+          hiNote: g.getAttribute("hiNote")?.toString()
         }));
       }
     }

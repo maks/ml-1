@@ -76,13 +76,14 @@ export default function SamplePlayer(ac, source, options) {
 
     var opts = options || EMPTY
     when = Math.max(ac.currentTime, when || 0)
+    let offset = opts.offset || 0;
     player.emit('start', when, name, opts)
     var node = createNode(name, buffer, opts)
     node.id = track(name, node)
-    node.env.start(when)
+    node.env.start(when, offset, opts.duration)
     node.source.start(when)
     player.emit('started', when, node.id, node)
-    if (opts.duration) node.stop(when + opts.duration)
+    // if (opts.duration) node.stop(when + opts.duration)
     return node
   }
 
@@ -205,3 +206,4 @@ function envelope(ac, options, opts) {
  * f2 = f1 * 2^( C / 1200 )
  */
 function centsToRate(cents) { return cents ? Math.pow(2, cents / 1200) : 1 }
+
