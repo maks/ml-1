@@ -32,15 +32,15 @@ function loadSamples(baseUrl, ac, group) {
     return __awaiter(this, void 0, void 0, function* () {
         const mapping = {};
         for (const sample of group) {
-            mapping[sample.rootNote] = yield fetchAndDecodeAudio(baseUrl, ac, sample.path);
+            mapping[sample.rootNote] = yield fetchAndDecodeAudio(ac, baseUrl + sample.path);
         }
         return mapping;
     });
 }
 // returns a AudioBuffer for audio file at given url
-export function fetchAndDecodeAudio(baseUrl, context, url) {
+export function fetchAndDecodeAudio(context, url) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield fetch(baseUrl + url);
+        const response = yield fetch(url);
         const responseBuffer = yield response.arrayBuffer();
         return yield context.decodeAudioData(responseBuffer);
     });
@@ -50,12 +50,12 @@ export class Instrument {
         this._ranges = ranges;
         this._player = SamplePlayer(context, sampleBuffers).connect(context.destination);
     }
-    start(name, when, options) {
+    /// expect noteName to be a midi note number 0-127 as a string 
+    start(midiNote, when, options) {
         // lookup matching sample name from given ranges
-        const midiNote = parseInt(name);
         const matchingSampleRange = this._ranges.find(e => (e.rootNote == midiNote) || (e.maxNote >= midiNote && e.minNote <= midiNote));
         if (matchingSampleRange === undefined) {
-            console.log('no matching note:' + name);
+            console.log('no matching note:' + midiNote);
             return;
         }
         const opts = options || {};

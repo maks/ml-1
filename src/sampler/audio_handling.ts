@@ -23,14 +23,14 @@ export async function samplePlayerFromDS(baseUrl: string, context: AudioContext,
 async function loadSamples(baseUrl: string, ac: AudioContext, group: DSSample[]): Promise<Record<string, AudioBuffer>> {
   const mapping: Record<string, AudioBuffer> = {};
   for (const sample of group) {
-    mapping[sample.rootNote] = await fetchAndDecodeAudio(baseUrl, ac, sample.path);
+    mapping[sample.rootNote] = await fetchAndDecodeAudio(ac, baseUrl + sample.path,);
   }
   return mapping;
 }
 
 // returns a AudioBuffer for audio file at given url
-export async function fetchAndDecodeAudio(baseUrl: string, context: AudioContext, url: string) {
-  const response = await fetch(baseUrl + url);
+export async function fetchAndDecodeAudio(context: AudioContext, url: string) {
+  const response = await fetch(url);
   const responseBuffer = await response.arrayBuffer();
   return await context.decodeAudioData(responseBuffer);
 }
@@ -50,13 +50,13 @@ export class Instrument {
     this._player = SamplePlayer(context, sampleBuffers).connect(context.destination);
   }
 
-  start(name: string, when: number, options: object) {
+  /// expect noteName to be a midi note number 0-127 as a string 
+  start(midiNote: number, when: number, options: object) {
     // lookup matching sample name from given ranges
-    const midiNote: number = parseInt(name);
     const matchingSampleRange: SampleRange | undefined = this._ranges.find(e => (e.rootNote == midiNote) || (e.maxNote >= midiNote && e.minNote <= midiNote));
 
     if (matchingSampleRange === undefined) {
-      console.log('no matching note:' + name);
+      console.log('no matching note:' + midiNote);
       return;
     }
     const opts: any = options || {};
