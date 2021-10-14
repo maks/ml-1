@@ -23,10 +23,12 @@ export function samplePlayerFromDS(baseUrl, context, dspreset) {
             return sr;
         });
         const samples = yield loadSamples(baseUrl, context, group);
-        const instrument = new Instrument(sampleRanges, context, samples);
+        const filename = _stripLastChar(baseUrl.substring(_stripLastChar(baseUrl).lastIndexOf('/') + 1));
+        const instrument = new Instrument(filename, sampleRanges, context, samples);
         return instrument;
     });
 }
+function _stripLastChar(str) { return str.substring(0, str.length - 1); }
 // returns map of { notename: AudioBuffer } for every entry in dspresets group
 function loadSamples(baseUrl, ac, group) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -46,10 +48,12 @@ export function fetchAndDecodeAudio(context, url) {
     });
 }
 export class Instrument {
-    constructor(ranges, context, sampleBuffers) {
+    constructor(name, ranges, context, sampleBuffers) {
+        this._name = name;
         this._ranges = ranges;
         this._player = SamplePlayer(context, sampleBuffers).connect(context.destination);
     }
+    get name() { return this._name; }
     /// expect noteName to be a midi note number 0-127 as a string 
     start(midiNote, when, options) {
         // lookup matching sample name from given ranges

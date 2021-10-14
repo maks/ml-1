@@ -2,7 +2,8 @@ import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons
 
 import { MenuController } from '../menu/menu_controller.js'
 
-import { ListScreen, ListScreenItem, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js'
+import { ListScreen, ListScreenItem, MenuScreen, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js'
+import { Track } from './sequencer.js';
 
 const MENU_LIST_ITEMS_COUNT = 9;
 
@@ -18,9 +19,16 @@ interface controlInterface {
   stop: () => void
 }
 
+interface MachineState {
+  currentTrack: Track,
+  selectedStep: number,
+  tracks: Track[]
+}
+
 export function initControls(instrumentNames: string[],
   handlePlay: VoidFunction,
-  control: controlInterface
+  control: controlInterface,
+  machineState: MachineState
 ) {
   getMidi(midiReady, (isConnected: boolean) => {
     if (isConnected) { console.log('reconnected'); midiReady(); }
@@ -32,7 +40,7 @@ export function initControls(instrumentNames: string[],
     setupTransport(
       handlePlay, control.stop, function () { }
     );
-    padControl = setupPads(control.playNote);
+    padControl = setupPads((index) => handlePad(index, machineState));
     oled = setupOled();
 
     const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(instrumentNames, control.selectInstrument),
@@ -43,6 +51,21 @@ export function initControls(instrumentNames: string[],
     menu = new MenuController(oled);
     menu.pushMenuScreen(_topMenu);
 
+    const overlays = {
+      // 'volume': new NumberOverlayScreen(
+      //   "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
+      // ),
+      'pitch': new NumberOverlayScreen(
+        `P:`, 1, 127, 1, 1, 1, (pitch) => {
+          machineState.currentTrack.steps[machineState.selectedStep].note = pitch;
+        },
+      )
+      // ,
+      // 'effects': new NumberOverlayScreen(
+      //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
+      // ),
+    };
+
     dials = setupDials(
       {
         onVolume: (dir) => {
@@ -52,15 +75,15 @@ export function initControls(instrumentNames: string[],
 
         },
         onFilter: (dir) => {
-          // const instrumentName = machineState.currentInstrumentName;
-          // const overlay = overlays["pitch"];
-          // if (instrumentName == null) {
-          //   return;
-          // }
-          // let pitch = theBeat.getPitch(instrumentName);
-          // overlay.title = `P:${instrumentName}`;
-          // overlay.value = pitch;
-          // handleDialInput(dir, overlay);
+          const instrumentName = machineState.currentTrack.name;
+          const overlay = overlays["pitch"];
+          if (instrumentName == null) {
+            return;
+          }
+          let pitch = machineState.currentTrack.steps[machineState.selectedStep].note;
+          overlay.title = `${instrumentName}`;
+          overlay.value = pitch;
+          handleDialInput(dir, overlay);
         },
         onResonance: (dir) => {
           // handleDialInput(dir, overlays["effects"]);
@@ -93,9 +116,15 @@ export function initControls(instrumentNames: string[],
       solomute1: (up: boolean) => {
         //_selectedInstrumentIndex = up ? null : 0;
         console.log('SOLO1' + up);
+        machineState.currentTrack = machineState.tracks[0];
+
+        console.log(machineState);
       },
       solomute2: (up: boolean) => {
         //_selectedInstrumentIndex = up ? null : 1;
+        machineState.currentTrack = machineState.tracks[1];
+
+        console.log(machineState);
       },
       solomute3: (up: boolean) => {
         //_selectedInstrumentIndex = up ? null : 2;
@@ -143,6 +172,32 @@ export function initControls(instrumentNames: string[],
 function _topMenuListItems(entries: string[], selectedFn: Function): ListScreenItem[] {
   return entries.map((x) => new ListScreenItem(x, (item: ListScreenItem) => selectedFn(item.label), {}));
 }
+
+
+function handleDialInput(dir: number, overlay: MenuScreen) {
+  // button up
+  if (dir == 3) {
+    menu.clearOverlay();
+    return;
+  }
+
+  if (dir == 0) {
+    overlay.prev();
+  } else if (dir == 1) {
+    overlay.next();
+  }
+  menu.setOverlay(overlay)
+}
+
+function handlePad(index: number, machineState: MachineState,) {
+  console.log("pad offset" + index % 16);
+  //TODO: account for grid offset
+  machineState.selectedStep = index % 16;
+  //TODO: lookup color
+  const padColour = { r: 0, g: 0, b: 50 };
+  padControl.padLedOn(index, padColour);
+}
+
 
 // function onInstrumentSelected(item: ListScreenItem) {
 //   console.log("SELECTED:", item.label)

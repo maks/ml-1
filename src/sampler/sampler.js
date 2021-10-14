@@ -2,6 +2,7 @@ import { DSPreset } from "/dist/sampler/dspreset_parser.js";
 import { FileStore } from '/dist/sampler/file_browser.js';
 import { samplePlayerFromDS } from '/dist/sampler/audio_handling.js';
 import { initControls } from '/dist/sampler/sampler_ui.js';
+import { Project } from '/dist/sampler/sequencer.js';
 
 const baseUrl = "http://127.0.0.1:8008/";
 
@@ -11,12 +12,19 @@ window.onload = init;
 let context;
 let sample;
 let fileStore;
+let project;
 
 // array of packs as DSPreset objects
 let packs = [];
 let players = []
 
 let selectedPack;
+
+let machineState = {
+  currentTrack: null,
+  selectedStep: null,
+  tracks: []
+}
 
 window.document.testplay = function () {
   console.log('play', sample);
@@ -27,6 +35,10 @@ async function init() {
   context = new AudioContext()
   // To allow resuming audiocontext from user gesture in webpage when not headless
   document.audioContext = context;
+
+  project = new Project(120, "No Effect", 0);
+
+  machineState.tracks = project.tracks;
 
   fileStore = new FileStore(baseUrl);
 
@@ -58,7 +70,7 @@ async function init() {
     stop: () => sample.stop()
   };
 
-  initControls(packs.map((p) => p.name), window.document.testplay, controls);
+  initControls(packs.map((p) => p.name), window.document.testplay, controls, machineState);
 
   // hardcode first pack found for now for debugging
   selectedPack = packs[0];

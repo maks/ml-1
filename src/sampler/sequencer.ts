@@ -1,4 +1,4 @@
-import { fetchAndDecodeAudio, Instrument } from "./audio_handling";
+import { fetchAndDecodeAudio, Instrument } from "./audio_handling.js";
 
 export { Project, Track, ProjectPlayer, Effect };
 
@@ -85,6 +85,10 @@ class Track {
   constructor(context: AudioContext, instrument: Instrument, effect: Effect) {
     this._context = context;
     this._instrument = instrument;
+  }
+
+  get name() {
+    return this._instrument.name;
   }
 
   set instrument(i) {

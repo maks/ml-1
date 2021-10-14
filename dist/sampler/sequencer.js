@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { fetchAndDecodeAudio } from "./audio_handling";
+import { fetchAndDecodeAudio } from "./audio_handling.js";
 export { Project, Track, ProjectPlayer, Effect };
 const LOOP_LENGTH = 16;
 const BEATS_PER_FULL_NOTE = 4;
@@ -17,10 +17,7 @@ class Project {
         this._swingFactor = 0;
         this._tempo = tempo;
         this._effect = effect;
-        this._effectWetMix = effectMix;
-        if (effect.mix == 0) {
-            this._effectWetMix = 0.5;
-        }
+        this._effectMix = effectMix;
     }
     get tracks() {
         return this._tracks;
@@ -36,7 +33,7 @@ class Project {
         // If the effect is meant to be entirely wet (no unprocessed signal) then
         // put the effect level all the way up.
         if (effect.dryMix == 0) {
-            this._effectWetMix = 1;
+            this._effectMix = 1;
         }
     }
     get effect() {
@@ -67,6 +64,9 @@ class Track {
         this._context = context;
         this._instrument = instrument;
     }
+    get name() {
+        return this._instrument.name;
+    }
     set instrument(i) {
         this._instrument = i;
     }
@@ -87,15 +87,13 @@ class Track {
 }
 class Effect {
     constructor(context, name, url, mix) {
-        this._wetMix = 0; //range: 0..1 
-        this._dryMix = 0; //range: 0..1 
+        this.wetMix = 0; //range: 0..1 
+        this.dryMix = 0; //range: 0..1 
         this._buffer = null;
         this._context = context;
         this._name = name;
         this._url = url;
-        this._mix = mix === undefined ? 0 : mix;
     }
-    get mix() { return this._mix; }
     get buffer() { return this._buffer; }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -185,7 +183,8 @@ class ProjectPlayer {
         this._convolver.buffer = this._project.effect.buffer;
         // Factor in both the preset's effect level and the blending level
         // (effectWetMix) stored in the effect itself.
-        this._effectLevelNode.gain.value = this._project.effect.mix;
+        this._effectLevelNode.gain.value =
+            this._project.effectMix * this._project.effect.wetMix;
     }
     play() {
         // Ensure that initial notes are played at once by scheduling the playback
@@ -193,7 +192,7 @@ class ProjectPlayer {
         this._nextBeatAt = this._context.currentTime + 0.05;
         this._rhythmIndex = 0;
         for (const track of this._project.tracks) {
-            // shoudl we use this instead? is this bug in orig shiny-drums?
+            // should we use this instead? is this bug in orig shiny-drums?
             // this.playNoteAtTime(track, this._rhythmIndex, this._nextBeatAt);
             this.playNote(track, this._rhythmIndex);
         }

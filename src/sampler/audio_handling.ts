@@ -15,9 +15,12 @@ export async function samplePlayerFromDS(baseUrl: string, context: AudioContext,
     return sr;
   });
   const samples = await loadSamples(baseUrl, context, group);
-  const instrument = new Instrument(sampleRanges, context, samples);
+  const filename = _stripLastChar(baseUrl.substring(_stripLastChar(baseUrl).lastIndexOf('/') + 1));
+  const instrument = new Instrument(filename, sampleRanges, context, samples);
   return instrument;
 }
+
+function _stripLastChar(str: string) { return str.substring(0, str.length - 1); }
 
 // returns map of { notename: AudioBuffer } for every entry in dspresets group
 async function loadSamples(baseUrl: string, ac: AudioContext, group: DSSample[]): Promise<Record<string, AudioBuffer>> {
@@ -44,11 +47,15 @@ interface SampleRange {
 export class Instrument {
   readonly _ranges: SampleRange[];
   readonly _player: SamplePlayer;
+  readonly _name: string;
 
-  constructor(ranges: SampleRange[], context: AudioContext, sampleBuffers: Record<string, AudioBuffer>) {
+  constructor(name: string, ranges: SampleRange[], context: AudioContext, sampleBuffers: Record<string, AudioBuffer>) {
+    this._name = name;
     this._ranges = ranges;
     this._player = SamplePlayer(context, sampleBuffers).connect(context.destination);
   }
+
+  get name() { return this._name; }
 
   /// expect noteName to be a midi note number 0-127 as a string 
   start(midiNote: number, when: number, options: object) {
