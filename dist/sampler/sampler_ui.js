@@ -193,8 +193,11 @@ function handlePad(index, machineState, callback) {
     //TODO: account for grid offset
     machineState.selectedStep = index % 16;
     if (machineState.mode == MachineMode.Note) {
-        console.log('PLAY NOTE:' + index);
-        callback(_noteFromPadIndex(index));
+        const note = _noteFromPadIndex(index);
+        if (note > 0) {
+            console.log('PLAY NOTE:' + index);
+            callback(note);
+        }
     }
 }
 const firstBlackRow = 32;
@@ -218,6 +221,9 @@ function _noteFromPadIndex(index) {
     const octave = 3;
     let midiNote = 0;
     const octaveStartingNote = (octave * 12) % 128;
+    if (index < firstBlackRow) {
+        return 0;
+    }
     if (index >= firstBlackRow && index <= firstWhiteRow) {
         const noteOffset = blackKeys[index % 16];
         if (noteOffset == 0) {

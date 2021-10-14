@@ -239,8 +239,11 @@ function handlePad(index: number, machineState: MachineState, callback: (note: n
   machineState.selectedStep = index % 16;
 
   if (machineState.mode == MachineMode.Note) {
-    console.log('PLAY NOTE:' + index);
-    callback(_noteFromPadIndex(index));
+    const note = _noteFromPadIndex(index);
+    if (note > 0) {
+      console.log('PLAY NOTE:' + index);
+      callback(note);
+    }
   }
 }
 
@@ -267,6 +270,10 @@ function _noteFromPadIndex(index: number): number {
   const octave = 3;
   let midiNote = 0;
   const octaveStartingNote = (octave * 12) % 128;
+
+  if (index < firstBlackRow) {
+    return 0;
+  }
 
   if (index >= firstBlackRow && index <= firstWhiteRow) {
     const noteOffset = blackKeys[index % 16];
