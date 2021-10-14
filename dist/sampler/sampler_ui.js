@@ -129,6 +129,7 @@ export function initControls(instrumentNames, handlePlay, control, machineState)
                 if (!up) {
                     machineState.mode = MachineMode.Note;
                     _setModeButtonLeds(machineState.mode);
+                    _paintPadsKeyboard();
                 }
             },
             drum: function (up) {
@@ -150,7 +151,6 @@ export function initControls(instrumentNames, handlePlay, control, machineState)
         buttons = setupButtons(bSetup);
         // clear all now that we have finished init
         allOff();
-        _paintPadsKeyboard();
         // update OLED with loaded preset
         menu.updateOled();
     }

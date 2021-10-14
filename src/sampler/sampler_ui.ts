@@ -164,6 +164,7 @@ export function initControls(instrumentNames: string[],
         if (!up) {
           machineState.mode = MachineMode.Note;
           _setModeButtonLeds(machineState.mode);
+          _paintPadsKeyboard()
         }
       },
       drum: function (up: boolean): void {
@@ -188,8 +189,6 @@ export function initControls(instrumentNames: string[],
 
     // clear all now that we have finished init
     allOff();
-
-    _paintPadsKeyboard()
 
     // update OLED with loaded preset
     menu.updateOled();
