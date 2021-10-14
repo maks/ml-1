@@ -62,10 +62,10 @@ CCInputs.paleYellow = 1;
 CCInputs.yellow = 2;
 // Yellow-Red
 // step, note, drum, perform, shift
-CCInputs.paleYellow2 = 1;
-CCInputs.paleRed2 = 2;
-CCInputs.yellow2 = 3;
-CCInputs.red2 = 4;
+CCInputs.paleRed2 = 1;
+CCInputs.paleYellow2 = 2;
+CCInputs.red2 = 3;
+CCInputs.yellow2 = 4;
 //record
 CCInputs.recPaleRed = 1;
 CCInputs.recPaleYellow = 2;

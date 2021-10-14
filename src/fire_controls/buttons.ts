@@ -38,9 +38,8 @@ export class ButtonControls {
     this.buttonListener = onButton;
   }
 
-  public buttonOn(button: ButtonCode, ledColour?: number) {
-    const colour = 1;
-    this.midi.send(CCInputs.on(button, colour));
+  public buttonOn(button: ButtonCode, ledColour: number) {
+    this.midi.send(CCInputs.on(button, ledColour));
   }
 
   private onMidiMessage(data: Uint8Array) {

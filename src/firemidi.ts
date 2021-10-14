@@ -93,6 +93,12 @@ export interface OledControl {
   send: VoidFunction,
 }
 
+export interface ButtonControl {
+  buttonLedOn: ButtonOled
+}
+
+export type ButtonOled = (button: number, colour: number) => void;
+
 export function setupOled(): OledControl {
   oled = new OledScreen(midiOutput);
   return {
@@ -167,8 +173,7 @@ export function setupButtons(
     solomute3,
     solomute4
   }: ButtonsSetup
-) {
-
+): ButtonControl {
   buttons = new ButtonControls(
     {
       midi: dispatcher,
@@ -227,7 +232,7 @@ export function setupButtons(
     }
   );
   return {
-    buttonLedOn: (button: number, colour?: number) => {
+    buttonLedOn: (button: number, colour: number) => {
       buttons.buttonOn(button, colour);
     }
   };

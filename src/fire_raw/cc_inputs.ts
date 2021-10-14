@@ -70,10 +70,10 @@ export class CCInputs {
 
   // Yellow-Red
   // step, note, drum, perform, shift
-  public static readonly paleYellow2 = 1;
-  public static readonly paleRed2 = 2;
-  public static readonly yellow2 = 3;
-  public static readonly red2 = 4;
+  public static readonly paleRed2 = 1;
+  public static readonly paleYellow2 = 2;
+  public static readonly red2 = 3;
+  public static readonly yellow2 = 4;
 
   //record
   public static readonly recPaleRed = 1;

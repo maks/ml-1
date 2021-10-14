@@ -26,8 +26,7 @@ export class ButtonControls {
         this.buttonListener = onButton;
     }
     buttonOn(button, ledColour) {
-        const colour = 1;
-        this.midi.send(CCInputs.on(button, colour));
+        this.midi.send(CCInputs.on(button, ledColour));
     }
     onMidiMessage(data) {
         // console.log('midi:', data);
