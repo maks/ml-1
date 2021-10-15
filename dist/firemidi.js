@@ -50,7 +50,8 @@ export function setupPads(onPad) {
         resetBeat: () => { head.reset(); },
         padLedOn: (padIndex, colour) => {
             firePads.padLedOn(padIndex, colour);
-        }
+        },
+        allOff: () => { firePads.allOff(); }
     };
 }
 export function setupOled() {

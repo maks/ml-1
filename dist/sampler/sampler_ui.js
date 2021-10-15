@@ -123,12 +123,14 @@ export function initControls(instrumentNames, handlePlay, control, machineState)
                 if (!up) {
                     machineState.mode = MachineMode.Step;
                     _setModeButtonLeds(machineState.mode);
+                    padControl.allOff();
                 }
             },
             note: function (up) {
                 if (!up) {
                     machineState.mode = MachineMode.Note;
                     _setModeButtonLeds(machineState.mode);
+                    padControl.allOff();
                     _paintPadsKeyboard();
                 }
             },
@@ -136,12 +138,14 @@ export function initControls(instrumentNames, handlePlay, control, machineState)
                 if (!up) {
                     machineState.mode = MachineMode.Drum;
                     _setModeButtonLeds(machineState.mode);
+                    padControl.allOff();
                 }
             },
             perform: function (up) {
                 if (!up) {
                     machineState.mode = MachineMode.Preform;
                     _setModeButtonLeds(machineState.mode);
+                    padControl.allOff();
                 }
             },
             alt: function (up) {

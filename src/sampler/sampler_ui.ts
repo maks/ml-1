@@ -1,4 +1,4 @@
-import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons, allOff, ButtonsSetup, ButtonControl, ButtonCode } from '../firemidi.js';
+import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons, allOff, ButtonsSetup, ButtonControl, ButtonCode, PadsControl } from '../firemidi.js';
 import { CCInputs } from '../fire_raw/cc_inputs.js';
 
 import { MenuController } from '../menu/menu_controller.js'
@@ -12,7 +12,7 @@ let oled: any;
 let menu: any;
 let buttons: ButtonControl;
 let dials: any;
-let padControl: any;
+let padControl: PadsControl;
 
 interface controlInterface {
   selectInstrument: (instrument: string) => void,
@@ -158,12 +158,14 @@ export function initControls(instrumentNames: string[],
         if (!up) {
           machineState.mode = MachineMode.Step;
           _setModeButtonLeds(machineState.mode);
+          padControl.allOff();
         }
       },
       note: function (up: boolean): void {
         if (!up) {
           machineState.mode = MachineMode.Note;
           _setModeButtonLeds(machineState.mode);
+          padControl.allOff();
           _paintPadsKeyboard()
         }
       },
@@ -171,12 +173,14 @@ export function initControls(instrumentNames: string[],
         if (!up) {
           machineState.mode = MachineMode.Drum;
           _setModeButtonLeds(machineState.mode);
+          padControl.allOff();
         }
       },
       perform: function (up: boolean): void {
         if (!up) {
           machineState.mode = MachineMode.Preform;
           _setModeButtonLeds(machineState.mode);
+          padControl.allOff();
         }
       },
       alt: function (up: boolean): void {
