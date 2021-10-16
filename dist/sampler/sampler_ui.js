@@ -25,7 +25,7 @@ export function initControls(instrumentNames, control, machineState) {
     });
     function midiReady() {
         console.log('SAMPLER MIDI IS READY');
-        setupTransport(control.startPlayer, control.stop, function () { });
+        setupTransport(control.startPlayer, control.stop, control.save);
         padControl = setupPads((index) => handlePad(index, machineState, control.playNote));
         oled = setupOled();
         const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(instrumentNames, (instrumentName) => _handleInstrumentSelection(control, machineState, instrumentName)), () => {

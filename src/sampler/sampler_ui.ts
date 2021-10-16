@@ -19,7 +19,8 @@ interface controlInterface {
   selectInstrument: (instrument: string) => void,
   playNote: (note: number) => void,
   stop: () => void,
-  startPlayer: () => void
+  startPlayer: () => void,
+  save: () => void
 }
 
 export enum MachineMode {
@@ -51,7 +52,7 @@ export function initControls(
     console.log('SAMPLER MIDI IS READY');
 
     setupTransport(
-      control.startPlayer, control.stop, function () { }
+      control.startPlayer, control.stop, control.save
     );
     padControl = setupPads((index) => handlePad(index, machineState, control.playNote));
     oled = setupOled();

@@ -1,6 +1,6 @@
 import { DSPreset } from "/dist/sampler/dspreset_parser.js";
 import { FileStore } from '/dist/sampler/file_browser.js';
-import { samplePlayerFromDS } from '/dist/sampler/audio_handling.js';
+import { instrumentFromDS } from '/dist/sampler/audio_handling.js';
 import { initControls } from '/dist/sampler/sampler_ui.js';
 import { Project, ProjectPlayer } from '/dist/sampler/sequencer.js';
 
@@ -10,14 +10,13 @@ const baseUrl = "http://127.0.0.1:8008/";
 window.onload = init;
 
 let context;
-let samplePlayer;
+let instrument;
 let fileStore;
 let project;
 let projectPlayer;
 
 // array of packs as DSPreset objects
 let packs = [];
-let players = []
 
 let selectedPack;
 
@@ -30,7 +29,7 @@ let machineState = {
 
 window.document.testplay = function () {
   console.log('play', sample);
-  samplePlayer.start(60);
+  instrument.start(60);
 }
 
 async function init() {
@@ -39,8 +38,7 @@ async function init() {
   document.audioContext = context;
 
   project = new Project(context, 80, "No Effect", 0);
-
-  projectPlayer = new ProjectPlayer(context, project, handleOnNextBeat);
+  window.document.project = project;
 
   machineState.tracks = project.tracks;
 
@@ -69,28 +67,49 @@ async function init() {
 
   const controls = {
     selectInstrument: selectPack,
-    playNote: (note) => samplePlayer.start(note),
+    playNote: (note) => instrument.start(note),
     startPlayer: () => projectPlayer.play(),
-    stop: () => projectPlayer.stop()
-    // stop: () => samplePlayer.stop()
+    stop: () => projectPlayer.stop(),
+    save: () => console.log("save:" + saveToStorage(JSON.stringify(project.toData())))
   };
 
   initControls(packs.map((p) => p.name), controls, machineState);
 
   // hardcode first pack found for now for debugging
   selectedPack = packs[0];
-  samplePlayer = await samplePlayerFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
+  instrument = await instrumentFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
+
+  // load from saved data in localstorage
+  const data = loadFromStorage();
+  if (data) {
+    project = await Project.fromData(context, selectPack, data);
+    machineState.tracks = project.tracks;
+
+    console.log("loaded proj", project);
+  }
+  projectPlayer = new ProjectPlayer(context, project, handleOnNextBeat);
 }
 
 async function selectPack(name) {
+  if (!name) {
+    console.log("no point looking up undefined instrument pack name");
+    return;
+  }
+  console.log('looking for:' + name, packs)
   selectedPack = packs.find((p) => p.name === name);
   console.log('selected:', selectedPack);
-  samplePlayer = await samplePlayerFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
-  machineState.currentTrack.instrument = samplePlayer;
-  console.log('current sampleplayer', samplePlayer);
+  instrument = await instrumentFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
+  if (machineState.currentTrack) {
+    machineState.currentTrack.instrument = instrument;
+  } else {
+    console.log("no current track to set instrument on");
+  }
+  console.log('current sampleplayer', instrument);
+  return instrument;
 }
 
 // Load a multisample pack using a DecentSampler .dspresets file format at given url
+/// returns a DSPreset
 async function loadDSPreset(url, name, path) {
   const response = await fetch(url);
   const body = await response.text();
@@ -100,4 +119,15 @@ async function loadDSPreset(url, name, path) {
 
 function handleOnNextBeat(beatCount) {
   //console.log('Sampler BEAT:' + beatCount)
+}
+
+const projectKey = 'default.project';
+
+function saveToStorage(jsonString) {
+  localStorage.setItem(projectKey, jsonString);
+}
+
+function loadFromStorage() {
+  let jsonStr = localStorage.getItem(projectKey);
+  return JSON.parse(jsonStr);
 }

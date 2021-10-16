@@ -20,6 +20,18 @@ class Project {
         this._effectMix = effectMix;
         this._tracks = [0, 1, 2, 3].map((i) => new Track(context, null, `Trk${i}`, null));
     }
+    static fromData(context, lookupInstrument, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const project = new Project(context, data.tempo, new Effect(context, "No Effect"), data.effectMix);
+            project._tracks = [];
+            for (const tr of data.tracks) {
+                const instrument = yield lookupInstrument(tr.instrumentName);
+                const track = Track.fromData(context, instrument, tr);
+                project._tracks.push(track);
+            }
+            return project;
+        });
+    }
     get tracks() {
         return this._tracks;
     }
@@ -58,6 +70,16 @@ class Project {
     get swingFactor() {
         return this._swingFactor;
     }
+    // convert to easily stringifyable object
+    toData() {
+        console.log('todata tracks', this.tracks);
+        return {
+            tracks: this.tracks.map((t) => t.toData()),
+            tempo: this.tempo,
+            swing: this.swingFactor,
+            effect: this.effect
+        };
+    }
 }
 class Track {
     constructor(context, instrument, name, effect) {
@@ -68,6 +90,11 @@ class Track {
             this._steps[i] = { note: 0, velocity: 127 };
         }
         this._name = name;
+    }
+    static fromData(context, instrument, data) {
+        const track = new Track(context, instrument, data.name, null);
+        track._steps = data.steps;
+        return track;
     }
     get name() {
         var _a, _b;
@@ -98,6 +125,16 @@ class Track {
         }
     }
     getNote(rhythmIndex) { return this.steps[rhythmIndex].note; }
+    // convert to easily stringifyable object
+    toData() {
+        var _a;
+        console.log(this.steps);
+        return {
+            name: this.name,
+            instrumentName: (_a = this.instrument) === null || _a === void 0 ? void 0 : _a.name,
+            steps: this.steps
+        };
+    }
 }
 class Effect {
     constructor(context, name, url, mix) {
@@ -146,6 +183,7 @@ class ProjectPlayer {
     playNoteAtTime(track, rhythmIndex, noteTime) {
         const note = track.getNote(rhythmIndex);
         if (!note) {
+            console.log("missing note: tr" + track.name + " idx:" + rhythmIndex);
             return;
         }
         // Create the note

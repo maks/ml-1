@@ -2,8 +2,8 @@
 import { SamplePlayer } from "/src/sampler/sample-player/index.js";
 import { DSPreset, DSSample } from "./dspreset_parser";
 
-// returns a SamplePlayer created from a dspreset group
-export async function samplePlayerFromDS(baseUrl: string, context: AudioContext, dspreset: DSPreset): Promise<Instrument> {
+// returns a SamplePlayer based Instrument created from a dspreset group
+export async function instrumentFromDS(baseUrl: string, context: AudioContext, dspreset: DSPreset): Promise<Instrument> {
   const group = dspreset.group;
   const sampleRanges: SampleRange[] = group.map((sample) => {
     // decent parser format spec says root, lo, hi Note are 0-127 midi notes
@@ -16,7 +16,7 @@ export async function samplePlayerFromDS(baseUrl: string, context: AudioContext,
   });
   const samples = await loadSamples(baseUrl, context, group);
   const filename = _stripLastChar(baseUrl.substring(_stripLastChar(baseUrl).lastIndexOf('/') + 1));
-  const instrument = new Instrument(filename, sampleRanges, context, samples);
+  const instrument = new Instrument(dspreset.name, sampleRanges, context, samples);
   return instrument;
 }
 

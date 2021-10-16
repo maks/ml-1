@@ -13,6 +13,17 @@ class Project {
   private _effect: Effect;
   private _effectMix: number; // 0 to 1
 
+  static async fromData(context: AudioContext, lookupInstrument: (name: string) => Promise<Instrument>, data: any): Promise<Project> {
+    const project = new Project(context, data.tempo, new Effect(context, "No Effect"), data.effectMix);
+    project._tracks = [];
+    for (const tr of data.tracks) {
+      const instrument = await lookupInstrument(tr.instrumentName);
+      const track = Track.fromData(context, instrument, tr);
+      project._tracks.push(track);
+    }
+    return project;
+  }
+
   constructor(context: AudioContext, tempo: number, effect: Effect, effectMix: number) {
     this._tempo = tempo;
     this._effect = effect;
@@ -71,6 +82,17 @@ class Project {
   get swingFactor() {
     return this._swingFactor;
   }
+
+  // convert to easily stringifyable object
+  toData(): any {
+    console.log('todata tracks', this.tracks)
+    return {
+      tracks: this.tracks.map((t) => t.toData()),
+      tempo: this.tempo,
+      swing: this.swingFactor,
+      effect: this.effect
+    };
+  }
 }
 
 type Step = {
@@ -84,6 +106,12 @@ class Track {
   private _name: string | undefined;
 
   private _steps: Step[] = [];
+
+  static fromData(context: AudioContext, instrument: Instrument, data: any): Track {
+    const track = new Track(context, instrument, data.name, null);
+    track._steps = data.steps;
+    return track;
+  }
 
   constructor(context: AudioContext, instrument: Instrument | null, name: string, effect: Effect | null) {
     this._context = context;
@@ -126,6 +154,16 @@ class Track {
   }
 
   getNote(rhythmIndex: number) { return this.steps[rhythmIndex].note; }
+
+  // convert to easily stringifyable object
+  toData(): any {
+    console.log(this.steps)
+    return {
+      name: this.name,
+      instrumentName: this.instrument?.name,
+      steps: this.steps
+    };
+  }
 }
 
 class Effect {
@@ -196,6 +234,7 @@ class ProjectPlayer {
     const note = track.getNote(rhythmIndex);
 
     if (!note) {
+      console.log("missing note: tr" + track.name + " idx:" + rhythmIndex)
       return;
     }
 

@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 // @ts-ignore
 import { SamplePlayer } from "/src/sampler/sample-player/index.js";
-// returns a SamplePlayer created from a dspreset group
-export function samplePlayerFromDS(baseUrl, context, dspreset) {
+// returns a SamplePlayer based Instrument created from a dspreset group
+export function instrumentFromDS(baseUrl, context, dspreset) {
     return __awaiter(this, void 0, void 0, function* () {
         const group = dspreset.group;
         const sampleRanges = group.map((sample) => {
@@ -24,7 +24,7 @@ export function samplePlayerFromDS(baseUrl, context, dspreset) {
         });
         const samples = yield loadSamples(baseUrl, context, group);
         const filename = _stripLastChar(baseUrl.substring(_stripLastChar(baseUrl).lastIndexOf('/') + 1));
-        const instrument = new Instrument(filename, sampleRanges, context, samples);
+        const instrument = new Instrument(dspreset.name, sampleRanges, context, samples);
         return instrument;
     });
 }

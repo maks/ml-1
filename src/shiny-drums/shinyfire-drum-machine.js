@@ -279,7 +279,6 @@ function loadBeat(beat) {
 function onNextBeat(beatCount) {
   updatePadsFromPlayer();
   padControl.nextBeat();
-  console.log('nextb:' + beatCount)
 }
 
 function colourToString(colour) {
