@@ -1,4 +1,4 @@
-import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons, allOff, ButtonsSetup, ButtonControl, ButtonCode, PadsControl } from '../firemidi.js';
+import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons, allOff, ButtonsSetup, ButtonControl, ButtonCode, PadsControl, OledControl } from '../firemidi.js';
 import { CCInputs } from '../fire_raw/cc_inputs.js';
 
 import { MenuController } from '../menu/menu_controller.js'
@@ -8,8 +8,8 @@ import { Track } from './sequencer.js';
 
 const MENU_LIST_ITEMS_COUNT = 9;
 
-let oled: any;
-let menu: any;
+let oled: OledControl;
+let menu: MenuController;
 let buttons: ButtonControl;
 let dials: any;
 let padControl: PadsControl;
@@ -85,15 +85,19 @@ export function initControls(instrumentNames: string[],
 
         },
         onFilter: (dir) => {
-          const instrumentName = machineState.currentTrack.name;
-          const overlay = overlays["pitch"];
-          if (instrumentName == null) {
-            return;
+          if (machineState.mode == MachineMode.Step) {
+            const instrumentName = machineState.currentTrack.name;
+            const overlay = overlays["pitch"];
+            if (instrumentName == null) {
+              return;
+            }
+            let pitch = machineState.currentTrack.steps[machineState.selectedStep].note;
+            overlay.title = `${instrumentName}`;
+            overlay.value = pitch;
+            handleDialInput(dir, overlay);
+          } else {
+            console.log('NO FILTER YET except STEP mode');
           }
-          let pitch = machineState.currentTrack.steps[machineState.selectedStep].note;
-          overlay.title = `${instrumentName}`;
-          overlay.value = pitch;
-          handleDialInput(dir, overlay);
         },
         onResonance: (dir) => {
           // handleDialInput(dir, overlays["effects"]);
@@ -131,6 +135,7 @@ export function initControls(instrumentNames: string[],
       solomute1: (up: boolean) => {
         console.log('SOLO1' + up);
         machineState.currentTrack = machineState.tracks[0];
+        machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
         console.log(machineState);
       },
       solomute2: (up: boolean) => {
@@ -219,7 +224,7 @@ function _setModeButtonLeds(mode: MachineMode) {
   }
 }
 
-function handleDialInput(dir: number, overlay: MenuScreen) {
+function handleDialInput(dir: number, overlay: NumberOverlayScreen) {
   // button up
   if (dir == 3) {
     menu.clearOverlay();

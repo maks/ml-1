@@ -13,10 +13,12 @@ class Project {
   private _effect: Effect;
   private _effectMix: number; // 0 to 1
 
-  constructor(tempo: number, effect: Effect, effectMix: number) {
+  constructor(context: AudioContext, tempo: number, effect: Effect, effectMix: number) {
     this._tempo = tempo;
     this._effect = effect;
     this._effectMix = effectMix;
+
+    this._tracks = [0, 1, 2, 3].map((i) => new Track(context, null, `Trk${i}`, null));
   }
 
   get tracks() {
@@ -78,17 +80,22 @@ type Step = {
 
 class Track {
   readonly _context: AudioContext;
-  private _instrument: Instrument;
+  private _instrument: Instrument | null;
+  private _name: string | undefined;
 
   private _steps: Step[] = [];
 
-  constructor(context: AudioContext, instrument: Instrument, effect: Effect) {
+  constructor(context: AudioContext, instrument: Instrument | null, name: string, effect: Effect | null) {
     this._context = context;
     this._instrument = instrument;
+    for (let i = 0; i < LOOP_LENGTH; i++) {
+      this._steps[i] = { note: 0, velocity: 127 };
+    }
+    this._name = name;
   }
 
   get name() {
-    return this._instrument.name;
+    return this._instrument?.name ?? this._name;
   }
 
   set instrument(i) {
@@ -211,7 +218,7 @@ class ProjectPlayer {
     // finalNode.connect(wetGainNode);
     // wetGainNode.connect(this.convolver);
 
-    voice.start(note, noteTime, {});
+    voice?.start(note, noteTime, {});
   }
 
   // Call when beat `n` is played to schedule beat `n+1`.

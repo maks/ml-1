@@ -12,12 +12,13 @@ export { Project, Track, ProjectPlayer, Effect };
 const LOOP_LENGTH = 16;
 const BEATS_PER_FULL_NOTE = 4;
 class Project {
-    constructor(tempo, effect, effectMix) {
+    constructor(context, tempo, effect, effectMix) {
         this._tracks = [];
         this._swingFactor = 0;
         this._tempo = tempo;
         this._effect = effect;
         this._effectMix = effectMix;
+        this._tracks = [0, 1, 2, 3].map((i) => new Track(context, null, `Trk${i}`, null));
     }
     get tracks() {
         return this._tracks;
@@ -59,13 +60,18 @@ class Project {
     }
 }
 class Track {
-    constructor(context, instrument, effect) {
+    constructor(context, instrument, name, effect) {
         this._steps = [];
         this._context = context;
         this._instrument = instrument;
+        for (let i = 0; i < LOOP_LENGTH; i++) {
+            this._steps[i] = { note: 0, velocity: 127 };
+        }
+        this._name = name;
     }
     get name() {
-        return this._instrument.name;
+        var _a, _b;
+        return (_b = (_a = this._instrument) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : this._name;
     }
     set instrument(i) {
         this._instrument = i;
@@ -155,7 +161,7 @@ class ProjectPlayer {
         // const wetGainNode = new GainNode(context, { gain: instrument.sendGain });
         // finalNode.connect(wetGainNode);
         // wetGainNode.connect(this.convolver);
-        voice.start(note, noteTime, {});
+        voice === null || voice === void 0 ? void 0 : voice.start(note, noteTime, {});
     }
     // Call when beat `n` is played to schedule beat `n+1`.
     tick() {

@@ -52,15 +52,20 @@ export function initControls(instrumentNames, handlePlay, control, machineState)
             onPan: (dir) => {
             },
             onFilter: (dir) => {
-                const instrumentName = machineState.currentTrack.name;
-                const overlay = overlays["pitch"];
-                if (instrumentName == null) {
-                    return;
+                if (machineState.mode == MachineMode.Step) {
+                    const instrumentName = machineState.currentTrack.name;
+                    const overlay = overlays["pitch"];
+                    if (instrumentName == null) {
+                        return;
+                    }
+                    let pitch = machineState.currentTrack.steps[machineState.selectedStep].note;
+                    overlay.title = `${instrumentName}`;
+                    overlay.value = pitch;
+                    handleDialInput(dir, overlay);
                 }
-                let pitch = machineState.currentTrack.steps[machineState.selectedStep].note;
-                overlay.title = `${instrumentName}`;
-                overlay.value = pitch;
-                handleDialInput(dir, overlay);
+                else {
+                    console.log('NO FILTER YET except STEP mode');
+                }
             },
             onResonance: (dir) => {
                 // handleDialInput(dir, overlays["effects"]);
@@ -96,6 +101,7 @@ export function initControls(instrumentNames, handlePlay, control, machineState)
             solomute1: (up) => {
                 console.log('SOLO1' + up);
                 machineState.currentTrack = machineState.tracks[0];
+                machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
                 console.log(machineState);
             },
             solomute2: (up) => {
