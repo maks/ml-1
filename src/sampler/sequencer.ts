@@ -234,7 +234,7 @@ class ProjectPlayer {
     const note = track.getNote(rhythmIndex);
 
     if (!note) {
-      console.log("missing note: tr" + track.name + " idx:" + rhythmIndex)
+      //console.log("missing note: tr" + track.name + " idx:" + rhythmIndex)
       return;
     }
 
