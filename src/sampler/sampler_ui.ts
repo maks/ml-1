@@ -18,7 +18,8 @@ let padControl: PadsControl;
 interface controlInterface {
   selectInstrument: (instrument: string) => void,
   playNote: (note: number) => void,
-  stop: () => void
+  stop: () => void,
+  startPlayer: () => void
 }
 
 export enum MachineMode {
@@ -37,8 +38,8 @@ interface MachineState {
   tracks: Track[]
 }
 
-export function initControls(instrumentNames: string[],
-  handlePlay: VoidFunction,
+export function initControls(
+  instrumentNames: string[],
   control: controlInterface,
   machineState: MachineState
 ) {
@@ -50,7 +51,7 @@ export function initControls(instrumentNames: string[],
     console.log('SAMPLER MIDI IS READY');
 
     setupTransport(
-      handlePlay, control.stop, function () { }
+      control.startPlayer, control.stop, function () { }
     );
     padControl = setupPads((index) => handlePad(index, machineState, control.playNote));
     oled = setupOled();

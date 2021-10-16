@@ -16,7 +16,7 @@ export var MachineMode;
     MachineMode[MachineMode["Preform"] = 4] = "Preform";
     MachineMode[MachineMode["Browser"] = 5] = "Browser";
 })(MachineMode || (MachineMode = {}));
-export function initControls(instrumentNames, handlePlay, control, machineState) {
+export function initControls(instrumentNames, control, machineState) {
     getMidi(midiReady, (isConnected) => {
         if (isConnected) {
             console.log('reconnected');
@@ -25,7 +25,7 @@ export function initControls(instrumentNames, handlePlay, control, machineState)
     });
     function midiReady() {
         console.log('SAMPLER MIDI IS READY');
-        setupTransport(handlePlay, control.stop, function () { });
+        setupTransport(control.startPlayer, control.stop, function () { });
         padControl = setupPads((index) => handlePad(index, machineState, control.playNote));
         oled = setupOled();
         const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(instrumentNames, (instrumentName) => _handleInstrumentSelection(control, machineState, instrumentName)), () => {

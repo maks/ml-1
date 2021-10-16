@@ -2,7 +2,7 @@ import { DSPreset } from "/dist/sampler/dspreset_parser.js";
 import { FileStore } from '/dist/sampler/file_browser.js';
 import { samplePlayerFromDS } from '/dist/sampler/audio_handling.js';
 import { initControls } from '/dist/sampler/sampler_ui.js';
-import { Project } from '/dist/sampler/sequencer.js';
+import { Project, ProjectPlayer } from '/dist/sampler/sequencer.js';
 
 const baseUrl = "http://127.0.0.1:8008/";
 
@@ -13,6 +13,7 @@ let context;
 let samplePlayer;
 let fileStore;
 let project;
+let projectPlayer;
 
 // array of packs as DSPreset objects
 let packs = [];
@@ -37,7 +38,9 @@ async function init() {
   // To allow resuming audiocontext from user gesture in webpage when not headless
   document.audioContext = context;
 
-  project = new Project(120, "No Effect", 0);
+  project = new Project(context, 80, "No Effect", 0);
+
+  projectPlayer = new ProjectPlayer(context, project, handleOnNextBeat);
 
   machineState.tracks = project.tracks;
 
@@ -66,12 +69,13 @@ async function init() {
 
   const controls = {
     selectInstrument: selectPack,
-    // TODO: dont hardcode note offset, allow selecting octave range on Fire
-    playNote: (note) => samplePlayer.start(note), //start at midinote 30 for range on pads midi notes: 30-94
-    stop: () => samplePlayer.stop()
+    playNote: (note) => samplePlayer.start(note),
+    startPlayer: () => projectPlayer.play(),
+    stop: () => projectPlayer.stop()
+    // stop: () => samplePlayer.stop()
   };
 
-  initControls(packs.map((p) => p.name), window.document.testplay, controls, machineState);
+  initControls(packs.map((p) => p.name), controls, machineState);
 
   // hardcode first pack found for now for debugging
   selectedPack = packs[0];
@@ -92,4 +96,8 @@ async function loadDSPreset(url, name, path) {
   const body = await response.text();
   const ds = new DSPreset(new window.DOMParser().parseFromString(body, "text/xml"), name, path);
   return ds;
+}
+
+function handleOnNextBeat(beatCount) {
+  //console.log('Sampler BEAT:' + beatCount)
 }

@@ -205,6 +205,7 @@ class ProjectPlayer {
         // slightly in the future.
         this._nextBeatAt = this._context.currentTime + 0.05;
         this._rhythmIndex = 0;
+        console.log('TEMPO:' + this._project.tempo);
         for (const track of this._project.tracks) {
             // should we use this instead? is this bug in orig shiny-drums?
             // this.playNoteAtTime(track, this._rhythmIndex, this._nextBeatAt);
