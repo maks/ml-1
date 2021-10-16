@@ -1,12 +1,24 @@
 import { fetchAndDecodeAudio, Instrument } from "./audio_handling.js";
+import { Color } from "../fire_raw/pads.js";
 
 export { Project, Track, ProjectPlayer, Effect };
 
 const LOOP_LENGTH = 16;
 const BEATS_PER_FULL_NOTE = 4;
 
+const COLORS = [
+  { r: 0, g: 100, b: 0 },
+  { r: 0, g: 0, b: 100 },
+  { r: 80, g: 80, b: 0 },
+  { r: 0, g: 80, b: 80 },
+  { r: 80, g: 80, b: 0 },
+  { r: 80, g: 0, b: 80 },
+  { r: 0, g: 100, b: 0 },
+  { r: 80, g: 80, b: 80 },
+];
+
 class Project {
-  private _tracks: Track[] = [];
+  private _tracks: Track[];
   private _tempo: number;
   private _swingFactor: number = 0;
   // master fx
@@ -14,22 +26,27 @@ class Project {
   private _effectMix: number; // 0 to 1
 
   static async fromData(context: AudioContext, lookupInstrument: (name: string) => Promise<Instrument>, data: any): Promise<Project> {
-    const project = new Project(context, data.tempo, new Effect(context, "No Effect"), data.effectMix);
-    project._tracks = [];
+
+    const tracks: Track[] = [];
     for (const tr of data.tracks) {
       const instrument = await lookupInstrument(tr.instrumentName);
       const track = Track.fromData(context, instrument, tr);
-      project._tracks.push(track);
+      tracks.push(track);
     }
+    const project = new Project(context, tracks, data.tempo, new Effect(context, "No Effect"), data.effectMix);
     return project;
   }
 
-  constructor(context: AudioContext, tempo: number, effect: Effect, effectMix: number) {
+  constructor(context: AudioContext, tracks: Track[], tempo: number, effect: Effect, effectMix: number) {
     this._tempo = tempo;
     this._effect = effect;
     this._effectMix = effectMix;
 
-    this._tracks = [0, 1, 2, 3].map((i) => new Track(context, null, `Trk${i}`, null));
+    if (tracks) {
+      this._tracks = tracks;
+    } else {
+      this._tracks = [0, 1, 2, 3].map((i) => new Track(context, null, `Trk${i}`, null, null));
+    }
   }
 
   get tracks() {
@@ -104,26 +121,34 @@ class Track {
   readonly _context: AudioContext;
   private _instrument: Instrument | null;
   private _name: string | undefined;
+  private _color: Color;
 
   private _steps: Step[] = [];
 
+  static colorCounter = 0;
+
   static fromData(context: AudioContext, instrument: Instrument, data: any): Track {
-    const track = new Track(context, instrument, data.name, null);
+    const track = new Track(context, instrument, data.name, data.color, null);
     track._steps = data.steps;
     return track;
   }
 
-  constructor(context: AudioContext, instrument: Instrument | null, name: string, effect: Effect | null) {
+  constructor(context: AudioContext, instrument: Instrument | null, name: string, color: Color | null, effect: Effect | null) {
     this._context = context;
     this._instrument = instrument;
     for (let i = 0; i < LOOP_LENGTH; i++) {
       this._steps[i] = { note: 0, velocity: 127 };
     }
     this._name = name;
+    this._color = color || COLORS[Track.colorCounter++ % COLORS.length];
   }
 
   get name() {
     return this._instrument?.name ?? this._name;
+  }
+
+  get color() {
+    return this._color;
   }
 
   set instrument(i) {
@@ -160,6 +185,7 @@ class Track {
     console.log(this.steps)
     return {
       name: this.name,
+      color: this._color,
       instrumentName: this.instrument?.name,
       steps: this.steps
     };

@@ -39,7 +39,7 @@ async function init() {
   // To allow resuming audiocontext from user gesture in webpage when not headless
   document.audioContext = context;
 
-  project = new Project(context, 80, "No Effect", 0);
+  project = new Project(context, null, 80, "No Effect", 0);
   window.document.project = project;
 
   machineState.tracks = project.tracks;
@@ -85,7 +85,7 @@ async function init() {
     project = await Project.fromData(context, selectPack, data);
     machineState.tracks = project.tracks;
 
-    console.log("loaded proj", project);
+    console.log("LOADED project", project);
   }
   projectPlayer = new ProjectPlayer(context, project, handleOnNextBeat);
 

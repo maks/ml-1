@@ -1,6 +1,6 @@
 import { MidiDispatcher } from "../midi_dispatcher";
 
-interface Color {
+export interface Color {
   r: number,
   g: number,
   b: number

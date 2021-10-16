@@ -362,7 +362,7 @@ function _paintPadsSteps(tracks: Track[]) {
 
 function _paintPadsStepsRow(track: Track, rowIndex: number) {
   const steps = track.steps;
-  const trackcolour = { r: 0, g: 0, b: 90 };
+  const trackcolour = track.color;
   const off = { r: 0, g: 0, b: 0 };
   for (let i = 0; i < steps.length; i++) {
     const colour = (steps[i].note != 0) ? trackcolour : off;

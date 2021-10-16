@@ -11,24 +11,38 @@ import { fetchAndDecodeAudio } from "./audio_handling.js";
 export { Project, Track, ProjectPlayer, Effect };
 const LOOP_LENGTH = 16;
 const BEATS_PER_FULL_NOTE = 4;
+const COLORS = [
+    { r: 0, g: 100, b: 0 },
+    { r: 0, g: 0, b: 100 },
+    { r: 80, g: 80, b: 0 },
+    { r: 0, g: 80, b: 80 },
+    { r: 80, g: 80, b: 0 },
+    { r: 80, g: 0, b: 80 },
+    { r: 0, g: 100, b: 0 },
+    { r: 80, g: 80, b: 80 },
+];
 class Project {
-    constructor(context, tempo, effect, effectMix) {
-        this._tracks = [];
+    constructor(context, tracks, tempo, effect, effectMix) {
         this._swingFactor = 0;
         this._tempo = tempo;
         this._effect = effect;
         this._effectMix = effectMix;
-        this._tracks = [0, 1, 2, 3].map((i) => new Track(context, null, `Trk${i}`, null));
+        if (tracks) {
+            this._tracks = tracks;
+        }
+        else {
+            this._tracks = [0, 1, 2, 3].map((i) => new Track(context, null, `Trk${i}`, null, null));
+        }
     }
     static fromData(context, lookupInstrument, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const project = new Project(context, data.tempo, new Effect(context, "No Effect"), data.effectMix);
-            project._tracks = [];
+            const tracks = [];
             for (const tr of data.tracks) {
                 const instrument = yield lookupInstrument(tr.instrumentName);
                 const track = Track.fromData(context, instrument, tr);
-                project._tracks.push(track);
+                tracks.push(track);
             }
+            const project = new Project(context, tracks, data.tempo, new Effect(context, "No Effect"), data.effectMix);
             return project;
         });
     }
@@ -82,7 +96,7 @@ class Project {
     }
 }
 class Track {
-    constructor(context, instrument, name, effect) {
+    constructor(context, instrument, name, color, effect) {
         this._steps = [];
         this._context = context;
         this._instrument = instrument;
@@ -90,15 +104,19 @@ class Track {
             this._steps[i] = { note: 0, velocity: 127 };
         }
         this._name = name;
+        this._color = color || COLORS[Track.colorCounter++ % COLORS.length];
     }
     static fromData(context, instrument, data) {
-        const track = new Track(context, instrument, data.name, null);
+        const track = new Track(context, instrument, data.name, data.color, null);
         track._steps = data.steps;
         return track;
     }
     get name() {
         var _a, _b;
         return (_b = (_a = this._instrument) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : this._name;
+    }
+    get color() {
+        return this._color;
     }
     set instrument(i) {
         this._instrument = i;
@@ -131,11 +149,13 @@ class Track {
         console.log(this.steps);
         return {
             name: this.name,
+            color: this._color,
             instrumentName: (_a = this.instrument) === null || _a === void 0 ? void 0 : _a.name,
             steps: this.steps
         };
     }
 }
+Track.colorCounter = 0;
 class Effect {
     constructor(context, name, url, mix) {
         this.wetMix = 0; //range: 0..1 
