@@ -23,16 +23,23 @@ interface controlInterface {
   save: () => void
 }
 
+export enum KeyMod {
+  None = 0,
+  Shift,
+  Alt
+}
+
 export enum MachineMode {
   Step = 1,
   Note,
   Drum,
   Preform,
-  Browser,
+  Browser
 }
 
 interface MachineState {
   mode: MachineMode,
+  keyMod: KeyMod,
   currentTrack: Track,
   selectedStep: number,
   selectedNote: number,
@@ -52,7 +59,14 @@ export function initControls(
     console.log('SAMPLER MIDI IS READY');
 
     setupTransport(
-      control.startPlayer, control.stop, control.save
+      control.startPlayer, control.stop,
+      () => {
+        if (machineState.keyMod == KeyMod.Shift) {
+          control.save();
+        } else {
+          console.log('no save without shift mod');
+        }
+      }
     );
     padControl = setupPads((index) => handlePad(index, machineState, control.playNote));
     oled = setupOled();
@@ -129,9 +143,6 @@ export function initControls(
         menu.onBack()
       },
       patternUp: (up: boolean) => console.log('patternup button'),
-      shift: (up: boolean) => {
-        //_shiftON = !up;
-      },
       pattern: (up: boolean) => {
         console.log('pattern:' + up);
         if (up) {
@@ -180,17 +191,13 @@ export function initControls(
       step: function (up: boolean): void {
         if (!up) {
           machineState.mode = MachineMode.Step;
-          _setModeButtonLeds(machineState.mode);
-          padControl.allOff();
-          _paintPadsSteps(machineState.tracks);
+          _handleUpdateMode(machineState);
         }
       },
       note: function (up: boolean): void {
         if (!up) {
           machineState.mode = MachineMode.Note;
-          _setModeButtonLeds(machineState.mode);
-          padControl.allOff();
-          _paintPadsKeyboard()
+          _handleUpdateMode(machineState);
         }
       },
       drum: function (up: boolean): void {
@@ -203,23 +210,49 @@ export function initControls(
       perform: function (up: boolean): void {
         if (!up) {
           machineState.mode = MachineMode.Preform;
-          _setModeButtonLeds(machineState.mode);
-          padControl.allOff();
+          _handleUpdateMode(machineState);
+        }
+      },
+      shift: (up: boolean) => {
+        if (up) {
+          machineState.keyMod = KeyMod.None;
+        } else {
+          machineState.keyMod = KeyMod.Shift;
         }
       },
       alt: function (up: boolean): void {
-        throw new Error('Function not implemented.');
+        if (up) {
+          machineState.keyMod = KeyMod.None;
+        } else {
+          machineState.keyMod = KeyMod.Alt;
+        }
       }
     };
 
     buttons = setupButtons(bSetup);
 
-
     // clear all now that we have finished init
     allOff();
 
+    // update pads based on initial mode
+    _handleUpdateMode(machineState);
+
     // update OLED with loaded preset
     menu.updateOled();
+  }
+}
+
+function _handleUpdateMode(machineState: MachineState) {
+  _setModeButtonLeds(machineState.mode);
+  padControl.allOff();
+  switch (machineState.mode) {
+    case MachineMode.Step:
+
+      _paintPadsSteps(machineState.tracks);
+      break;
+    case MachineMode.Note:
+      _paintPadsKeyboard();
+      break;
   }
 }
 

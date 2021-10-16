@@ -8,6 +8,12 @@ let menu;
 let buttons;
 let dials;
 let padControl;
+export var KeyMod;
+(function (KeyMod) {
+    KeyMod[KeyMod["None"] = 0] = "None";
+    KeyMod[KeyMod["Shift"] = 1] = "Shift";
+    KeyMod[KeyMod["Alt"] = 2] = "Alt";
+})(KeyMod || (KeyMod = {}));
 export var MachineMode;
 (function (MachineMode) {
     MachineMode[MachineMode["Step"] = 1] = "Step";
@@ -25,7 +31,14 @@ export function initControls(instrumentNames, control, machineState) {
     });
     function midiReady() {
         console.log('SAMPLER MIDI IS READY');
-        setupTransport(control.startPlayer, control.stop, control.save);
+        setupTransport(control.startPlayer, control.stop, () => {
+            if (machineState.keyMod == KeyMod.Shift) {
+                control.save();
+            }
+            else {
+                console.log('no save without shift mod');
+            }
+        });
         padControl = setupPads((index) => handlePad(index, machineState, control.playNote));
         oled = setupOled();
         const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(instrumentNames, (instrumentName) => _handleInstrumentSelection(control, machineState, instrumentName)), () => {
@@ -88,9 +101,6 @@ export function initControls(instrumentNames, control, machineState) {
                 menu.onBack();
             },
             patternUp: (up) => console.log('patternup button'),
-            shift: (up) => {
-                //_shiftON = !up;
-            },
             pattern: (up) => {
                 console.log('pattern:' + up);
                 if (up) {
@@ -139,17 +149,13 @@ export function initControls(instrumentNames, control, machineState) {
             step: function (up) {
                 if (!up) {
                     machineState.mode = MachineMode.Step;
-                    _setModeButtonLeds(machineState.mode);
-                    padControl.allOff();
-                    _paintPadsSteps(machineState.tracks);
+                    _handleUpdateMode(machineState);
                 }
             },
             note: function (up) {
                 if (!up) {
                     machineState.mode = MachineMode.Note;
-                    _setModeButtonLeds(machineState.mode);
-                    padControl.allOff();
-                    _paintPadsKeyboard();
+                    _handleUpdateMode(machineState);
                 }
             },
             drum: function (up) {
@@ -162,19 +168,45 @@ export function initControls(instrumentNames, control, machineState) {
             perform: function (up) {
                 if (!up) {
                     machineState.mode = MachineMode.Preform;
-                    _setModeButtonLeds(machineState.mode);
-                    padControl.allOff();
+                    _handleUpdateMode(machineState);
+                }
+            },
+            shift: (up) => {
+                if (up) {
+                    machineState.keyMod = KeyMod.None;
+                }
+                else {
+                    machineState.keyMod = KeyMod.Shift;
                 }
             },
             alt: function (up) {
-                throw new Error('Function not implemented.');
+                if (up) {
+                    machineState.keyMod = KeyMod.None;
+                }
+                else {
+                    machineState.keyMod = KeyMod.Alt;
+                }
             }
         };
         buttons = setupButtons(bSetup);
         // clear all now that we have finished init
         allOff();
+        // update pads based on initial mode
+        _handleUpdateMode(machineState);
         // update OLED with loaded preset
         menu.updateOled();
+    }
+}
+function _handleUpdateMode(machineState) {
+    _setModeButtonLeds(machineState.mode);
+    padControl.allOff();
+    switch (machineState.mode) {
+        case MachineMode.Step:
+            _paintPadsSteps(machineState.tracks);
+            break;
+        case MachineMode.Note:
+            _paintPadsKeyboard();
+            break;
     }
 }
 function _topMenuListItems(entries, selectedFn) {

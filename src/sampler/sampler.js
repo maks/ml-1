@@ -21,6 +21,8 @@ let packs = [];
 let selectedPack;
 
 let machineState = {
+  mode: 1,
+  keyMod: 0,
   currentTrack: null,
   selectedStep: null,
   selectedNote: 60,
@@ -73,8 +75,6 @@ async function init() {
     save: () => console.log("save:" + saveToStorage(JSON.stringify(project.toData())))
   };
 
-  initControls(packs.map((p) => p.name), controls, machineState);
-
   // hardcode first pack found for now for debugging
   selectedPack = packs[0];
   instrument = await instrumentFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
@@ -88,6 +88,8 @@ async function init() {
     console.log("loaded proj", project);
   }
   projectPlayer = new ProjectPlayer(context, project, handleOnNextBeat);
+
+  initControls(packs.map((p) => p.name), controls, machineState);
 }
 
 async function selectPack(name) {
