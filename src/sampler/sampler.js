@@ -67,7 +67,7 @@ async function init() {
   const controls = {
     selectInstrument: selectPack,
     // TODO: dont hardcode note offset, allow selecting octave range on Fire
-    playNote: (note) => samplePlayer.start(note + 30), //start at midinote 30 for range on pads midi notes: 30-94
+    playNote: (note) => samplePlayer.start(note), //start at midinote 30 for range on pads midi notes: 30-94
     stop: () => samplePlayer.stop()
   };
 
