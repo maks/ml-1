@@ -32,6 +32,7 @@ interface MachineState {
   mode: MachineMode,
   currentTrack: Track,
   selectedStep: number,
+  selectedNote: number,
   tracks: Track[]
 }
 
@@ -134,21 +135,32 @@ export function initControls(instrumentNames: string[],
       },
       solomute1: (up: boolean) => {
         console.log('SOLO1' + up);
-        machineState.currentTrack = machineState.tracks[0];
-        machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
-        console.log(machineState);
+        if (machineState.mode == MachineMode.Step) {
+          machineState.currentTrack = machineState.tracks[0];
+          machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
+          _setSelectedTrackButtonLeds(0);
+        }
       },
       solomute2: (up: boolean) => {
-        machineState.currentTrack = machineState.tracks[1];
-        console.log(machineState);
+        if (machineState.mode == MachineMode.Step) {
+          machineState.currentTrack = machineState.tracks[1];
+          machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
+          _setSelectedTrackButtonLeds(1);
+        }
       },
       solomute3: (up: boolean) => {
-        machineState.currentTrack = machineState.tracks[2];
-        console.log(machineState);
+        if (machineState.mode == MachineMode.Step) {
+          machineState.currentTrack = machineState.tracks[2];
+          machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
+          _setSelectedTrackButtonLeds(2);
+        }
       },
       solomute4: (up: boolean) => {
-        machineState.currentTrack = machineState.tracks[3];
-        console.log(machineState);
+        if (machineState.mode == MachineMode.Step) {
+          machineState.currentTrack = machineState.tracks[3];
+          machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
+          _setSelectedTrackButtonLeds(3);
+        }
       },
       patternDown: function (up: boolean): void {
         throw new Error('Function not implemented.');
@@ -224,6 +236,16 @@ function _setModeButtonLeds(mode: MachineMode) {
   }
 }
 
+// make these 1 indexed to match button naming
+function _setSelectedTrackButtonLeds(trackNum: number) {
+  const off = 0;
+  const color = CCInputs.rowGreen;
+  buttons.buttonLedOn(ButtonCode.SoloMute1, trackNum == 0 ? color : off);
+  buttons.buttonLedOn(ButtonCode.SoloMute2, trackNum == 1 ? color : off);
+  buttons.buttonLedOn(ButtonCode.SoloMute3, trackNum == 2 ? color : off);
+  buttons.buttonLedOn(ButtonCode.SoloMute4, trackNum == 3 ? color : off);
+}
+
 function handleDialInput(dir: number, overlay: NumberOverlayScreen) {
   // button up
   if (dir == 3) {
@@ -250,6 +272,7 @@ function handlePad(index: number, machineState: MachineState, callback: (note: n
     const note = _noteFromPadIndex(index);
     if (note > 0) {
       console.log('PLAY NOTE:' + index);
+      machineState.selectedNote = note;
       callback(note);
     }
   }

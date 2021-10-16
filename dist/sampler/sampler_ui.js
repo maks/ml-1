@@ -100,21 +100,32 @@ export function initControls(instrumentNames, handlePlay, control, machineState)
             },
             solomute1: (up) => {
                 console.log('SOLO1' + up);
-                machineState.currentTrack = machineState.tracks[0];
-                machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
-                console.log(machineState);
+                if (machineState.mode == MachineMode.Step) {
+                    machineState.currentTrack = machineState.tracks[0];
+                    machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
+                    _setSelectedTrackButtonLeds(0);
+                }
             },
             solomute2: (up) => {
-                machineState.currentTrack = machineState.tracks[1];
-                console.log(machineState);
+                if (machineState.mode == MachineMode.Step) {
+                    machineState.currentTrack = machineState.tracks[1];
+                    machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
+                    _setSelectedTrackButtonLeds(1);
+                }
             },
             solomute3: (up) => {
-                machineState.currentTrack = machineState.tracks[2];
-                console.log(machineState);
+                if (machineState.mode == MachineMode.Step) {
+                    machineState.currentTrack = machineState.tracks[2];
+                    machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
+                    _setSelectedTrackButtonLeds(2);
+                }
             },
             solomute4: (up) => {
-                machineState.currentTrack = machineState.tracks[3];
-                console.log(machineState);
+                if (machineState.mode == MachineMode.Step) {
+                    machineState.currentTrack = machineState.tracks[3];
+                    machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
+                    _setSelectedTrackButtonLeds(3);
+                }
             },
             patternDown: function (up) {
                 throw new Error('Function not implemented.');
@@ -182,6 +193,15 @@ function _setModeButtonLeds(mode) {
         buttons.buttonLedOn(parseInt(b), buttonStates[b]);
     }
 }
+// make these 1 indexed to match button naming
+function _setSelectedTrackButtonLeds(trackNum) {
+    const off = 0;
+    const color = CCInputs.rowGreen;
+    buttons.buttonLedOn(ButtonCode.SoloMute1, trackNum == 0 ? color : off);
+    buttons.buttonLedOn(ButtonCode.SoloMute2, trackNum == 1 ? color : off);
+    buttons.buttonLedOn(ButtonCode.SoloMute3, trackNum == 2 ? color : off);
+    buttons.buttonLedOn(ButtonCode.SoloMute4, trackNum == 3 ? color : off);
+}
 function handleDialInput(dir, overlay) {
     // button up
     if (dir == 3) {
@@ -206,6 +226,7 @@ function handlePad(index, machineState, callback) {
         const note = _noteFromPadIndex(index);
         if (note > 0) {
             console.log('PLAY NOTE:' + index);
+            machineState.selectedNote = note;
             callback(note);
         }
     }
