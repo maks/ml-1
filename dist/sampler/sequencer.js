@@ -82,12 +82,20 @@ class Track {
     get steps() {
         return this._steps;
     }
-    setNote(rhythmIndex, midiNote, velocity) {
+    toggleStepNote(rhythmIndex, midiNote, velocity) {
         const step = this.steps[rhythmIndex];
-        this.steps[rhythmIndex] = {
-            note: midiNote !== null && midiNote !== void 0 ? midiNote : step.note,
-            velocity: velocity !== null && velocity !== void 0 ? velocity : step.velocity
-        };
+        if (this.steps[rhythmIndex].note == 0) {
+            this.steps[rhythmIndex] = {
+                note: midiNote !== null && midiNote !== void 0 ? midiNote : step.note,
+                velocity: velocity !== null && velocity !== void 0 ? velocity : step.velocity
+            };
+        }
+        else {
+            this.steps[rhythmIndex] = {
+                note: 0,
+                velocity: 127
+            };
+        }
     }
     getNote(rhythmIndex) { return this.steps[rhythmIndex].note; }
 }

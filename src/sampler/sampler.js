@@ -23,7 +23,7 @@ let selectedPack;
 let machineState = {
   currentTrack: null,
   selectedStep: null,
-  selectedNote: null,
+  selectedNote: 60,
   tracks: []
 }
 

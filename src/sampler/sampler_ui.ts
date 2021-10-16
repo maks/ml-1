@@ -276,16 +276,26 @@ function handleDialInput(dir: number, overlay: NumberOverlayScreen) {
 function handlePad(index: number, machineState: MachineState, callback: (note: number) => void) {
   const rowIndex = Math.floor(index / 16);
   const columnIndex = index % 16;
-  console.log("pad offset" + index % 16);
+  console.log("pad index:" + index + "MODE:" + machineState.mode);
   //TODO: account for grid offset
   machineState.selectedStep = index % 16;
 
   if (machineState.mode == MachineMode.Note) {
     const note = _noteFromPadIndex(index);
     if (note > 0) {
-      console.log('PLAY NOTE:' + index);
+      console.log('PLAY NOTE:' + note);
       machineState.selectedNote = note;
       callback(note);
+    }
+  }
+
+  if (machineState.mode == MachineMode.Step) {
+    const note = machineState.selectedNote;
+    if (note > 0) {
+      console.log(`STEP NOTE: ${note} tr:${rowIndex} stp: ${columnIndex}`);
+      machineState.tracks[rowIndex].toggleStepNote(columnIndex, note, 127);
+      console.log(machineState.tracks)
+      _paintPadsStepsRow(machineState.tracks[rowIndex], rowIndex);
     }
   }
 }
@@ -305,6 +315,22 @@ function _paintPadsKeyboard() {
   }
   for (var i = firstWhiteRow; i < firstWhiteRow + 16; i++) {
     padControl.padLedOn(i, whiteKeyColour);
+  }
+}
+
+function _paintPadsSteps(tracks: Track[]) {
+  for (let i = 0; i < tracks.length; i++) {
+    _paintPadsStepsRow(tracks[i], i);
+  }
+}
+
+function _paintPadsStepsRow(track: Track, rowIndex: number) {
+  const steps = track.steps;
+  const trackcolour = { r: 0, g: 0, b: 90 };
+  const off = { r: 0, g: 0, b: 0 };
+  for (let i = 0; i < steps.length; i++) {
+    const colour = (steps[i].note != 0) ? trackcolour : off;
+    padControl.padLedOn(i + (rowIndex * 16), colour);
   }
 }
 
