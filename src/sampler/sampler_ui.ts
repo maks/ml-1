@@ -4,6 +4,7 @@ import { CCInputs } from '../fire_raw/cc_inputs.js';
 import { MenuController } from '../menu/menu_controller.js'
 
 import { ListScreen, ListScreenItem, MenuScreen, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js'
+import { Instrument } from './audio_handling.js';
 import { Track } from './sequencer.js';
 
 const MENU_LIST_ITEMS_COUNT = 9;
@@ -54,9 +55,12 @@ export function initControls(instrumentNames: string[],
     padControl = setupPads((index) => handlePad(index, machineState, control.playNote));
     oled = setupOled();
 
-    const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(instrumentNames, control.selectInstrument),
+    const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT,
+      _topMenuListItems(instrumentNames,
+        (instrumentName: string) => _handleInstrumentSelection(control, machineState, instrumentName)),
       () => {
-        _topMenu.updateItems(_topMenuListItems(instrumentNames, control.selectInstrument));
+        _topMenu.updateItems(_topMenuListItems(instrumentNames,
+          (instrumentName: string) => _handleInstrumentSelection(control, machineState, instrumentName)));
       });
 
     menu = new MenuController(oled);
@@ -135,28 +139,28 @@ export function initControls(instrumentNames: string[],
       },
       solomute1: (up: boolean) => {
         console.log('SOLO1' + up);
-        if (machineState.mode == MachineMode.Step) {
+        if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
           machineState.currentTrack = machineState.tracks[0];
           machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
           _setSelectedTrackButtonLeds(0);
         }
       },
       solomute2: (up: boolean) => {
-        if (machineState.mode == MachineMode.Step) {
+        if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
           machineState.currentTrack = machineState.tracks[1];
           machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
           _setSelectedTrackButtonLeds(1);
         }
       },
       solomute3: (up: boolean) => {
-        if (machineState.mode == MachineMode.Step) {
+        if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
           machineState.currentTrack = machineState.tracks[2];
           machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
           _setSelectedTrackButtonLeds(2);
         }
       },
       solomute4: (up: boolean) => {
-        if (machineState.mode == MachineMode.Step) {
+        if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
           machineState.currentTrack = machineState.tracks[3];
           machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
           _setSelectedTrackButtonLeds(3);
@@ -218,6 +222,14 @@ export function initControls(instrumentNames: string[],
 
 function _topMenuListItems(entries: string[], selectedFn: Function): ListScreenItem[] {
   return entries.map((x) => new ListScreenItem(x, (item: ListScreenItem) => selectedFn(item.label), {}));
+}
+
+function _handleInstrumentSelection(control: controlInterface, machineState: MachineState, instrument: string) {
+  if (machineState.mode == MachineMode.Note || machineState.mode == MachineMode.Step) {
+    control.selectInstrument(instrument);
+  } else {
+    console.log("cannot set instrument outside Step, Note mode");
+  }
 }
 
 function _setModeButtonLeds(mode: MachineMode) {

@@ -10,7 +10,7 @@ const baseUrl = "http://127.0.0.1:8008/";
 window.onload = init;
 
 let context;
-let sample;
+let samplePlayer;
 let fileStore;
 let project;
 
@@ -29,7 +29,7 @@ let machineState = {
 
 window.document.testplay = function () {
   console.log('play', sample);
-  sample.start(60);
+  samplePlayer.start(60);
 }
 
 async function init() {
@@ -67,22 +67,23 @@ async function init() {
   const controls = {
     selectInstrument: selectPack,
     // TODO: dont hardcode note offset, allow selecting octave range on Fire
-    playNote: (note) => sample.start(note + 30), //start at midinote 30 for range on pads midi notes: 30-94
-    stop: () => sample.stop()
+    playNote: (note) => samplePlayer.start(note + 30), //start at midinote 30 for range on pads midi notes: 30-94
+    stop: () => samplePlayer.stop()
   };
 
   initControls(packs.map((p) => p.name), window.document.testplay, controls, machineState);
 
   // hardcode first pack found for now for debugging
   selectedPack = packs[0];
-  sample = await samplePlayerFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
+  samplePlayer = await samplePlayerFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
 }
 
 async function selectPack(name) {
   selectedPack = packs.find((p) => p.name === name);
   console.log('selected:', selectedPack);
-  sample = await samplePlayerFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
-  console.log('current sample', sample);
+  samplePlayer = await samplePlayerFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
+  machineState.currentTrack.instrument = samplePlayer;
+  console.log('current sampleplayer', samplePlayer);
 }
 
 // Load a multisample pack using a DecentSampler .dspresets file format at given url
