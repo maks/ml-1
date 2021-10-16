@@ -180,6 +180,7 @@ export function initControls(instrumentNames: string[],
           machineState.mode = MachineMode.Step;
           _setModeButtonLeds(machineState.mode);
           padControl.allOff();
+          _paintPadsSteps(machineState.tracks);
         }
       },
       note: function (up: boolean): void {

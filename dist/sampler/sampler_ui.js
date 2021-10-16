@@ -141,6 +141,7 @@ export function initControls(instrumentNames, handlePlay, control, machineState)
                     machineState.mode = MachineMode.Step;
                     _setModeButtonLeds(machineState.mode);
                     padControl.allOff();
+                    _paintPadsSteps(machineState.tracks);
                 }
             },
             note: function (up) {
