@@ -94,6 +94,10 @@ export class CCInputs {
   public static readonly rowRed = 3;
   public static readonly rowGreen = 4;
 
+  public static readonly rowDim = 1;
+  public static readonly rowBright = 2;
+
+
   static on(id: number, value: number) {
     return [
       0xB0, // midi control change code

@@ -116,31 +116,51 @@ export function initControls(instrumentNames, control, machineState) {
             },
             solomute1: (up) => {
                 console.log('SOLO1' + up);
-                if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
-                    machineState.currentTrack = machineState.tracks[0];
-                    machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
-                    _setSelectedTrackButtonLeds(0);
+                if (!up) {
+                    if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
+                        if (machineState.keyMod == KeyMod.Shift) {
+                            _handleTrackSelect(machineState, 0);
+                        }
+                        else {
+                            _handleToggleTrackMute(machineState, 0);
+                        }
+                    }
                 }
             },
             solomute2: (up) => {
-                if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
-                    machineState.currentTrack = machineState.tracks[1];
-                    machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
-                    _setSelectedTrackButtonLeds(1);
+                if (!up) {
+                    if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
+                        if (machineState.keyMod == KeyMod.Shift) {
+                            _handleTrackSelect(machineState, 1);
+                        }
+                        else {
+                            _handleToggleTrackMute(machineState, 1);
+                        }
+                    }
                 }
             },
             solomute3: (up) => {
-                if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
-                    machineState.currentTrack = machineState.tracks[2];
-                    machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
-                    _setSelectedTrackButtonLeds(2);
+                if (!up) {
+                    if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
+                        if (machineState.keyMod == KeyMod.Shift) {
+                            _handleTrackSelect(machineState, 2);
+                        }
+                        else {
+                            _handleToggleTrackMute(machineState, 2);
+                        }
+                    }
                 }
             },
             solomute4: (up) => {
-                if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
-                    machineState.currentTrack = machineState.tracks[3];
-                    machineState.selectedStep = 0; //TODO: temp hardcode 1st step selected
-                    _setSelectedTrackButtonLeds(3);
+                if (!up) {
+                    if (machineState.mode == MachineMode.Step || machineState.mode == MachineMode.Note) {
+                        if (machineState.keyMod == KeyMod.Shift) {
+                            _handleTrackSelect(machineState, 3);
+                        }
+                        else {
+                            _handleToggleTrackMute(machineState, 3);
+                        }
+                    }
                 }
             },
             patternDown: function (up) {
@@ -199,9 +219,22 @@ export function initControls(instrumentNames, control, machineState) {
         allOff();
         // update pads based on initial mode
         _handleUpdateMode(machineState);
+        // update solo/mute status button leds
+        _setoloMuteTrackButtonLeds(machineState.tracks.map((t) => t.muted));
         // update OLED with loaded preset
         menu.updateOled();
     }
+}
+function _handleToggleTrackMute(machineState, trackIndex) {
+    console.log('handle track mute', trackIndex);
+    machineState.tracks[trackIndex].toggleMute();
+    _setoloMuteTrackButtonLeds(machineState.tracks.map((t) => t.muted));
+}
+function _handleTrackSelect(machineState, trackIndex) {
+    console.log('handle track sel', trackIndex);
+    machineState.currentTrack = machineState.tracks[trackIndex];
+    machineState.selectedStep = 0; //TODO: for now just always reset to first step
+    _setSelectedTrackLeds(trackIndex);
 }
 function _handleUpdateMode(machineState) {
     _setModeButtonLeds(machineState.mode);
@@ -241,13 +274,21 @@ function _setModeButtonLeds(mode) {
     }
 }
 // make these 1 indexed to match button naming
-function _setSelectedTrackButtonLeds(trackNum) {
+function _setoloMuteTrackButtonLeds(trackMutes) {
+    const onColor = CCInputs.rowBright;
+    const muteColor = CCInputs.rowDim;
+    console.log('trck mutes', trackMutes);
+    buttons.buttonLedOn(ButtonCode.SoloMute1, trackMutes[0] ? muteColor : onColor);
+    buttons.buttonLedOn(ButtonCode.SoloMute2, trackMutes[1] ? muteColor : onColor);
+    buttons.buttonLedOn(ButtonCode.SoloMute3, trackMutes[2] ? muteColor : onColor);
+    buttons.buttonLedOn(ButtonCode.SoloMute4, trackMutes[3] ? muteColor : onColor);
+}
+// make these 1 indexed to match button naming
+function _setSelectedTrackLeds(trackNum) {
     const off = 0;
-    const color = CCInputs.rowGreen;
-    buttons.buttonLedOn(ButtonCode.SoloMute1, trackNum == 0 ? color : off);
-    buttons.buttonLedOn(ButtonCode.SoloMute2, trackNum == 1 ? color : off);
-    buttons.buttonLedOn(ButtonCode.SoloMute3, trackNum == 2 ? color : off);
-    buttons.buttonLedOn(ButtonCode.SoloMute4, trackNum == 3 ? color : off);
+    const color = 1;
+    [0, 1, 2, 3].forEach((x) => padControl.rowLedOff(x));
+    padControl.rowLedOn(trackNum);
 }
 function handleDialInput(dir, overlay) {
     // button up

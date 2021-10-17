@@ -51,6 +51,12 @@ export function setupPads(onPad) {
         padLedOn: (padIndex, colour) => {
             firePads.padLedOn(padIndex, colour);
         },
+        rowLedOn: (rowIndex) => {
+            firePads.rowLedOn(rowIndex);
+        },
+        rowLedOff: (rowIndex) => {
+            firePads.rowLedOff(rowIndex);
+        },
         allOff: () => { firePads.allOff(); }
     };
 }

@@ -132,16 +132,18 @@ class Track {
   private _instrument: Instrument | null;
   private _name: string | undefined;
   private _color: Color;
+  private _mute = false;
   private _steps: Step[] = [];
 
   public offset = 0;
   public duration: number | undefined;
-
   static colorCounter = 0;
 
   static fromData(context: AudioContext, instrument: Instrument, data: any): Track {
     const track = new Track(context, instrument, data.name, data.color, null);
     track.duration = data.duration;
+    track.offset = data.offset;
+    track._mute = data._mute ?? false;
     track._steps = data.steps;
     return track;
   }
@@ -172,8 +174,16 @@ class Track {
     return this._instrument;
   }
 
+  get muted() {
+    return this._mute;
+  }
+
   get steps() {
     return this._steps;
+  }
+
+  toggleMute() {
+    this._mute = !this._mute;
   }
 
   toggleStepNote(rhythmIndex: number, midiNote: number, velocity?: number) {
@@ -200,6 +210,8 @@ class Track {
       color: this._color,
       instrumentName: this.instrument?.name,
       duration: this.duration,
+      offset: this.offset,
+      mute: this.muted,
       steps: this.steps
     };
   }
@@ -273,7 +285,7 @@ class ProjectPlayer {
   playNoteAtTime(track: Track, rhythmIndex: number, noteTime: number) {
     const note = track.getNote(rhythmIndex);
 
-    if (!note) {
+    if (!note || track.muted) {
       //console.log("missing note: tr" + track.name + " idx:" + rhythmIndex)
       return;
     }

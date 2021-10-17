@@ -56,6 +56,8 @@ export interface PadsControl {
   nextBeat: VoidFunction,
   resetBeat: VoidFunction,
   padLedOn: (padIndex: number, colour?: PadColour) => void,
+  rowLedOn: (padIndex: number) => void,
+  rowLedOff: (padIndex: number) => void,
   allOff: VoidFunction
 }
 
@@ -77,6 +79,12 @@ export function setupPads(onPad: (padIndex: number) => void): PadsControl {
     resetBeat: () => { head.reset(); },
     padLedOn: (padIndex: number, colour?: PadColour) => {
       firePads.padLedOn(padIndex, colour);
+    },
+    rowLedOn: (rowIndex: number) => {
+      firePads.rowLedOn(rowIndex);
+    },
+    rowLedOff: (rowIndex: number) => {
+      firePads.rowLedOff(rowIndex);
     },
     allOff: () => { firePads.allOff(); }
   };

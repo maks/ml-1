@@ -82,3 +82,5 @@ CCInputs.rowPaleRed = 1;
 CCInputs.rowPalegreen = 2;
 CCInputs.rowRed = 3;
 CCInputs.rowGreen = 4;
+CCInputs.rowDim = 1;
+CCInputs.rowBright = 2;
