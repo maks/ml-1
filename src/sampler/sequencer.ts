@@ -1,4 +1,4 @@
-import { fetchAndDecodeAudio, Instrument } from "./audio_handling.js";
+import { fetchAndDecodeAudio, Instrument, OptsInterface } from "./audio_handling.js";
 import { Color } from "../fire_raw/pads.js";
 
 export { Project, Track, ProjectPlayer, Effect };
@@ -16,6 +16,16 @@ const COLORS = [
   { r: 0, g: 100, b: 0 },
   { r: 80, g: 80, b: 80 },
 ];
+
+
+let adsr: ADSR = {};
+
+export interface ADSR {
+  a?: number,
+  d?: number,
+  s?: number,
+  r?: number
+}
 
 class Project {
   private _tracks: Track[];
@@ -122,13 +132,16 @@ class Track {
   private _instrument: Instrument | null;
   private _name: string | undefined;
   private _color: Color;
-
   private _steps: Step[] = [];
+
+  public offset = 0;
+  public duration: number | undefined;
 
   static colorCounter = 0;
 
   static fromData(context: AudioContext, instrument: Instrument, data: any): Track {
     const track = new Track(context, instrument, data.name, data.color, null);
+    track.duration = data.duration;
     track._steps = data.steps;
     return track;
   }
@@ -182,11 +195,11 @@ class Track {
 
   // convert to easily stringifyable object
   toData(): any {
-    console.log(this.steps)
     return {
       name: this.name,
       color: this._color,
       instrumentName: this.instrument?.name,
+      duration: this.duration,
       steps: this.steps
     };
   }
@@ -253,6 +266,7 @@ class ProjectPlayer {
   }
 
   playNote(track: Track, rhythmIndex: number) {
+    console.log('playNote dur:', track.duration)
     this.playNoteAtTime(track, rhythmIndex, 0);
   }
 
@@ -289,8 +303,10 @@ class ProjectPlayer {
     // const wetGainNode = new GainNode(context, { gain: instrument.sendGain });
     // finalNode.connect(wetGainNode);
     // wetGainNode.connect(this.convolver);
-
-    voice?.start(note, noteTime, {});
+    const opts = {
+      duration: track.duration
+    };
+    voice?.start(note, noteTime, opts);
   }
 
   // Call when beat `n` is played to schedule beat `n+1`.

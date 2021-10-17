@@ -83,7 +83,7 @@ export default function SamplePlayer(ac, source, options) {
     node.env.start(when, offset, opts.duration)
     node.source.start(when)
     player.emit('started', when, node.id, node)
-    // if (opts.duration) node.stop(when + opts.duration)
+    if (opts.duration) node.stop(when + opts.duration)
     return node
   }
 

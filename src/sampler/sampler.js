@@ -69,7 +69,7 @@ async function init() {
 
   const controls = {
     selectInstrument: selectPack,
-    playNote: (note) => instrument.start(note),
+    playNote: (note, options) => machineState.currentTrack.instrument.start(note, null, options),
     startPlayer: () => projectPlayer.play(),
     stop: () => projectPlayer.stop(),
     save: () => console.log("save:" + saveToStorage(JSON.stringify(project.toData())))

@@ -21,6 +21,7 @@ const COLORS = [
     { r: 0, g: 100, b: 0 },
     { r: 80, g: 80, b: 80 },
 ];
+let adsr = {};
 class Project {
     constructor(context, tracks, tempo, effect, effectMix) {
         this._swingFactor = 0;
@@ -98,6 +99,7 @@ class Project {
 class Track {
     constructor(context, instrument, name, color, effect) {
         this._steps = [];
+        this.offset = 0;
         this._context = context;
         this._instrument = instrument;
         for (let i = 0; i < LOOP_LENGTH; i++) {
@@ -108,6 +110,7 @@ class Track {
     }
     static fromData(context, instrument, data) {
         const track = new Track(context, instrument, data.name, data.color, null);
+        track.duration = data.duration;
         track._steps = data.steps;
         return track;
     }
@@ -146,11 +149,11 @@ class Track {
     // convert to easily stringifyable object
     toData() {
         var _a;
-        console.log(this.steps);
         return {
             name: this.name,
             color: this._color,
             instrumentName: (_a = this.instrument) === null || _a === void 0 ? void 0 : _a.name,
+            duration: this.duration,
             steps: this.steps
         };
     }
@@ -198,6 +201,7 @@ class ProjectPlayer {
         this._convolver.connect(this._effectLevelNode);
     }
     playNote(track, rhythmIndex) {
+        console.log('playNote dur:', track.duration);
         this.playNoteAtTime(track, rhythmIndex, 0);
     }
     playNoteAtTime(track, rhythmIndex, noteTime) {
@@ -227,7 +231,10 @@ class ProjectPlayer {
         // const wetGainNode = new GainNode(context, { gain: instrument.sendGain });
         // finalNode.connect(wetGainNode);
         // wetGainNode.connect(this.convolver);
-        voice === null || voice === void 0 ? void 0 : voice.start(note, noteTime, {});
+        const opts = {
+            duration: track.duration
+        };
+        voice === null || voice === void 0 ? void 0 : voice.start(note, noteTime, opts);
     }
     // Call when beat `n` is played to schedule beat `n+1`.
     tick() {

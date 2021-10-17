@@ -4,10 +4,11 @@ import { CCInputs } from '../fire_raw/cc_inputs.js';
 import { MenuController } from '../menu/menu_controller.js'
 
 import { ListScreen, ListScreenItem, MenuScreen, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js'
-import { Instrument } from './audio_handling.js';
-import { Track } from './sequencer.js';
+import { Instrument, OptsInterface } from './audio_handling.js';
+import { ADSR, Track } from './sequencer.js';
 
 const MENU_LIST_ITEMS_COUNT = 9;
+const DURATION_INCREMENT = 0.1;
 
 let oled: OledControl;
 let menu: MenuController;
@@ -17,7 +18,7 @@ let padControl: PadsControl;
 
 interface controlInterface {
   selectInstrument: (instrument: string) => void,
-  playNote: (note: number) => void,
+  playNote: (note: number, options: OptsInterface) => void,
   stop: () => void,
   startPlayer: () => void,
   save: () => void
@@ -45,6 +46,7 @@ interface MachineState {
   selectedNote: number,
   tracks: Track[]
 }
+
 
 export function initControls(
   instrumentNames: string[],
@@ -116,8 +118,12 @@ export function initControls(
             overlay.title = `${instrumentName}`;
             overlay.value = pitch;
             handleDialInput(dir, overlay);
+          } else if (machineState.mode == MachineMode.Note) {
+            const dur = machineState.currentTrack.duration;
+            machineState.currentTrack.duration = dir ? ((dur ?? 0) + DURATION_INCREMENT) : Math.min(0, (dur ?? 0) - DURATION_INCREMENT);
+            console.log('DUR:' + machineState.currentTrack.duration, machineState.currentTrack);
           } else {
-            console.log('NO FILTER YET except STEP mode');
+            console.log('NO FILTER YET in mode:' + machineState.mode);
           }
         },
         onResonance: (dir) => {
@@ -309,7 +315,7 @@ function handleDialInput(dir: number, overlay: NumberOverlayScreen) {
   menu.setOverlay(overlay)
 }
 
-function handlePad(index: number, machineState: MachineState, callback: (note: number) => void) {
+function handlePad(index: number, machineState: MachineState, callback: (note: number, opts: OptsInterface) => void) {
   const rowIndex = Math.floor(index / 16);
   const columnIndex = index % 16;
   console.log("pad index:" + index + "MODE:" + machineState.mode);
@@ -321,7 +327,10 @@ function handlePad(index: number, machineState: MachineState, callback: (note: n
     if (note > 0) {
       console.log('PLAY NOTE:' + note);
       machineState.selectedNote = note;
-      callback(note);
+      const opts = {
+        duration: machineState.currentTrack.duration
+      };
+      callback(note, opts);
     }
   }
 

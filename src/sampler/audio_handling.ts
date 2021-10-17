@@ -1,7 +1,14 @@
 // @ts-ignore
 import { SamplePlayer } from "/src/sampler/sample-player/index.js";
 import { DSPreset, DSSample } from "./dspreset_parser";
+import { ADSR } from "./sequencer";
 
+
+export interface OptsInterface {
+  duration?: number,
+  loop?: boolean
+  adsr?: ADSR
+}
 // returns a SamplePlayer based Instrument created from a dspreset group
 export async function instrumentFromDS(baseUrl: string, context: AudioContext, dspreset: DSPreset): Promise<Instrument> {
   const group = dspreset.group;
@@ -70,7 +77,7 @@ export class Instrument {
     if (matchingSampleRange.rootNote != midiNote) {
       opts.cents = (midiNote - matchingSampleRange.rootNote) * 100;
     }
-    //console.log(`for note: ${midiNote} play ${matchingSampleRange.rootNote} detune by: ${opts.cents}`)
+    console.log(`for note: ${midiNote} play ${matchingSampleRange.rootNote} opts:`, opts)
     this._player.start(matchingSampleRange.rootNote, when, opts)
   }
 

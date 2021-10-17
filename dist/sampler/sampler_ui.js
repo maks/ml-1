@@ -3,6 +3,7 @@ import { CCInputs } from '../fire_raw/cc_inputs.js';
 import { MenuController } from '../menu/menu_controller.js';
 import { ListScreen, ListScreenItem, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js';
 const MENU_LIST_ITEMS_COUNT = 9;
+const DURATION_INCREMENT = 0.1;
 let oled;
 let menu;
 let buttons;
@@ -76,8 +77,13 @@ export function initControls(instrumentNames, control, machineState) {
                     overlay.value = pitch;
                     handleDialInput(dir, overlay);
                 }
+                else if (machineState.mode == MachineMode.Note) {
+                    const dur = machineState.currentTrack.duration;
+                    machineState.currentTrack.duration = dir ? ((dur !== null && dur !== void 0 ? dur : 0) + DURATION_INCREMENT) : Math.min(0, (dur !== null && dur !== void 0 ? dur : 0) - DURATION_INCREMENT);
+                    console.log('DUR:' + machineState.currentTrack.duration, machineState.currentTrack);
+                }
                 else {
-                    console.log('NO FILTER YET except STEP mode');
+                    console.log('NO FILTER YET in mode:' + machineState.mode);
                 }
             },
             onResonance: (dir) => {
@@ -268,7 +274,10 @@ function handlePad(index, machineState, callback) {
         if (note > 0) {
             console.log('PLAY NOTE:' + note);
             machineState.selectedNote = note;
-            callback(note);
+            const opts = {
+                duration: machineState.currentTrack.duration
+            };
+            callback(note, opts);
         }
     }
     if (machineState.mode == MachineMode.Step) {
