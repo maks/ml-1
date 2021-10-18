@@ -528,7 +528,7 @@ function _noteFromPadIndex(machineState: MachineState, index: number): number {
     return 0;
   }
 
-  if (index >= firstBlackRow && index <= firstWhiteRow) {
+  if (index >= firstBlackRow && index < firstWhiteRow) {
     const noteOffset = blackKeys[index % 16];
     if (noteOffset == 0) {
       return 0;
