@@ -1,0 +1,325 @@
+{
+  "tracks": [
+    {
+      "name": "Loopop-6m0d6",
+      "color": {
+        "r": 0,
+        "g": 100,
+        "b": 0
+      },
+      "instrumentName": "Loopop-6m0d6",
+      "mute": false,
+      "gain": 0.9200000000000004,
+      "steps": [
+        {
+          "note": 61,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 61,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 61,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 61,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-HydraSynth-3-PianoPad",
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 100
+      },
+      "instrumentName": "Loopop-HydraSynth-3-PianoPad",
+      "duration": 2.1400000000000015,
+      "offset": 0.02,
+      "mute": false,
+      "gain": 0.8600000000000003,
+      "release": 0.9000000000000004,
+      "steps": [
+        {
+          "note": 52,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 59,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-HydraSynth-3-PianoPad",
+      "color": {
+        "r": 80,
+        "g": 80,
+        "b": 0
+      },
+      "instrumentName": "Loopop-HydraSynth-3-PianoPad",
+      "duration": 2.1000000000000005,
+      "mute": false,
+      "steps": [
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 52,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 52,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-UDO-1-TwinkleWow",
+      "color": {
+        "r": 0,
+        "g": 80,
+        "b": 80
+      },
+      "instrumentName": "Loopop-UDO-1-TwinkleWow",
+      "duration": 1.5000000000000002,
+      "mute": false,
+      "gain": 0.32,
+      "steps": [
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 48,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 48,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    }
+  ],
+  "tempo": 80,
+  "swing": 0,
+  "effect": {
+    "wetMix": 0,
+    "dryMix": 0,
+    "_buffer": null,
+    "_context": {},
+    "_name": "No Effect"
+  }
+}

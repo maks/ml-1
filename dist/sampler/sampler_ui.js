@@ -212,10 +212,20 @@ export function initControls(instrumentNames, control, machineState) {
                 throw new Error('Function not implemented.');
             },
             gridLeft: function (up) {
-                throw new Error('Function not implemented.');
+                if (!up) {
+                    if (machineState.mode == MachineMode.Note) {
+                        machineState.keybdOctave = Math.max(1, machineState.keybdOctave - 1);
+                    }
+                }
+                _handleOctaveDisplay(machineState);
             },
             gridRight: function (up) {
-                throw new Error('Function not implemented.');
+                if (!up) {
+                    if (machineState.mode == MachineMode.Note) {
+                        machineState.keybdOctave = Math.min(7, machineState.keybdOctave + 1);
+                    }
+                }
+                _handleOctaveDisplay(machineState);
             },
             step: function (up) {
                 if (!up) {
@@ -272,6 +282,39 @@ export function initControls(instrumentNames, control, machineState) {
         _setSelectedTrackLeds(0);
         // update OLED with loaded preset
         menu.updateOled();
+    }
+}
+function _handleOctaveDisplay(machineState) {
+    console.log("OCTAVE:" + machineState.keybdOctave);
+    switch (machineState.keybdOctave) {
+        case 1:
+            buttons.buttonLedOn(ButtonCode.GridLeft, CCInputs.red);
+            buttons.buttonLedOn(ButtonCode.GridRight, CCInputs.red);
+            break;
+        case 2:
+            buttons.buttonLedOn(ButtonCode.GridLeft, CCInputs.red);
+            buttons.buttonLedOn(ButtonCode.GridRight, 0);
+            break;
+        case 3:
+            buttons.buttonLedOn(ButtonCode.GridLeft, CCInputs.paleRed);
+            buttons.buttonLedOn(ButtonCode.GridRight, 0);
+            break;
+        case 4:
+            buttons.buttonLedOn(ButtonCode.GridLeft, 0);
+            buttons.buttonLedOn(ButtonCode.GridRight, 0);
+            break;
+        case 5:
+            buttons.buttonLedOn(ButtonCode.GridLeft, 0);
+            buttons.buttonLedOn(ButtonCode.GridRight, CCInputs.paleRed);
+            break;
+        case 6:
+            buttons.buttonLedOn(ButtonCode.GridLeft, 0);
+            buttons.buttonLedOn(ButtonCode.GridRight, CCInputs.red);
+            break;
+        case 7:
+            buttons.buttonLedOn(ButtonCode.GridLeft, CCInputs.paleRed);
+            buttons.buttonLedOn(ButtonCode.GridRight, CCInputs.paleRed);
+            break;
     }
 }
 function _handleToggleTrackMute(machineState, trackIndex) {
@@ -360,7 +403,7 @@ function handlePad(index, machineState, callback) {
     //TODO: account for grid offset
     machineState.selectedStep = index % 16;
     if (machineState.mode == MachineMode.Note) {
-        const note = _noteFromPadIndex(index);
+        const note = _noteFromPadIndex(machineState, index);
         if (note > 0) {
             console.log('PLAY NOTE:' + note);
             machineState.selectedNote = note;
@@ -417,10 +460,9 @@ function _paintPadsStepsRow(track, rowIndex) {
     }
 }
 // work out note from chromatic keyboard displayed on bottom 2 rows of pads
-function _noteFromPadIndex(index) {
-    const octave = 3;
+function _noteFromPadIndex(machineState, index) {
     let midiNote = 0;
-    const octaveStartingNote = (octave * 12) % 128;
+    const octaveStartingNote = (machineState.keybdOctave * 12) % 128;
     if (index < firstBlackRow) {
         return 0;
     }

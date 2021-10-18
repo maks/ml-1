@@ -6,6 +6,8 @@ import { Project, ProjectPlayer } from '/dist/sampler/sequencer.js';
 
 const baseUrl = "http://127.0.0.1:8008/";
 
+const startingOctave = 4;
+
 // init() once the page has finished loading.
 window.onload = init;
 
@@ -26,6 +28,7 @@ let machineState = {
   currentTrack: null,
   selectedStep: null,
   selectedNote: 60,
+  keybdOctave: startingOctave,
   tracks: []
 }
 
