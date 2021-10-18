@@ -21,7 +21,6 @@ const COLORS = [
     { r: 0, g: 100, b: 0 },
     { r: 80, g: 80, b: 80 },
 ];
-let adsr = {};
 class Project {
     constructor(context, tracks, tempo, effect, effectMix) {
         this._swingFactor = 0;
@@ -101,6 +100,8 @@ class Track {
         this._mute = false;
         this._steps = [];
         this.offset = 0;
+        this.sustain = 1; // 1.0 is no effect
+        this.gain = 1; // 1.0 is no effect
         this._context = context;
         this._instrument = instrument;
         for (let i = 0; i < LOOP_LENGTH; i++) {
@@ -114,7 +115,12 @@ class Track {
         const track = new Track(context, instrument, data.name, data.color, null);
         track.duration = data.duration;
         track.offset = data.offset;
-        track._mute = (_a = data._mute) !== null && _a !== void 0 ? _a : false;
+        track._mute = (_a = data.mute) !== null && _a !== void 0 ? _a : false;
+        track.gain = data.gain;
+        track.attack = data.attack;
+        track.decay = data.decay;
+        track.sustain = data.sustain;
+        track.release = data.release;
         track._steps = data.steps;
         return track;
     }
@@ -166,6 +172,11 @@ class Track {
             duration: this.duration,
             offset: this.offset,
             mute: this.muted,
+            gain: this.gain,
+            attack: this.attack,
+            decay: this.decay,
+            sustain: this.sustain,
+            release: this.release,
             steps: this.steps
         };
     }
@@ -213,7 +224,6 @@ class ProjectPlayer {
         this._convolver.connect(this._effectLevelNode);
     }
     playNote(track, rhythmIndex) {
-        console.log('playNote dur:', track.duration);
         this.playNoteAtTime(track, rhythmIndex, 0);
     }
     playNoteAtTime(track, rhythmIndex, noteTime) {
@@ -244,7 +254,13 @@ class ProjectPlayer {
         // finalNode.connect(wetGainNode);
         // wetGainNode.connect(this.convolver);
         const opts = {
-            duration: track.duration
+            gain: track.gain,
+            duration: track.duration,
+            offset: track.offset,
+            attack: track.attack,
+            decay: track.decay,
+            sustain: track.sustain,
+            release: track.release
         };
         voice === null || voice === void 0 ? void 0 : voice.start(note, noteTime, opts);
     }

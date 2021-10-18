@@ -81,7 +81,7 @@ export default function SamplePlayer(ac, source, options) {
     var node = createNode(name, buffer, opts)
     node.id = track(name, node)
     node.env.start(when, offset, opts.duration)
-    node.source.start(when)
+    node.source.start(when, offset, opts.duration)
     player.emit('started', when, node.id, node)
     if (opts.duration) node.stop(when + opts.duration)
     return node
@@ -179,7 +179,9 @@ export default function SamplePlayer(ac, source, options) {
     node.stop = function (when) {
       var time = when || ac.currentTime
       player.emit('stop', time, name)
-      var stopAt = node.env.stop(time)
+
+      const target = (opts.release ? true : false);
+      var stopAt = node.env.stop(time, target)
       node.source.stop(stopAt)
     }
     return node

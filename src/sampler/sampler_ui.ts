@@ -5,10 +5,10 @@ import { MenuController } from '../menu/menu_controller.js'
 
 import { ListScreen, ListScreenItem, MenuScreen, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js'
 import { Instrument, OptsInterface } from './audio_handling.js';
-import { ADSR, Track } from './sequencer.js';
+import { Track } from './sequencer.js';
 
 const MENU_LIST_ITEMS_COUNT = 9;
-const DURATION_INCREMENT = 0.1;
+const DURATION_INCREMENT = 0.02;
 
 let oled: OledControl;
 let menu: MenuController;
@@ -103,31 +103,72 @@ export function initControls(
       {
         onVolume: (dir) => {
           // handleDialInput(dir, overlays["volume"]);
+          if (machineState.mode == MachineMode.Note) {
+            if (machineState.keyMod == KeyMod.Alt) {
+              const attack = machineState.currentTrack.attack;
+              //TODO: clamp max at track max audiosample duration
+              machineState.currentTrack.attack = dir ? ((attack ?? 0) + DURATION_INCREMENT) : Math.max(0, (attack ?? 0) - DURATION_INCREMENT);
+              console.log('ATTAK:', machineState.currentTrack.attack);
+            } else {
+              const gain = machineState.currentTrack.gain;
+              machineState.currentTrack.gain = dir ? ((gain ?? 0) + DURATION_INCREMENT) : Math.max(0, (gain ?? 0) - DURATION_INCREMENT);
+              console.log('GAIN:' + machineState.currentTrack.gain);
+            }
+          }
         },
         onPan: (dir) => {
-
+          if (machineState.mode == MachineMode.Note) {
+            if (machineState.keyMod == KeyMod.Shift) {
+              const offset = machineState.currentTrack.offset;
+              machineState.currentTrack.offset = dir ? ((offset ?? 0) + DURATION_INCREMENT) : Math.max(0, (offset ?? 0) - DURATION_INCREMENT);
+              console.log('OFFSET:' + offset);
+            } else if (machineState.keyMod == KeyMod.Alt) {
+              const decay = machineState.currentTrack.decay;
+              //TODO: clamp max at track max audiosample duration
+              machineState.currentTrack.decay = dir ? ((decay ?? 0) + DURATION_INCREMENT) : Math.max(0, (decay ?? 0) - DURATION_INCREMENT);
+              console.log('DECAY:', machineState.currentTrack.decay);
+            }
+          }
         },
         onFilter: (dir) => {
-          if (machineState.mode == MachineMode.Step) {
-            const instrumentName = machineState.currentTrack.name;
-            const overlay = overlays["pitch"];
-            if (instrumentName == null) {
-              return;
+          if (machineState.mode == MachineMode.Note) {
+            if (machineState.keyMod == KeyMod.Shift) {
+              const dur = machineState.currentTrack.duration;
+              machineState.currentTrack.duration = dir ? ((dur ?? 0) + DURATION_INCREMENT) : (dur ?? 0) - DURATION_INCREMENT;
+              if (machineState.currentTrack.duration < 0) {
+                machineState.currentTrack.duration = undefined;
+              }
+              console.log('DUR:' + machineState.currentTrack.duration);
+            } else if (machineState.keyMod == KeyMod.Alt) {
+              const sustain = machineState.currentTrack.decay;
+              //TODO: clamp max at track max audiosample duration
+              machineState.currentTrack.decay = dir ? ((sustain ?? 0) + DURATION_INCREMENT) : Math.max(0, (sustain ?? 0) - DURATION_INCREMENT);
+              console.log('SUSTAIN:', machineState.currentTrack.sustain);
+            } else {
+              const instrumentName = machineState.currentTrack.name;
+              const overlay = overlays["pitch"];
+              if (instrumentName == null) {
+                return;
+              }
+              let pitch = machineState.currentTrack.steps[machineState.selectedStep].note;
+              overlay.title = `${instrumentName}`;
+              overlay.value = pitch;
+              handleDialInput(dir, overlay);
             }
-            let pitch = machineState.currentTrack.steps[machineState.selectedStep].note;
-            overlay.title = `${instrumentName}`;
-            overlay.value = pitch;
-            handleDialInput(dir, overlay);
-          } else if (machineState.mode == MachineMode.Note) {
-            const dur = machineState.currentTrack.duration;
-            machineState.currentTrack.duration = dir ? ((dur ?? 0) + DURATION_INCREMENT) : Math.min(0, (dur ?? 0) - DURATION_INCREMENT);
-            console.log('DUR:' + machineState.currentTrack.duration, machineState.currentTrack);
           } else {
             console.log('NO FILTER YET in mode:' + machineState.mode);
           }
         },
         onResonance: (dir) => {
           // handleDialInput(dir, overlays["effects"]);
+          if (machineState.mode == MachineMode.Note) {
+            if (machineState.keyMod == KeyMod.Alt) {
+              const release = machineState.currentTrack.release;
+              //TODO: clamp max at track max audiosample duration
+              machineState.currentTrack.release = dir ? ((release ?? 0) + DURATION_INCREMENT) : Math.max(0, (release ?? 0) - DURATION_INCREMENT);
+              console.log('RELEASE:', machineState.currentTrack.release);
+            }
+          }
         },
         onSelect: (dir) => {
           if (dir == 2 || dir == 3) {
@@ -262,6 +303,12 @@ export function initControls(
     // update solo/mute status button leds
     _setoloMuteTrackButtonLeds(machineState.tracks.map((t) => t.muted));
 
+    // make first track (selected) current track
+    machineState.currentTrack = machineState.tracks[0];
+
+    // update row leds to show (selected) currentTrack
+    _setSelectedTrackLeds(0);
+
     // update OLED with loaded preset
     menu.updateOled();
   }
@@ -356,7 +403,7 @@ function handleDialInput(dir: number, overlay: NumberOverlayScreen) {
   menu.setOverlay(overlay)
 }
 
-function handlePad(index: number, machineState: MachineState, callback: (note: number, opts: OptsInterface) => void) {
+function handlePad(index: number, machineState: MachineState, callback: (note: number, options: OptsInterface) => void) {
   const rowIndex = Math.floor(index / 16);
   const columnIndex = index % 16;
   console.log("pad index:" + index + "MODE:" + machineState.mode);
@@ -369,7 +416,13 @@ function handlePad(index: number, machineState: MachineState, callback: (note: n
       console.log('PLAY NOTE:' + note);
       machineState.selectedNote = note;
       const opts = {
-        duration: machineState.currentTrack.duration
+        gain: machineState.currentTrack.gain,
+        duration: machineState.currentTrack.duration,
+        offset: machineState.currentTrack.offset,
+        attack: machineState.currentTrack.attack,
+        decay: machineState.currentTrack.decay,
+        sustain: machineState.currentTrack.sustain,
+        release: machineState.currentTrack.release
       };
       callback(note, opts);
     }

@@ -1,13 +1,16 @@
 // @ts-ignore
 import { SamplePlayer } from "/src/sampler/sample-player/index.js";
 import { DSPreset, DSSample } from "./dspreset_parser";
-import { ADSR } from "./sequencer";
-
 
 export interface OptsInterface {
+  gain: number,
   duration?: number,
+  offset?: number,
   loop?: boolean
-  adsr?: ADSR
+  attack?: number,
+  decay?: number,
+  sustain?: number,
+  release?: number,
 }
 // returns a SamplePlayer based Instrument created from a dspreset group
 export async function instrumentFromDS(baseUrl: string, context: AudioContext, dspreset: DSPreset): Promise<Instrument> {

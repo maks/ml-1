@@ -3,4 +3,6 @@ with detune for multisample instrument note-ranges added back in from its origin
 
 License for sample-player (MIT): https://github.com/danigb/sample-player/blob/master/LICENSE
 
+adsr from: https://github.com/mmckegg/adsr
+
 

@@ -17,16 +17,6 @@ const COLORS = [
   { r: 80, g: 80, b: 80 },
 ];
 
-
-let adsr: ADSR = {};
-
-export interface ADSR {
-  a?: number,
-  d?: number,
-  s?: number,
-  r?: number
-}
-
 class Project {
   private _tracks: Track[];
   private _tempo: number;
@@ -137,13 +127,24 @@ class Track {
 
   public offset = 0;
   public duration: number | undefined;
+  public attack?: number;
+  public decay?: number;
+  public sustain?: number = 1; // 1.0 is no effect
+  public release?: number;
+  public gain: number = 1; // 1.0 is no effect
+
   static colorCounter = 0;
 
   static fromData(context: AudioContext, instrument: Instrument, data: any): Track {
     const track = new Track(context, instrument, data.name, data.color, null);
     track.duration = data.duration;
     track.offset = data.offset;
-    track._mute = data._mute ?? false;
+    track._mute = data.mute ?? false;
+    track.gain = data.gain;
+    track.attack = data.attack;
+    track.decay = data.decay;
+    track.sustain = data.sustain;
+    track.release = data.release;
     track._steps = data.steps;
     return track;
   }
@@ -212,6 +213,11 @@ class Track {
       duration: this.duration,
       offset: this.offset,
       mute: this.muted,
+      gain: this.gain,
+      attack: this.attack,
+      decay: this.decay,
+      sustain: this.sustain,
+      release: this.release,
       steps: this.steps
     };
   }
@@ -278,7 +284,6 @@ class ProjectPlayer {
   }
 
   playNote(track: Track, rhythmIndex: number) {
-    console.log('playNote dur:', track.duration)
     this.playNoteAtTime(track, rhythmIndex, 0);
   }
 
@@ -315,9 +320,16 @@ class ProjectPlayer {
     // const wetGainNode = new GainNode(context, { gain: instrument.sendGain });
     // finalNode.connect(wetGainNode);
     // wetGainNode.connect(this.convolver);
-    const opts = {
-      duration: track.duration
+    const opts: OptsInterface = {
+      gain: track.gain,
+      duration: track.duration,
+      offset: track.offset,
+      attack: track.attack,
+      decay: track.decay,
+      sustain: track.sustain,
+      release: track.release
     };
+
     voice?.start(note, noteTime, opts);
   }
 
