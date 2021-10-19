@@ -23,6 +23,15 @@ export var MachineMode;
     MachineMode[MachineMode["Preform"] = 4] = "Preform";
     MachineMode[MachineMode["Browser"] = 5] = "Browser";
 })(MachineMode || (MachineMode = {}));
+export var TransportMode;
+(function (TransportMode) {
+    TransportMode[TransportMode["None"] = 1] = "None";
+    TransportMode[TransportMode["Play"] = 2] = "Play";
+    TransportMode[TransportMode["Pause"] = 3] = "Pause";
+    TransportMode[TransportMode["Stop"] = 4] = "Stop";
+    TransportMode[TransportMode["Record"] = 5] = "Record";
+    TransportMode[TransportMode["CountIn"] = 6] = "CountIn";
+})(TransportMode || (TransportMode = {}));
 export function initControls(instrumentNames, control, machineState) {
     getMidi(midiReady, (isConnected) => {
         if (isConnected) {
@@ -32,11 +41,21 @@ export function initControls(instrumentNames, control, machineState) {
     });
     function midiReady() {
         console.log('SAMPLER MIDI IS READY');
-        setupTransport(control.startPlayer, control.stop, () => {
+        // pass in callbacks which will be called when one of the 3 transport buttons is pressed
+        setupTransport(() => {
+            machineState.transportMode = TransportMode.Play;
+            control.startPlayer();
+        }, () => {
+            machineState.transportMode = TransportMode.Stop;
+            control.stop();
+        }, () => {
+            // for now special case to SAVE Project data using REC+SHIFT buttons
             if (machineState.keyMod == KeyMod.Shift) {
                 control.save();
+                return true; // true means to clear all buttons after handling this
             }
             else {
+                machineState.transportMode = TransportMode.Record;
                 console.log('no save without shift mod');
             }
         });
@@ -74,6 +93,10 @@ export function initControls(instrumentNames, control, machineState) {
                         machineState.currentTrack.gain = dir ? ((gain !== null && gain !== void 0 ? gain : 0) + DURATION_INCREMENT) : Math.max(0, (gain !== null && gain !== void 0 ? gain : 0) - DURATION_INCREMENT);
                         console.log('GAIN:' + machineState.currentTrack.gain);
                     }
+                }
+                else {
+                    //TODO:
+                    console.log('MAster VOLume:');
                 }
             },
             onPan: (dir) => {
@@ -336,6 +359,7 @@ function _handleUpdateMode(machineState) {
             _paintPadsSteps(machineState.tracks);
             break;
         case MachineMode.Note:
+            _paintPadsNoteTracks(machineState.tracks);
             _paintPadsKeyboard();
             break;
     }
@@ -403,6 +427,11 @@ function handlePad(index, machineState, callback) {
     //TODO: account for grid offset
     machineState.selectedStep = index % 16;
     if (machineState.mode == MachineMode.Note) {
+        // first row is track list
+        if (rowIndex == 0) {
+            _handleTrackSelect(machineState, columnIndex);
+            console.log('pad handled track sel:' + machineState.currentTrack);
+        }
         const note = _noteFromPadIndex(machineState, index);
         if (note > 0) {
             console.log('PLAY NOTE:' + note);
@@ -433,6 +462,7 @@ const firstBlackRow = 32;
 const firstWhiteRow = 48;
 const blackKeys = [0, 1, 3, 0, 6, 8, 10, 0, 13, 15, 0, 18, 20, 22, 0, 25];
 const whitekeys = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26];
+// chromatic keyboard, shown in Note mode
 function _paintPadsKeyboard() {
     const blackKeyColour = { r: 0, g: 0, b: 80 };
     const whiteKeyColour = { r: 80, g: 80, b: 100 };
@@ -443,6 +473,13 @@ function _paintPadsKeyboard() {
     }
     for (var i = firstWhiteRow; i < firstWhiteRow + 16; i++) {
         padControl.padLedOn(i, whiteKeyColour);
+    }
+}
+// show list of all tracks, 1 per top pad row, each pad in colour of the track
+function _paintPadsNoteTracks(tracks) {
+    const tracksInFirstRow = Math.min(16, tracks.length);
+    for (var i = 0; i < tracksInFirstRow; i++) {
+        padControl.padLedOn(i, tracks[i].color);
     }
 }
 function _paintPadsSteps(tracks) {

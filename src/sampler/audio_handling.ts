@@ -80,7 +80,7 @@ export class Instrument {
     if (matchingSampleRange.rootNote != midiNote) {
       opts.cents = (midiNote - matchingSampleRange.rootNote) * 100;
     }
-    console.log(`for note: ${midiNote} play ${matchingSampleRange.rootNote} opts:`, opts)
+    //console.log(`for note: ${midiNote} play ${matchingSampleRange.rootNote} opts:`, opts)
     this._player.start(matchingSampleRange.rootNote, when, opts)
   }
 

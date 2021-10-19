@@ -17,21 +17,32 @@ let dials;
 let buttons;
 //TODO: make config param in future
 const BAR_LENGTH = 16;
+// the optional bool return val from the onX callbacks means
+// if ===true, clear all transport button leds
 export function setupTransport(onPlay, onStop, onRecord) {
     const transport = new TransportControls({
         midi: dispatcher,
         onPlay: () => {
             console.log('ts play');
             transport.play();
-            onPlay();
+            const clear = onPlay();
+            if (clear === true) {
+                transport.allOff();
+            }
         },
         onStop: () => {
             transport.stop();
-            onStop();
+            const clear = onStop();
+            if (clear === true) {
+                transport.allOff();
+            }
         },
         onRecord: () => {
             transport.record();
-            onRecord();
+            const clear = onRecord();
+            if (clear === true) {
+                transport.allOff();
+            }
         },
     });
 }

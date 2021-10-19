@@ -23,8 +23,9 @@ let packs = [];
 let selectedPack;
 
 let machineState = {
-  mode: 1,
-  keyMod: 0,
+  mode: 1, // MachineMode.Step = 1,
+  keyMod: 0, // KeyMod.None = 0,
+  transportMode: 1, // TransportMode.None = 0
   currentTrack: null,
   selectedStep: null,
   selectedNote: 60,

@@ -277,9 +277,13 @@ class ProjectPlayer {
         this._onNextBeat(this._rhythmIndex);
         // Then, increase rhythmIndex and nextBeatAt for beat `n+1`.
         this.advanceBeat();
+        console.log("BEAT:" + this._rhythmIndex);
         // Schedule notes to be played at beat `n+1`.
         for (const track of this._project.tracks) {
-            this.playNoteAtTime(track, this._rhythmIndex, this._nextBeatAt);
+            // allow for tracks with step counts of any length, for tracks with step counts less than current rythmIndex
+            // it will loop the track from beginning "Arp style"
+            const beatIndex = track.steps.length <= this._rhythmIndex ? this._rhythmIndex % track.steps.length : this._rhythmIndex;
+            this.playNoteAtTime(track, beatIndex, this._nextBeatAt);
         }
         // Finally, call tick() again at the time when beat `n+1` is played.
         this._timeoutId = window.setTimeout(() => this.tick(), (this._nextBeatAt - this._context.currentTime) * 1000);
@@ -290,7 +294,7 @@ class ProjectPlayer {
         const swingDirection = (this._rhythmIndex % 2) ? -1 : 1;
         const swing = (this._project.swingFactor / 3) * swingDirection;
         this._nextBeatAt += (1 + swing) * secondsPerBeat;
-        this._rhythmIndex = (this._rhythmIndex + 1) % LOOP_LENGTH;
+        this._rhythmIndex = (this._rhythmIndex + 1);
     }
     updateEffect() {
         this._convolver.buffer = this._project.effect.buffer;
