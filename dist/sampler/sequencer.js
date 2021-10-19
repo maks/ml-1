@@ -46,8 +46,11 @@ class Project {
             return project;
         });
     }
-    addTrack(track) {
-        this._tracks.push(track);
+    addTrack(context, instrument) {
+        const i = this.tracks.length;
+        const nuTrack = new Track(context, instrument, `Trk${i}`, COLORS[i + 1], null);
+        this._tracks.push(nuTrack);
+        return nuTrack;
     }
     removeTrack(trackIndex) {
         this._tracks.splice(trackIndex, 1);

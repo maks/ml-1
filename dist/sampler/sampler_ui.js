@@ -59,7 +59,7 @@ export function initControls(instrumentNames, control, machineState) {
                 console.log('no save without shift mod');
             }
         });
-        padControl = setupPads((index) => handlePad(index, machineState, control.playNote));
+        padControl = setupPads((index) => handlePad(index, machineState, control));
         oled = setupOled();
         const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(instrumentNames, (instrumentName) => _handleInstrumentSelection(control, machineState, instrumentName)), () => {
             _topMenu.updateItems(_topMenuListItems(instrumentNames, (instrumentName) => _handleInstrumentSelection(control, machineState, instrumentName)));
@@ -420,7 +420,7 @@ function handleDialInput(dir, overlay) {
     }
     menu.setOverlay(overlay);
 }
-function handlePad(index, machineState, callback) {
+function handlePad(index, machineState, control) {
     const rowIndex = Math.floor(index / 16);
     const columnIndex = index % 16;
     console.log("pad index:" + index + "MODE:" + machineState.mode);
@@ -429,8 +429,17 @@ function handlePad(index, machineState, callback) {
     if (machineState.mode == MachineMode.Note) {
         // first row is track list
         if (rowIndex == 0) {
-            _handleTrackSelect(machineState, columnIndex);
-            console.log('pad handled track sel:' + machineState.currentTrack);
+            if (!machineState.tracks[columnIndex]) {
+                console.log('creating new track');
+                machineState.currentTrack = control.addTrack();
+                console.log('new sel track', machineState.currentTrack);
+                // repaint pad leds to show newly created track
+                _paintPadsNoteTracks(machineState.tracks);
+            }
+            else {
+                _handleTrackSelect(machineState, columnIndex);
+                console.log('pad handled track sel:' + machineState.currentTrack);
+            }
         }
         const note = _noteFromPadIndex(machineState, index);
         if (note > 0) {
@@ -445,7 +454,7 @@ function handlePad(index, machineState, callback) {
                 sustain: machineState.currentTrack.sustain,
                 release: machineState.currentTrack.release
             };
-            callback(note, opts);
+            control.playNote(note, opts);
         }
     }
     if (machineState.mode == MachineMode.Step) {

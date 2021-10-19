@@ -21,7 +21,9 @@ interface controlInterface {
   playNote: (note: number, options: OptsInterface) => void,
   stop: () => void,
   startPlayer: () => void,
-  save: () => void
+  save: () => void,
+  addTrack: () => Track,
+  removeTrack: (trackIndex: number) => void
 }
 
 export enum KeyMod {
@@ -93,7 +95,7 @@ export function initControls(
         }
       }
     );
-    padControl = setupPads((index) => handlePad(index, machineState, control.playNote));
+    padControl = setupPads((index) => handlePad(index, machineState, control));
     oled = setupOled();
 
     const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT,
@@ -475,7 +477,7 @@ function handleDialInput(dir: number, overlay: NumberOverlayScreen) {
   menu.setOverlay(overlay)
 }
 
-function handlePad(index: number, machineState: MachineState, callback: (note: number, options: OptsInterface) => void) {
+function handlePad(index: number, machineState: MachineState, control: controlInterface) {
   const rowIndex = Math.floor(index / 16);
   const columnIndex = index % 16;
   console.log("pad index:" + index + "MODE:" + machineState.mode);
@@ -485,8 +487,16 @@ function handlePad(index: number, machineState: MachineState, callback: (note: n
   if (machineState.mode == MachineMode.Note) {
     // first row is track list
     if (rowIndex == 0) {
-      _handleTrackSelect(machineState, columnIndex);
-      console.log('pad handled track sel:' + machineState.currentTrack);
+      if (!machineState.tracks[columnIndex]) {
+        console.log('creating new track')
+        machineState.currentTrack = control.addTrack();
+        console.log('new sel track', machineState.currentTrack);
+        // repaint pad leds to show newly created track
+        _paintPadsNoteTracks(machineState.tracks);
+      } else {
+        _handleTrackSelect(machineState, columnIndex);
+        console.log('pad handled track sel:' + machineState.currentTrack);
+      }
     }
 
 
@@ -503,7 +513,7 @@ function handlePad(index: number, machineState: MachineState, callback: (note: n
         sustain: machineState.currentTrack.sustain,
         release: machineState.currentTrack.release
       };
-      callback(note, opts);
+      control.playNote(note, opts);
     }
   }
 

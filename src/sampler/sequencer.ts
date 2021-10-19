@@ -49,8 +49,11 @@ class Project {
     }
   }
 
-  addTrack(track: Track) {
-    this._tracks.push(track);
+  addTrack(context: AudioContext, instrument: Instrument): Track {
+    const i = this.tracks.length;
+    const nuTrack = new Track(context, instrument, `Trk${i}`, COLORS[i + 1], null);
+    this._tracks.push(nuTrack);
+    return nuTrack;
   }
 
   removeTrack(trackIndex: number) {

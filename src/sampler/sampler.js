@@ -76,7 +76,9 @@ async function init() {
     playNote: (note, options) => machineState.currentTrack.instrument.start(note, null, options),
     startPlayer: () => projectPlayer.play(),
     stop: () => projectPlayer.stop(),
-    save: () => console.log("save:" + saveToStorage(JSON.stringify(project.toData())))
+    save: () => console.log("save:" + saveToStorage(JSON.stringify(project.toData()))),
+    addTrack: () => project.addTrack(context, machineState.currentTrack.instrument),
+    removeTrack: (trackIndex) => project.removeTrack(trackIndex)
   };
 
   // hardcode first pack found for now for debugging
