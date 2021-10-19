@@ -46,6 +46,12 @@ class Project {
             return project;
         });
     }
+    addTrack(track) {
+        this._tracks.push(track);
+    }
+    removeTrack(trackIndex) {
+        this._tracks.splice(trackIndex, 1);
+    }
     get tracks() {
         return this._tracks;
     }

@@ -49,6 +49,14 @@ class Project {
     }
   }
 
+  addTrack(track: Track) {
+    this._tracks.push(track);
+  }
+
+  removeTrack(trackIndex: number) {
+    this._tracks.splice(trackIndex, 1);
+  }
+
   get tracks() {
     return this._tracks;
   }
