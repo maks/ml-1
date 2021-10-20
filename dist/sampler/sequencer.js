@@ -158,19 +158,23 @@ class Track {
     toggleStepNote(rhythmIndex, midiNote, velocity) {
         const step = this.steps[rhythmIndex];
         if (this.steps[rhythmIndex].note == 0) {
-            this.steps[rhythmIndex] = {
-                note: midiNote !== null && midiNote !== void 0 ? midiNote : step.note,
-                velocity: velocity !== null && velocity !== void 0 ? velocity : step.velocity
-            };
+            this.setStepNote(rhythmIndex, midiNote, velocity);
         }
         else {
-            this.steps[rhythmIndex] = {
-                note: 0,
-                velocity: 127
-            };
+            this.setStepNote(rhythmIndex, 0, 127);
         }
     }
-    getNote(rhythmIndex) { return this.steps[rhythmIndex].note; }
+    setStepNote(rhythmIndex, midiNote, velocity) {
+        const existingStep = this.steps[rhythmIndex];
+        this.steps[rhythmIndex] = {
+            note: midiNote !== null && midiNote !== void 0 ? midiNote : existingStep === null || existingStep === void 0 ? void 0 : existingStep.note,
+            velocity: velocity !== null && velocity !== void 0 ? velocity : existingStep === null || existingStep === void 0 ? void 0 : existingStep.velocity
+        };
+    }
+    clearSteps() {
+        this._steps = [];
+    }
+    getNote(rhythmIndex) { var _a; return (_a = this.steps[rhythmIndex]) === null || _a === void 0 ? void 0 : _a.note; }
     // convert to easily stringifyable object
     toData() {
         var _a;
@@ -321,5 +325,6 @@ class ProjectPlayer {
     }
     stop() {
         clearTimeout(this._timeoutId);
+        this._project.tracks.forEach((tr) => { var _a; return (_a = tr.instrument) === null || _a === void 0 ? void 0 : _a.stop(); });
     }
 }

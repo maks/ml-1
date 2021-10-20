@@ -201,19 +201,25 @@ class Track {
   toggleStepNote(rhythmIndex: number, midiNote: number, velocity?: number) {
     const step = this.steps[rhythmIndex];
     if (this.steps[rhythmIndex].note == 0) {
-      this.steps[rhythmIndex] = {
-        note: midiNote ?? step.note,
-        velocity: velocity ?? step.velocity
-      };
+      this.setStepNote(rhythmIndex, midiNote, velocity);
     } else {
-      this.steps[rhythmIndex] = {
-        note: 0,
-        velocity: 127
-      };
+      this.setStepNote(rhythmIndex, 0, 127);
     }
   }
 
-  getNote(rhythmIndex: number) { return this.steps[rhythmIndex].note; }
+  setStepNote(rhythmIndex: number, midiNote: number, velocity?: number) {
+    const existingStep = this.steps[rhythmIndex];
+    this.steps[rhythmIndex] = {
+      note: midiNote ?? existingStep?.note,
+      velocity: velocity ?? existingStep?.velocity
+    };
+  }
+
+  clearSteps() {
+    this._steps = [];
+  }
+
+  getNote(rhythmIndex: number) { return this.steps[rhythmIndex]?.note; }
 
   // convert to easily stringifyable object
   toData(): any {
@@ -408,5 +414,6 @@ class ProjectPlayer {
 
   stop() {
     clearTimeout(this._timeoutId);
+    this._project.tracks.forEach((tr) => tr.instrument?.stop());
   }
 }

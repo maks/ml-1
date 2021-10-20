@@ -9,6 +9,7 @@ let menu;
 let buttons;
 let dials;
 let padControl;
+let infiniSeqCurrentStep = 0;
 export var KeyMod;
 (function (KeyMod) {
     KeyMod[KeyMod["None"] = 0] = "None";
@@ -46,8 +47,15 @@ export function initControls(instrumentNames, control, machineState) {
             machineState.transportMode = TransportMode.Play;
             control.startPlayer();
         }, () => {
+            // for now use ALT+Stop to clear current tracks steps 
+            if (machineState.keyMod == KeyMod.Alt) {
+                machineState.currentTrack.clearSteps();
+                console.log('Clear currrent track steps');
+                return true; // true means to clear all buttons after handling this
+            }
             machineState.transportMode = TransportMode.Stop;
             control.stop();
+            console.log('curr track', machineState.currentTrack);
         }, () => {
             // for now special case to SAVE Project data using REC+SHIFT buttons
             if (machineState.keyMod == KeyMod.Shift) {
@@ -56,7 +64,9 @@ export function initControls(instrumentNames, control, machineState) {
             }
             else {
                 machineState.transportMode = TransportMode.Record;
-                console.log('no save without shift mod');
+                // reset the infini-seq step counter
+                infiniSeqCurrentStep = 0;
+                console.log('reset infini seq steps');
             }
         });
         padControl = setupPads((index) => handlePad(index, machineState, control));
@@ -174,7 +184,6 @@ export function initControls(instrumentNames, control, machineState) {
                 _setModeButtonLeds(machineState.mode);
                 menu.onBack();
             },
-            patternUp: (up) => console.log('patternup button'),
             pattern: (up) => {
                 console.log('pattern:' + up);
                 if (up) {
@@ -231,8 +240,23 @@ export function initControls(instrumentNames, control, machineState) {
                     }
                 }
             },
+            patternUp: (up) => {
+                if (!up) {
+                    if (machineState.mode == MachineMode.Note) {
+                        if (machineState.transportMode == TransportMode.Record) {
+                            infiniSeqCurrentStep++;
+                            _handleUpdateInfiSeq();
+                        }
+                    }
+                }
+            },
             patternDown: function (up) {
-                throw new Error('Function not implemented.');
+                if (machineState.mode == MachineMode.Note) {
+                    if (machineState.transportMode == TransportMode.Record) {
+                        infiniSeqCurrentStep = Math.max(0, infiniSeqCurrentStep - 1);
+                        _handleUpdateInfiSeq();
+                    }
+                }
             },
             gridLeft: function (up) {
                 if (!up) {
@@ -340,6 +364,9 @@ function _handleOctaveDisplay(machineState) {
             break;
     }
 }
+function _handleUpdateInfiSeq() {
+    console.log('INFINI Step:' + infiniSeqCurrentStep);
+}
 function _handleToggleTrackMute(machineState, trackIndex) {
     console.log('handle track mute', trackIndex);
     machineState.tracks[trackIndex].toggleMute();
@@ -423,7 +450,7 @@ function handleDialInput(dir, overlay) {
 function handlePad(index, machineState, control) {
     const rowIndex = Math.floor(index / 16);
     const columnIndex = index % 16;
-    console.log("pad index:" + index + "MODE:" + machineState.mode);
+    //console.log("pad index:" + index + "MODE:" + machineState.mode);
     //TODO: account for grid offset
     machineState.selectedStep = index % 16;
     if (machineState.mode == MachineMode.Note) {
@@ -448,20 +475,25 @@ function handlePad(index, machineState, control) {
             _paintPadsNoteTracks(machineState.tracks, machineState.currentTrack);
         }
         const note = _noteFromPadIndex(machineState, index);
-        if (note > 0) {
-            console.log('PLAY NOTE:' + note);
-            machineState.selectedNote = note;
-            const opts = {
-                gain: machineState.currentTrack.gain,
-                duration: machineState.currentTrack.duration,
-                offset: machineState.currentTrack.offset,
-                attack: machineState.currentTrack.attack,
-                decay: machineState.currentTrack.decay,
-                sustain: machineState.currentTrack.sustain,
-                release: machineState.currentTrack.release
-            };
-            control.playNote(note, opts);
+        // if (note > 0) {
+        console.log('AUDITION NOTE:' + note);
+        machineState.selectedNote = note;
+        const opts = {
+            gain: machineState.currentTrack.gain,
+            duration: machineState.currentTrack.duration,
+            offset: machineState.currentTrack.offset,
+            attack: machineState.currentTrack.attack,
+            decay: machineState.currentTrack.decay,
+            sustain: machineState.currentTrack.sustain,
+            release: machineState.currentTrack.release
+        };
+        control.playNote(note, opts);
+        if (machineState.transportMode == TransportMode.Record) {
+            const velocity = 127; //TODO: use pad velocity not hardcode value
+            machineState.currentTrack.setStepNote(infiniSeqCurrentStep++, note, velocity);
+            _handleUpdateInfiSeq();
         }
+        // }
     }
     if (machineState.mode == MachineMode.Step) {
         const note = machineState.selectedNote;
@@ -530,7 +562,7 @@ function _paintPadsStepsRow(track, rowIndex) {
 function _noteFromPadIndex(machineState, index) {
     let midiNote = 0;
     const octaveStartingNote = (machineState.keybdOctave * 12) % 128;
-    if (index < firstBlackRow) {
+    if (index <= firstBlackRow) {
         return 0;
     }
     if (index >= firstBlackRow && index < firstWhiteRow) {
