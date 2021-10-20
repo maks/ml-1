@@ -19,6 +19,8 @@ let padControl: PadsControl;
 
 let infiniSeqCurrentStep: number = 0;
 
+let overlays: Record<string, NumberOverlayScreen> = {};
+
 interface controlInterface {
   selectInstrument: (instrument: string) => void,
   playNote: (note: number, options: OptsInterface) => void,
@@ -91,6 +93,8 @@ export function initControls(
         }
         machineState.transportMode = TransportMode.Stop;
         control.stop();
+        overlays["stepseq"].value = 0;
+        menu.clearOverlay(); // stop showing step num overlay if prev in Record mode
         console.log('curr track', machineState.currentTrack)
       },
       () => {
@@ -103,6 +107,7 @@ export function initControls(
           machineState.transportMode = TransportMode.Record;
           // reset the infini-seq step counter
           infiniSeqCurrentStep = 0;
+          menu.setOverlay(overlays["stepseq"]); // show swq step number overlay
           console.log('reset infini seq steps');
         }
       }
@@ -121,20 +126,28 @@ export function initControls(
     menu = new MenuController(oled);
     menu.pushMenuScreen(_topMenu);
 
-    const overlays = {
-      // 'volume': new NumberOverlayScreen(
-      //   "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
-      // ),
-      'pitch': new NumberOverlayScreen(
-        `P:`, 1, 127, 1, 1, 1, (pitch) => {
-          machineState.currentTrack.steps[machineState.selectedStep].note = pitch;
-        },
-      )
-      // ,
-      // 'effects': new NumberOverlayScreen(
-      //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
-      // ),
-    };
+    overlays["pitch"] = new NumberOverlayScreen(
+      `P:`, 1, 127, 1, 1, 1, (pitch) => {
+        machineState.currentTrack.steps[machineState.selectedStep].note = pitch;
+      },
+    );
+
+    overlays["stepseq"] = new NumberOverlayScreen(
+      `P:`, 1, 127, 1, 1, 1, (step) => {
+        infiniSeqCurrentStep = step;
+        console.log('step now:' + step)
+      }, 0 //no decimal display
+    );
+
+    // const overlays = {
+    //   // 'volume': new NumberOverlayScreen(
+    //   //   "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
+    //   // ),
+    //   // ,
+    //   // 'effects': new NumberOverlayScreen(
+    //   //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
+    //   // ),
+    // };
 
     dials = setupDials(
       {
@@ -285,8 +298,12 @@ export function initControls(
         if (!up) {
           if (machineState.mode == MachineMode.Note) {
             if (machineState.transportMode == TransportMode.Record) {
-              infiniSeqCurrentStep++;
-              _handleUpdateInfiSeq();
+              const overlay = overlays["stepseq"];
+              if (infiniSeqCurrentStep < machineState.currentTrack.steps.length - 1) {
+                overlay.next();
+              }
+              menu.setOverlay(overlay);
+              _playNoteWithOpts(machineState.currentTrack.steps[infiniSeqCurrentStep].note, machineState, control);
             }
           }
         }
@@ -294,8 +311,10 @@ export function initControls(
       patternDown: function (up: boolean): void {
         if (machineState.mode == MachineMode.Note) {
           if (machineState.transportMode == TransportMode.Record) {
-            infiniSeqCurrentStep = Math.max(0, infiniSeqCurrentStep - 1);
-            _handleUpdateInfiSeq();
+            const overlay = overlays["stepseq"];
+            overlay.prev();
+            menu.setOverlay(overlay);
+            _playNoteWithOpts(machineState.currentTrack.steps[infiniSeqCurrentStep].note, machineState, control);
           }
         }
       },
@@ -411,10 +430,6 @@ function _handleOctaveDisplay(machineState: MachineState) {
       break;
   }
 
-}
-
-function _handleUpdateInfiSeq() {
-  console.log('INFINI Step:' + infiniSeqCurrentStep)
 }
 
 function _handleToggleTrackMute(machineState: MachineState, trackIndex: number) {
@@ -535,26 +550,15 @@ function handlePad(index: number, machineState: MachineState, control: controlIn
     }
 
     const note = _noteFromPadIndex(machineState, index);
-    // if (note > 0) {
-    console.log('AUDITION NOTE:' + note);
-    machineState.selectedNote = note;
-    const opts = {
-      gain: machineState.currentTrack.gain,
-      duration: machineState.currentTrack.duration,
-      offset: machineState.currentTrack.offset,
-      attack: machineState.currentTrack.attack,
-      decay: machineState.currentTrack.decay,
-      sustain: machineState.currentTrack.sustain,
-      release: machineState.currentTrack.release
-    };
-    control.playNote(note, opts);
 
+    _playNoteWithOpts(note, machineState, control);
     if (machineState.transportMode == TransportMode.Record) {
       const velocity = 127; //TODO: use pad velocity not hardcode value
       machineState.currentTrack.setStepNote(infiniSeqCurrentStep++, note, velocity);
-      _handleUpdateInfiSeq();
+      const overlay = overlays["stepseq"];
+      overlay.next();
+      menu.setOverlay(overlay);
     }
-    // }
   }
 
   if (machineState.mode == MachineMode.Step) {
@@ -565,6 +569,23 @@ function handlePad(index: number, machineState: MachineState, control: controlIn
       console.log(machineState.tracks)
       _paintPadsStepsRow(machineState.tracks[rowIndex], rowIndex);
     }
+  }
+}
+
+function _playNoteWithOpts(note: number, machineState: MachineState, control: controlInterface) {
+  console.log('AUDITION NOTE:' + note);
+  machineState.selectedNote = note;
+  const opts = {
+    gain: machineState.currentTrack.gain,
+    duration: machineState.currentTrack.duration,
+    offset: machineState.currentTrack.offset,
+    attack: machineState.currentTrack.attack,
+    decay: machineState.currentTrack.decay,
+    sustain: machineState.currentTrack.sustain,
+    release: machineState.currentTrack.release
+  };
+  if (note > 0) {
+    control.playNote(note, opts);
   }
 }
 

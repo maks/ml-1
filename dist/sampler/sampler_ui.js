@@ -10,6 +10,7 @@ let buttons;
 let dials;
 let padControl;
 let infiniSeqCurrentStep = 0;
+let overlays = {};
 export var KeyMod;
 (function (KeyMod) {
     KeyMod[KeyMod["None"] = 0] = "None";
@@ -55,6 +56,8 @@ export function initControls(instrumentNames, control, machineState) {
             }
             machineState.transportMode = TransportMode.Stop;
             control.stop();
+            overlays["stepseq"].value = 0;
+            menu.clearOverlay(); // stop showing step num overlay if prev in Record mode
             console.log('curr track', machineState.currentTrack);
         }, () => {
             // for now special case to SAVE Project data using REC+SHIFT buttons
@@ -66,6 +69,7 @@ export function initControls(instrumentNames, control, machineState) {
                 machineState.transportMode = TransportMode.Record;
                 // reset the infini-seq step counter
                 infiniSeqCurrentStep = 0;
+                menu.setOverlay(overlays["stepseq"]); // show swq step number overlay
                 console.log('reset infini seq steps');
             }
         });
@@ -76,18 +80,23 @@ export function initControls(instrumentNames, control, machineState) {
         });
         menu = new MenuController(oled);
         menu.pushMenuScreen(_topMenu);
-        const overlays = {
-            // 'volume': new NumberOverlayScreen(
-            //   "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
-            // ),
-            'pitch': new NumberOverlayScreen(`P:`, 1, 127, 1, 1, 1, (pitch) => {
-                machineState.currentTrack.steps[machineState.selectedStep].note = pitch;
-            })
-            // ,
-            // 'effects': new NumberOverlayScreen(
-            //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
-            // ),
-        };
+        overlays["pitch"] = new NumberOverlayScreen(`P:`, 1, 127, 1, 1, 1, (pitch) => {
+            machineState.currentTrack.steps[machineState.selectedStep].note = pitch;
+        });
+        overlays["stepseq"] = new NumberOverlayScreen(`P:`, 1, 127, 1, 1, 1, (step) => {
+            infiniSeqCurrentStep = step;
+            console.log('step now:' + step);
+        }, 0 //no decimal display
+        );
+        // const overlays = {
+        //   // 'volume': new NumberOverlayScreen(
+        //   //   "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
+        //   // ),
+        //   // ,
+        //   // 'effects': new NumberOverlayScreen(
+        //   //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
+        //   // ),
+        // };
         dials = setupDials({
             onVolume: (dir) => {
                 // handleDialInput(dir, overlays["volume"]);
@@ -244,8 +253,12 @@ export function initControls(instrumentNames, control, machineState) {
                 if (!up) {
                     if (machineState.mode == MachineMode.Note) {
                         if (machineState.transportMode == TransportMode.Record) {
-                            infiniSeqCurrentStep++;
-                            _handleUpdateInfiSeq();
+                            const overlay = overlays["stepseq"];
+                            if (infiniSeqCurrentStep < machineState.currentTrack.steps.length - 1) {
+                                overlay.next();
+                            }
+                            menu.setOverlay(overlay);
+                            _playNoteWithOpts(machineState.currentTrack.steps[infiniSeqCurrentStep].note, machineState, control);
                         }
                     }
                 }
@@ -253,8 +266,10 @@ export function initControls(instrumentNames, control, machineState) {
             patternDown: function (up) {
                 if (machineState.mode == MachineMode.Note) {
                     if (machineState.transportMode == TransportMode.Record) {
-                        infiniSeqCurrentStep = Math.max(0, infiniSeqCurrentStep - 1);
-                        _handleUpdateInfiSeq();
+                        const overlay = overlays["stepseq"];
+                        overlay.prev();
+                        menu.setOverlay(overlay);
+                        _playNoteWithOpts(machineState.currentTrack.steps[infiniSeqCurrentStep].note, machineState, control);
                     }
                 }
             },
@@ -364,9 +379,6 @@ function _handleOctaveDisplay(machineState) {
             break;
     }
 }
-function _handleUpdateInfiSeq() {
-    console.log('INFINI Step:' + infiniSeqCurrentStep);
-}
 function _handleToggleTrackMute(machineState, trackIndex) {
     console.log('handle track mute', trackIndex);
     machineState.tracks[trackIndex].toggleMute();
@@ -475,25 +487,14 @@ function handlePad(index, machineState, control) {
             _paintPadsNoteTracks(machineState.tracks, machineState.currentTrack);
         }
         const note = _noteFromPadIndex(machineState, index);
-        // if (note > 0) {
-        console.log('AUDITION NOTE:' + note);
-        machineState.selectedNote = note;
-        const opts = {
-            gain: machineState.currentTrack.gain,
-            duration: machineState.currentTrack.duration,
-            offset: machineState.currentTrack.offset,
-            attack: machineState.currentTrack.attack,
-            decay: machineState.currentTrack.decay,
-            sustain: machineState.currentTrack.sustain,
-            release: machineState.currentTrack.release
-        };
-        control.playNote(note, opts);
+        _playNoteWithOpts(note, machineState, control);
         if (machineState.transportMode == TransportMode.Record) {
             const velocity = 127; //TODO: use pad velocity not hardcode value
             machineState.currentTrack.setStepNote(infiniSeqCurrentStep++, note, velocity);
-            _handleUpdateInfiSeq();
+            const overlay = overlays["stepseq"];
+            overlay.next();
+            menu.setOverlay(overlay);
         }
-        // }
     }
     if (machineState.mode == MachineMode.Step) {
         const note = machineState.selectedNote;
@@ -503,6 +504,22 @@ function handlePad(index, machineState, control) {
             console.log(machineState.tracks);
             _paintPadsStepsRow(machineState.tracks[rowIndex], rowIndex);
         }
+    }
+}
+function _playNoteWithOpts(note, machineState, control) {
+    console.log('AUDITION NOTE:' + note);
+    machineState.selectedNote = note;
+    const opts = {
+        gain: machineState.currentTrack.gain,
+        duration: machineState.currentTrack.duration,
+        offset: machineState.currentTrack.offset,
+        attack: machineState.currentTrack.attack,
+        decay: machineState.currentTrack.decay,
+        sustain: machineState.currentTrack.sustain,
+        release: machineState.currentTrack.release
+    };
+    if (note > 0) {
+        control.playNote(note, opts);
     }
 }
 const firstBlackRow = 32;
