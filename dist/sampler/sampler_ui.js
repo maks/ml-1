@@ -359,7 +359,7 @@ function _handleUpdateMode(machineState) {
             _paintPadsSteps(machineState.tracks);
             break;
         case MachineMode.Note:
-            _paintPadsNoteTracks(machineState.tracks);
+            _paintPadsNoteTracks(machineState.tracks, machineState.currentTrack);
             _paintPadsKeyboard();
             break;
     }
@@ -433,13 +433,19 @@ function handlePad(index, machineState, control) {
                 console.log('creating new track');
                 machineState.currentTrack = control.addTrack();
                 console.log('new sel track', machineState.currentTrack);
-                // repaint pad leds to show newly created track
-                _paintPadsNoteTracks(machineState.tracks);
             }
             else {
-                _handleTrackSelect(machineState, columnIndex);
-                console.log('pad handled track sel:' + machineState.currentTrack);
+                if (machineState.keyMod == KeyMod.Shift) {
+                    console.log("mute track:" + machineState.tracks[columnIndex].name);
+                    machineState.tracks[columnIndex].toggleMute();
+                }
+                else {
+                    _handleTrackSelect(machineState, columnIndex);
+                    console.log('pad handled track sel:' + machineState.currentTrack);
+                }
             }
+            // repaint pad leds to show new selected and/or newly created track
+            _paintPadsNoteTracks(machineState.tracks, machineState.currentTrack);
         }
         const note = _noteFromPadIndex(machineState, index);
         if (note > 0) {
@@ -485,11 +491,26 @@ function _paintPadsKeyboard() {
     }
 }
 // show list of all tracks, 1 per top pad row, each pad in colour of the track
-function _paintPadsNoteTracks(tracks) {
+function _paintPadsNoteTracks(tracks, currentTrack) {
+    const mutedColor = { r: 30, g: 30, b: 30 };
     const tracksInFirstRow = Math.min(16, tracks.length);
     for (var i = 0; i < tracksInFirstRow; i++) {
-        padControl.padLedOn(i, tracks[i].color);
+        const track = tracks[i];
+        let color = track.color;
+        if (track.muted) {
+            color = mutedColor; //_dim(color, 50);
+        }
+        if (currentTrack == track) {
+            color = { r: 120, g: 120, b: 120 };
+        }
+        padControl.padLedOn(i, color);
     }
+}
+function _dim(color, dimBy) {
+    const r = Math.max(8, color.r - dimBy);
+    const g = Math.max(8, color.g - dimBy);
+    const b = Math.max(8, color.b - dimBy);
+    return { r: r, g: g, b: b };
 }
 function _paintPadsSteps(tracks) {
     for (let i = 0; i < tracks.length; i++) {
