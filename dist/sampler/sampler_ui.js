@@ -11,6 +11,7 @@ let buttons;
 let dials;
 let padControl;
 let infiniSeqCurrentStep = 0;
+let editTempo = false;
 let overlays = {};
 export var KeyMod;
 (function (KeyMod) {
@@ -115,6 +116,7 @@ export function initControls(instrumentNames, control, machineState, theBeat) {
             console.log('step now:' + step);
         }, 0 //no decimal display
         );
+        overlays["tempo"] = new NumberOverlayScreen("BPM", machineState.tempo, 300, 20, 1, 10, (val) => { control.setTempo(val); }, 0);
         // const overlays = {
         //   // 'volume': new NumberOverlayScreen(
         //   //   "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
@@ -126,6 +128,7 @@ export function initControls(instrumentNames, control, machineState, theBeat) {
         // };
         dials = setupDials({
             onVolume: (dir) => {
+                console.log("VOL dir:" + dir);
                 // handleDialInput(dir, overlays["volume"]);
                 if (machineState.mode == MachineMode.Note || machineState.mode == MachineMode.Step) {
                     if (machineState.keyMod == KeyMod.Alt) {
@@ -210,7 +213,11 @@ export function initControls(instrumentNames, control, machineState, theBeat) {
                     }
                 }
                 else {
+                    // if (editTempo) {
+                    //   menu.pushMenuScreen(overlays["tempo"])
+                    // } else {
                     menu.onDial(dir);
+                    // }            
                 }
             }
         });
@@ -223,8 +230,14 @@ export function initControls(instrumentNames, control, machineState, theBeat) {
             pattern: (up) => {
                 console.log('pattern:' + up);
                 if (up) {
+                    editTempo = false;
                     // need to repaint showing menu
-                    menu.updateOled();
+                    menu.onBack();
+                    // menu.updateOled();
+                }
+                else {
+                    editTempo = true;
+                    menu.pushMenuScreen(overlays["tempo"]);
                 }
             },
             solomute1: (up) => {

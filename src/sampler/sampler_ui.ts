@@ -6,7 +6,7 @@ import { MenuController } from '../menu/menu_controller.js'
 
 import { ListScreen, ListScreenItem, MenuScreen, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js'
 import { Instrument, OptsInterface } from './audio_handling.js';
-import { Track } from './sequencer.js';
+import { Project, Track } from './sequencer.js';
 
 const MENU_LIST_ITEMS_COUNT = 9;
 const DURATION_INCREMENT = 0.02;
@@ -20,6 +20,8 @@ let padControl: PadsControl;
 
 let infiniSeqCurrentStep: number = 0;
 
+let editTempo = false;
+
 let overlays: Record<string, NumberOverlayScreen> = {};
 
 interface controlInterface {
@@ -29,7 +31,8 @@ interface controlInterface {
   startPlayer: () => void,
   save: () => void,
   addTrack: () => Track,
-  removeTrack: (trackIndex: number) => void
+  removeTrack: (trackIndex: number) => void,
+  setTempo: (tempo: number) => void
 }
 
 export enum KeyMod {
@@ -64,7 +67,8 @@ interface MachineState {
   selectedNote: number,
   keybdOctave: number,
   tracks: Track[],
-  theBeat: Beat
+  theBeat: Beat,
+  tempo: number
 }
 
 type BeatListener = (beatCount: number) => void;
@@ -165,13 +169,16 @@ export function initControls(
         machineState.currentTrack.steps[machineState.selectedStep].note = pitch;
       },
     );
-
     overlays["stepseq"] = new NumberOverlayScreen(
       `P:`, 1, 127, 1, 1, 1, (step) => {
         infiniSeqCurrentStep = step;
         console.log('step now:' + step)
       }, 0 //no decimal display
     );
+
+    overlays["tempo"] = new NumberOverlayScreen(
+      "BPM", machineState.tempo, 300, 20, 1, 10, (val) => { control.setTempo(val); }, 0
+    )
 
     // const overlays = {
     //   // 'volume': new NumberOverlayScreen(
@@ -186,6 +193,7 @@ export function initControls(
     dials = setupDials(
       {
         onVolume: (dir) => {
+          console.log("VOL dir:" + dir)
           // handleDialInput(dir, overlays["volume"]);
           if (machineState.mode == MachineMode.Note || machineState.mode == MachineMode.Step) {
             if (machineState.keyMod == KeyMod.Alt) {
@@ -263,7 +271,11 @@ export function initControls(
               menu.onSelect();
             }
           } else {
+            // if (editTempo) {
+            //   menu.pushMenuScreen(overlays["tempo"])
+            // } else {
             menu.onDial(dir);
+            // }            
           }
         }
       }
@@ -279,8 +291,13 @@ export function initControls(
       pattern: (up: boolean) => {
         console.log('pattern:' + up);
         if (up) {
+          editTempo = false
           // need to repaint showing menu
-          menu.updateOled();
+          menu.onBack();
+          // menu.updateOled();
+        } else {
+          editTempo = true;
+          menu.pushMenuScreen(overlays["tempo"])
         }
       },
       solomute1: (up: boolean) => {
@@ -463,7 +480,6 @@ function _handleOctaveDisplay(machineState: MachineState) {
       buttons.buttonLedOn(ButtonCode.GridRight, CCInputs.paleRed);
       break;
   }
-
 }
 
 function _handleToggleTrackMute(machineState: MachineState, trackIndex: number) {
