@@ -11,6 +11,8 @@ import { fetchAndDecodeAudio } from "./audio_handling.js";
 export { Project, Track, ProjectPlayer, Effect };
 const LOOP_LENGTH = 16;
 const BEATS_PER_FULL_NOTE = 4;
+// use for drum/percussion accents
+const ACCENT_VOLUME = 0.3;
 const COLORS = [
     { r: 0, g: 100, b: 0 },
     { r: 0, g: 0, b: 100 },
@@ -114,7 +116,7 @@ class Track {
         this._context = context;
         this._instrument = instrument;
         for (let i = 0; i < LOOP_LENGTH; i++) {
-            this._steps[i] = { note: 0, velocity: 127 };
+            this._steps[i] = { note: 0, velocity: 127, accent: false };
         }
         this._name = name;
         this._color = color || COLORS[Track.colorCounter++ % COLORS.length];
@@ -155,6 +157,10 @@ class Track {
     toggleMute() {
         this._mute = !this._mute;
     }
+    toggleStepAccent(rhythmIndex) {
+        const step = this.steps[rhythmIndex];
+        step.accent = !step.accent;
+    }
     toggleStepNote(rhythmIndex, midiNote, velocity) {
         const step = this.steps[rhythmIndex];
         if (this.steps[rhythmIndex].note == 0) {
@@ -168,13 +174,15 @@ class Track {
         const existingStep = this.steps[rhythmIndex];
         this.steps[rhythmIndex] = {
             note: midiNote !== null && midiNote !== void 0 ? midiNote : existingStep === null || existingStep === void 0 ? void 0 : existingStep.note,
-            velocity: velocity !== null && velocity !== void 0 ? velocity : existingStep === null || existingStep === void 0 ? void 0 : existingStep.velocity
+            velocity: velocity !== null && velocity !== void 0 ? velocity : existingStep === null || existingStep === void 0 ? void 0 : existingStep.velocity,
+            accent: existingStep.accent
         };
     }
     clearSteps() {
         this._steps = [];
     }
     getNote(rhythmIndex) { var _a; return (_a = this.steps[rhythmIndex]) === null || _a === void 0 ? void 0 : _a.note; }
+    getAccent(rhythmIndex) { var _a, _b; return (_b = (_a = this.steps[rhythmIndex]) === null || _a === void 0 ? void 0 : _a.accent) !== null && _b !== void 0 ? _b : false; }
     // convert to easily stringifyable object
     toData() {
         var _a;
@@ -257,9 +265,12 @@ class ProjectPlayer {
         //   finalNode.connect(panner);
         //   finalNode = panner;
         // }
+        // apply accent,  ACCENT_VOLUMES first item is just 1.0, ie no effect
+        let stepGain = track.gain * (track.getAccent(rhythmIndex) ? ACCENT_VOLUME : 1);
+        console.log('step gain:' + stepGain + "[" + track.getAccent(rhythmIndex));
         // Connect to dry mix
-        // const dryGainNode = new GainNode(context,
-        //   { gain: VOLUMES[note] * instrument.mainGain * this.beat.effect.dryMix });
+        // const dryGainNode = new GainNode(this._context,
+        //   { gain: ACCENT_VOLUMES[note] * instrument.mainGain * this.beat.effect.dryMix });
         // finalNode.connect(dryGainNode);
         // dryGainNode.connect(this.masterGainNode);
         // // Connect to wet mix
@@ -267,7 +278,7 @@ class ProjectPlayer {
         // finalNode.connect(wetGainNode);
         // wetGainNode.connect(this.convolver);
         const opts = {
-            gain: track.gain,
+            gain: stepGain,
             duration: track.duration,
             offset: track.offset,
             attack: track.attack,

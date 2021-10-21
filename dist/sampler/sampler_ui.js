@@ -544,11 +544,16 @@ function handlePad(index, machineState, control) {
             menu.setOverlay(overlay);
         }
     }
-    if (machineState.mode == MachineMode.Step) {
+    else if (machineState.mode == MachineMode.Step) {
         const note = machineState.selectedNote;
         if (note > 0) {
             console.log(`STEP NOTE: ${note} tr:${rowIndex} stp: ${columnIndex}`);
-            machineState.tracks[rowIndex].toggleStepNote(columnIndex, note, 127);
+            if (machineState.keyMod == KeyMod.Shift) {
+                machineState.tracks[rowIndex].toggleStepAccent(columnIndex);
+            }
+            else {
+                machineState.tracks[rowIndex].toggleStepNote(columnIndex, note, 127);
+            }
             console.log(machineState.tracks);
             _paintPadsStepsRow(machineState.tracks[rowIndex], rowIndex);
         }
@@ -609,6 +614,13 @@ function _dim(color, dimBy) {
     const b = Math.max(8, color.b - dimBy);
     return { r: r, g: g, b: b };
 }
+function _padColor(track, stepIndex) {
+    let colour = (track.steps[stepIndex].note != 0) ? track.color : OFF_COLOR;
+    if (track.steps[stepIndex].accent) {
+        colour = _dim(colour, 40);
+    }
+    return colour;
+}
 function _paintPadsSteps(tracks) {
     for (let i = 0; i < tracks.length; i++) {
         _paintPadsStepsRow(tracks[i], i);
@@ -616,9 +628,8 @@ function _paintPadsSteps(tracks) {
 }
 function _paintPadsStepsRow(track, rowIndex) {
     const steps = track.steps;
-    const trackcolour = track.color;
     for (let i = 0; i < steps.length; i++) {
-        const colour = (steps[i].note != 0) ? trackcolour : OFF_COLOR;
+        const colour = _padColor(track, i);
         padControl.padLedOn(i + (rowIndex * 16), colour);
     }
 }
@@ -630,7 +641,7 @@ function _paintPlayHead(beatCount, tracks) {
     const prevColumnIndex = columnIndex == 0 ? 15 : columnIndex - 1;
     const prevColumnColors = [];
     for (let i = 0; i < 4; i++) {
-        prevColumnColors[i] = tracks[i].steps[prevColumnIndex].note > 0 ? tracks[i].color : OFF_COLOR;
+        prevColumnColors[i] = _padColor(tracks[i], prevColumnIndex);
     }
     _paintPadsStepsColumn(prevColumnIndex, prevColumnColors);
 }
