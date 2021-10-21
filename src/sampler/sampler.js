@@ -33,7 +33,8 @@ let machineState = {
   selectedNote: 60,
   keybdOctave: startingOctave,
   tracks: [],
-  tempo: 0
+  tempo: 0,
+  swing: 0
 }
 
 window.document.testplay = function () {
@@ -82,7 +83,8 @@ async function init() {
     save: () => console.log("save:" + saveToStorage(JSON.stringify(project.toData()))),
     addTrack: () => project.addTrack(context, machineState.currentTrack.instrument),
     removeTrack: (trackIndex) => project.removeTrack(trackIndex),
-    setTempo: (tempo) => project.tempo = tempo
+    setTempo: (tempo) => project.tempo = tempo,
+    setSwing: (swing) => project.swing = swing
   };
 
   // hardcode first pack found for now for debugging
@@ -95,6 +97,7 @@ async function init() {
     project = await Project.fromData(context, selectPack, data);
     machineState.tracks = project.tracks;
     machineState.tempo = project.tempo;
+    machineState.swing = project.swing;
     machineState.currentTrack = project.tracks[0];
 
     console.log("LOADED project", project);

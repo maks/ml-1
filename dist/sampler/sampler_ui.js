@@ -117,6 +117,7 @@ export function initControls(instrumentNames, control, machineState, theBeat) {
         }, 0 //no decimal display
         );
         overlays["tempo"] = new NumberOverlayScreen("BPM", machineState.tempo, 300, 20, 1, 10, (val) => { control.setTempo(val); }, 0);
+        overlays["swing"] = new NumberOverlayScreen("SWING", machineState.swing, 1, 0, 0.01, 0.1, (val) => { control.setSwing(val); });
         overlays["volume"] = new NumberOverlayScreen("VOLUME", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.gain = val; });
         overlays["duration"] = new NumberOverlayScreen("DURATION", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.duration = val; });
         overlays["offset"] = new NumberOverlayScreen("OFFSET", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.offset = val; });
@@ -166,6 +167,15 @@ export function initControls(instrumentNames, control, machineState, theBeat) {
                         overlay.value = (_b = machineState.currentTrack.decay) !== null && _b !== void 0 ? _b : 0;
                         handleDialInput(dir, overlay);
                         console.log('DECAY:', machineState.currentTrack.decay);
+                    }
+                }
+                else if (machineState.mode == MachineMode.Step) {
+                    // in step mode use Pan dial for setting swing
+                    if (machineState.keyMod == KeyMod.Shift) {
+                        const overlay = overlays["swing"];
+                        // overlay.value = machineState.swing;
+                        handleDialInput(dir, overlay);
+                        console.log('SWING:' + machineState.swing);
                     }
                 }
             },
@@ -232,6 +242,7 @@ export function initControls(instrumentNames, control, machineState, theBeat) {
                 _setModeButtonLeds(machineState.mode);
                 menu.onBack();
             },
+            //aka Metronome key
             pattern: (up) => {
                 console.log('pattern:' + up);
                 if (up) {

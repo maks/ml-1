@@ -31,7 +31,8 @@ interface controlInterface {
   save: () => void,
   addTrack: () => Track,
   removeTrack: (trackIndex: number) => void,
-  setTempo: (tempo: number) => void
+  setTempo: (tempo: number) => void,
+  setSwing: (swing: number) => void
 }
 
 export enum KeyMod {
@@ -67,7 +68,8 @@ interface MachineState {
   keybdOctave: number,
   tracks: Track[],
   theBeat: Beat,
-  tempo: number
+  tempo: number,
+  swing: number
 }
 
 type BeatListener = (beatCount: number) => void;
@@ -177,6 +179,9 @@ export function initControls(
     overlays["tempo"] = new NumberOverlayScreen(
       "BPM", machineState.tempo, 300, 20, 1, 10, (val) => { control.setTempo(val); }, 0
     );
+    overlays["swing"] = new NumberOverlayScreen(
+      "SWING", machineState.swing, 1, 0, 0.01, 0.1, (val) => { control.setSwing(val); },
+    );
     overlays["volume"] = new NumberOverlayScreen(
       "VOLUME", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.gain = val; },
     );
@@ -237,6 +242,14 @@ export function initControls(
               overlay.value = machineState.currentTrack.decay ?? 0;
               handleDialInput(dir, overlay);
               console.log('DECAY:', machineState.currentTrack.decay);
+            }
+          } else if (machineState.mode == MachineMode.Step) {
+            // in step mode use Pan dial for setting swing
+            if (machineState.keyMod == KeyMod.Shift) {
+              const overlay = overlays["swing"];
+              // overlay.value = machineState.swing;
+              handleDialInput(dir, overlay);
+              console.log('SWING:' + machineState.swing);
             }
           }
         },
@@ -299,6 +312,7 @@ export function initControls(
         _setModeButtonLeds(machineState.mode);
         menu.onBack()
       },
+      //aka Metronome key
       pattern: (up: boolean) => {
         console.log('pattern:' + up);
         if (up) {

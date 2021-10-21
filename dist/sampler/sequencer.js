@@ -91,10 +91,10 @@ class Project {
     get tempo() {
         return this._tempo;
     }
-    set swingFactor(swingFactor) {
-        this._swingFactor = swingFactor;
+    set swing(swing) {
+        this._swingFactor = swing;
     }
-    get swingFactor() {
+    get swing() {
         return this._swingFactor;
     }
     // convert to easily stringifyable object
@@ -103,7 +103,7 @@ class Project {
         return {
             tracks: this.tracks.map((t) => t.toData()),
             tempo: this.tempo,
-            swing: this.swingFactor,
+            swing: this.swing,
             effect: this.effect
         };
     }
@@ -312,7 +312,7 @@ class ProjectPlayer {
         // Convert configured beats per minute to delay per tick.
         const secondsPerBeat = 60.0 / this._project.tempo / BEATS_PER_FULL_NOTE;
         const swingDirection = (this._rhythmIndex % 2) ? -1 : 1;
-        const swing = (this._project.swingFactor / 3) * swingDirection;
+        const swing = (this._project.swing / 3) * swingDirection;
         this._nextBeatAt += (1 + swing) * secondsPerBeat;
         this._rhythmIndex = (this._rhythmIndex + 1);
     }

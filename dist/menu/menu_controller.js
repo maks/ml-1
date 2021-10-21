@@ -52,7 +52,6 @@ export class MenuController {
         }
         else {
             if (this._currentScreen instanceof NumberOverlayScreen) {
-                console.log('NUMEBR SCREEN');
                 this._oled.clear();
                 this._oled.bigTitled(this._currentScreen.title, this._currentScreen.stringValue);
             }
