@@ -1,7 +1,7 @@
 import { CCInputs } from "../fire_raw/cc_inputs.js";
 import { MidiDispatcher } from "../midi_dispatcher.js";
 
-enum DialEvent {
+export enum DialEvent {
   Left,
   Right,
   Touch,

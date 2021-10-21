@@ -1,4 +1,5 @@
 import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons, allOff, ButtonsSetup, ButtonControl, ButtonCode, PadsControl, OledControl } from '../firemidi.js';
+import { DialEvent } from '../fire_controls/dials.js';
 import { CCInputs } from '../fire_raw/cc_inputs.js';
 import { Color, colorPad } from '../fire_raw/pads.js';
 
@@ -175,111 +176,116 @@ export function initControls(
         console.log('step now:' + step)
       }, 0 //no decimal display
     );
-
     overlays["tempo"] = new NumberOverlayScreen(
       "BPM", machineState.tempo, 300, 20, 1, 10, (val) => { control.setTempo(val); }, 0
-    )
+    );
+    overlays["volume"] = new NumberOverlayScreen(
+      "VOL", machineState.currentTrack?.gain, 1, 0, 0.01, 0.1, (val) => { machineState.currentTrack.gain = val; },
+    ),
 
-    // const overlays = {
-    //   // 'volume': new NumberOverlayScreen(
-    //   //   "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
-    //   // ),
-    //   // ,
-    //   // 'effects': new NumberOverlayScreen(
-    //   //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
-    //   // ),
-    // };
+      // const overlays = {
+      //   // 'volume': new NumberOverlayScreen(
+      //   //   "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
+      //   // ),
+      //   // ,
+      //   // 'effects': new NumberOverlayScreen(
+      //   //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
+      //   // ),
+      // };
 
-    dials = setupDials(
-      {
-        onVolume: (dir) => {
-          console.log("VOL dir:" + dir)
-          // handleDialInput(dir, overlays["volume"]);
-          if (machineState.mode == MachineMode.Note || machineState.mode == MachineMode.Step) {
-            if (machineState.keyMod == KeyMod.Alt) {
-              const attack = machineState.currentTrack.attack;
-              //TODO: clamp max at track max audiosample duration
-              machineState.currentTrack.attack = dir ? ((attack ?? 0) + DURATION_INCREMENT) : Math.max(0, (attack ?? 0) - DURATION_INCREMENT);
-              console.log('ATTAK:', machineState.currentTrack.attack);
-            } else {
-              const gain = machineState.currentTrack.gain;
-              machineState.currentTrack.gain = dir ? ((gain ?? 0) + DURATION_INCREMENT) : Math.max(0, (gain ?? 0) - DURATION_INCREMENT);
-              console.log('GAIN:' + machineState.currentTrack.gain);
-            }
-          } else {
-            //TODO:
-            console.log('MAster VOLume:');
-          }
-        },
-        onPan: (dir) => {
-          if (machineState.mode == MachineMode.Note) {
-            if (machineState.keyMod == KeyMod.Shift) {
-              const offset = machineState.currentTrack.offset;
-              machineState.currentTrack.offset = dir ? ((offset ?? 0) + DURATION_INCREMENT) : Math.max(0, (offset ?? 0) - DURATION_INCREMENT);
-              console.log('OFFSET:' + offset);
-            } else if (machineState.keyMod == KeyMod.Alt) {
-              const decay = machineState.currentTrack.decay;
-              //TODO: clamp max at track max audiosample duration
-              machineState.currentTrack.decay = dir ? ((decay ?? 0) + DURATION_INCREMENT) : Math.max(0, (decay ?? 0) - DURATION_INCREMENT);
-              console.log('DECAY:', machineState.currentTrack.decay);
-            }
-          }
-        },
-        onFilter: (dir) => {
-          if (machineState.mode == MachineMode.Note) {
-            if (machineState.keyMod == KeyMod.Shift) {
-              const dur = machineState.currentTrack.duration;
-              machineState.currentTrack.duration = dir ? ((dur ?? 0) + DURATION_INCREMENT) : (dur ?? 0) - DURATION_INCREMENT;
-              if (machineState.currentTrack.duration < 0) {
-                machineState.currentTrack.duration = undefined;
+      dials = setupDials(
+        {
+          onVolume: (dir: DialEvent) => {
+            console.log("VOL dir:" + dir)
+            if (machineState.mode == MachineMode.Note || machineState.mode == MachineMode.Step) {
+              if (machineState.keyMod == KeyMod.Alt) {
+                const attack = machineState.currentTrack.attack;
+                //TODO: clamp max at track max audiosample duration
+                machineState.currentTrack.attack = dir ? ((attack ?? 0) + DURATION_INCREMENT) : Math.max(0, (attack ?? 0) - DURATION_INCREMENT);
+                console.log('ATTAK:', machineState.currentTrack.attack);
+              } else {
+                // const gain = machineState.currentTrack.gain;
+                // machineState.currentTrack.gain = dir ? ((gain ?? 0) + DURATION_INCREMENT) : Math.max(0, (gain ?? 0) - DURATION_INCREMENT);
+                // console.log('GAIN:' + machineState.currentTrack.gain);
+
+                const overlay = overlays["volume"];
+                overlay.value = machineState.currentTrack.gain;
+                handleDialInput(dir, overlay);
               }
-              console.log('DUR:' + machineState.currentTrack.duration);
-            } else if (machineState.keyMod == KeyMod.Alt) {
-              const sustain = machineState.currentTrack.decay;
-              //TODO: clamp max at track max audiosample duration
-              machineState.currentTrack.decay = dir ? ((sustain ?? 0) + DURATION_INCREMENT) : Math.max(0, (sustain ?? 0) - DURATION_INCREMENT);
-              console.log('SUSTAIN:', machineState.currentTrack.sustain);
             } else {
-              const instrumentName = machineState.currentTrack.name;
-              const overlay = overlays["pitch"];
-              if (instrumentName == null) {
-                return;
+              //TODO:
+              console.log('MAster VOLume:');
+            }
+          },
+          onPan: (dir) => {
+            if (machineState.mode == MachineMode.Note) {
+              if (machineState.keyMod == KeyMod.Shift) {
+                const offset = machineState.currentTrack.offset;
+                machineState.currentTrack.offset = dir ? ((offset ?? 0) + DURATION_INCREMENT) : Math.max(0, (offset ?? 0) - DURATION_INCREMENT);
+                console.log('OFFSET:' + offset);
+              } else if (machineState.keyMod == KeyMod.Alt) {
+                const decay = machineState.currentTrack.decay;
+                //TODO: clamp max at track max audiosample duration
+                machineState.currentTrack.decay = dir ? ((decay ?? 0) + DURATION_INCREMENT) : Math.max(0, (decay ?? 0) - DURATION_INCREMENT);
+                console.log('DECAY:', machineState.currentTrack.decay);
               }
-              let pitch = machineState.currentTrack.steps[machineState.selectedStep].note;
-              overlay.title = `${instrumentName}`;
-              overlay.value = pitch;
-              handleDialInput(dir, overlay);
             }
-          } else {
-            console.log('NO FILTER YET in mode:' + machineState.mode);
-          }
-        },
-        onResonance: (dir) => {
-          // handleDialInput(dir, overlays["effects"]);
-          if (machineState.mode == MachineMode.Note) {
-            if (machineState.keyMod == KeyMod.Alt) {
-              const release = machineState.currentTrack.release;
-              //TODO: clamp max at track max audiosample duration
-              machineState.currentTrack.release = dir ? ((release ?? 0) + DURATION_INCREMENT) : Math.max(0, (release ?? 0) - DURATION_INCREMENT);
-              console.log('RELEASE:', machineState.currentTrack.release);
+          },
+          onFilter: (dir) => {
+            if (machineState.mode == MachineMode.Note) {
+              if (machineState.keyMod == KeyMod.Shift) {
+                const dur = machineState.currentTrack.duration;
+                machineState.currentTrack.duration = dir ? ((dur ?? 0) + DURATION_INCREMENT) : (dur ?? 0) - DURATION_INCREMENT;
+                if (machineState.currentTrack.duration < 0) {
+                  machineState.currentTrack.duration = undefined;
+                }
+                console.log('DUR:' + machineState.currentTrack.duration);
+              } else if (machineState.keyMod == KeyMod.Alt) {
+                const sustain = machineState.currentTrack.decay;
+                //TODO: clamp max at track max audiosample duration
+                machineState.currentTrack.decay = dir ? ((sustain ?? 0) + DURATION_INCREMENT) : Math.max(0, (sustain ?? 0) - DURATION_INCREMENT);
+                console.log('SUSTAIN:', machineState.currentTrack.sustain);
+              } else {
+                const instrumentName = machineState.currentTrack.name;
+                const overlay = overlays["pitch"];
+                if (instrumentName == null) {
+                  return;
+                }
+                let pitch = machineState.currentTrack.steps[machineState.selectedStep].note;
+                overlay.title = `${instrumentName}`;
+                overlay.value = pitch;
+                handleDialInput(dir, overlay);
+              }
+            } else {
+              console.log('NO FILTER YET in mode:' + machineState.mode);
             }
-          }
-        },
-        onSelect: (dir) => {
-          if (dir == 2 || dir == 3) {
-            if (dir == 2) {
-              menu.onSelect();
+          },
+          onResonance: (dir) => {
+            // handleDialInput(dir, overlays["effects"]);
+            if (machineState.mode == MachineMode.Note) {
+              if (machineState.keyMod == KeyMod.Alt) {
+                const release = machineState.currentTrack.release;
+                //TODO: clamp max at track max audiosample duration
+                machineState.currentTrack.release = dir ? ((release ?? 0) + DURATION_INCREMENT) : Math.max(0, (release ?? 0) - DURATION_INCREMENT);
+                console.log('RELEASE:', machineState.currentTrack.release);
+              }
             }
-          } else {
-            // if (editTempo) {
-            //   menu.pushMenuScreen(overlays["tempo"])
-            // } else {
-            menu.onDial(dir);
-            // }            
+          },
+          onSelect: (dir) => {
+            if (dir == 2 || dir == 3) {
+              if (dir == 2) {
+                menu.onSelect();
+              }
+            } else {
+              // if (editTempo) {
+              //   menu.pushMenuScreen(overlays["tempo"])
+              // } else {
+              menu.onDial(dir);
+              // }            
+            }
           }
         }
-      }
-    );
+      );
 
     const bSetup: ButtonsSetup = {
       browser: (up: boolean) => {
@@ -557,19 +563,21 @@ function _setSelectedTrackLeds(trackNum: number) {
   padControl.rowLedOn(trackNum);
 }
 
-function handleDialInput(dir: number, overlay: NumberOverlayScreen) {
+function handleDialInput(dialEvent: DialEvent, overlay: NumberOverlayScreen) {
   // button up
-  if (dir == 3) {
-    menu.clearOverlay();
-    return;
-  }
-
-  if (dir == 0) {
+  if (dialEvent == DialEvent.Release) {
+    menu.onBack();
+  } else if (dialEvent == DialEvent.Touch) {
+    menu.pushMenuScreen(overlay);
+  } else if (dialEvent == DialEvent.Left) {
     overlay.prev();
-  } else if (dir == 1) {
+    menu.updateOled();
+  } else if (dialEvent == DialEvent.Right) {
     overlay.next();
+    menu.updateOled();
+  } else {
+    console.warn('unexpected dialevent:' + dialEvent);
   }
-  menu.setOverlay(overlay)
 }
 
 function handlePad(index: number, machineState: MachineState, control: controlInterface) {

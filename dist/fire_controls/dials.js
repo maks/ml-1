@@ -1,5 +1,5 @@
 import { CCInputs } from "../fire_raw/cc_inputs.js";
-var DialEvent;
+export var DialEvent;
 (function (DialEvent) {
     DialEvent[DialEvent["Left"] = 0] = "Left";
     DialEvent[DialEvent["Right"] = 1] = "Right";
