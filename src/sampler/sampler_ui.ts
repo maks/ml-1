@@ -21,8 +21,6 @@ let padControl: PadsControl;
 
 let infiniSeqCurrentStep: number = 0;
 
-let editTempo = false;
-
 let overlays: Record<string, NumberOverlayScreen> = {};
 
 interface controlInterface {
@@ -183,11 +181,7 @@ export function initControls(
       "VOL", machineState.currentTrack?.gain, 1, 0, 0.01, 0.1, (val) => { machineState.currentTrack.gain = val; },
     ),
 
-      // const overlays = {
-      //   // 'volume': new NumberOverlayScreen(
-      //   //   "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
-      //   // ),
-      //   // ,
+
       //   // 'effects': new NumberOverlayScreen(
       //   //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
       //   // ),
@@ -204,10 +198,6 @@ export function initControls(
                 machineState.currentTrack.attack = dir ? ((attack ?? 0) + DURATION_INCREMENT) : Math.max(0, (attack ?? 0) - DURATION_INCREMENT);
                 console.log('ATTAK:', machineState.currentTrack.attack);
               } else {
-                // const gain = machineState.currentTrack.gain;
-                // machineState.currentTrack.gain = dir ? ((gain ?? 0) + DURATION_INCREMENT) : Math.max(0, (gain ?? 0) - DURATION_INCREMENT);
-                // console.log('GAIN:' + machineState.currentTrack.gain);
-
                 const overlay = overlays["volume"];
                 overlay.value = machineState.currentTrack.gain;
                 handleDialInput(dir, overlay);
@@ -277,11 +267,7 @@ export function initControls(
                 menu.onSelect();
               }
             } else {
-              // if (editTempo) {
-              //   menu.pushMenuScreen(overlays["tempo"])
-              // } else {
               menu.onDial(dir);
-              // }            
             }
           }
         }
@@ -291,18 +277,14 @@ export function initControls(
       browser: (up: boolean) => {
         machineState.mode = MachineMode.Browser;
         _setModeButtonLeds(machineState.mode);
-
         menu.onBack()
       },
       pattern: (up: boolean) => {
         console.log('pattern:' + up);
         if (up) {
-          editTempo = false
           // need to repaint showing menu
           menu.onBack();
-          // menu.updateOled();
         } else {
-          editTempo = true;
           menu.pushMenuScreen(overlays["tempo"])
         }
       },
