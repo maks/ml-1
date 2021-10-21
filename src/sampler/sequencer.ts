@@ -12,12 +12,14 @@ const ACCENT_VOLUME = 0.3;
 const COLORS = [
   { r: 0, g: 100, b: 0 },
   { r: 0, g: 0, b: 100 },
-  { r: 80, g: 80, b: 0 },
-  { r: 0, g: 80, b: 80 },
-  { r: 80, g: 80, b: 0 },
-  { r: 80, g: 0, b: 80 },
+  { r: 90, g: 40, b: 0 },
+  { r: 0, g: 90, b: 40 },
+  { r: 0, g: 0, b: 100 },
+  { r: 40, g: 90, b: 0 },
+  { r: 40, g: 0, b: 90 },
+  { r: 100, g: 0, b: 0 },
   { r: 0, g: 100, b: 0 },
-  { r: 80, g: 80, b: 80 },
+  { r: 90, g: 20, b: 20 },
 ];
 
 class Project {
@@ -328,7 +330,7 @@ class ProjectPlayer {
     const voice = track.instrument;
     let finalNode = voice;
 
-    //TODO: implement panning from orig shuiny-drums seq
+    //TODO: implement panning from orig shiny-drums seq
 
     // Optionally, connect to a panner.
     // if (instrument.pan) {
@@ -339,10 +341,7 @@ class ProjectPlayer {
     //   finalNode = panner;
     // }
 
-    // apply accent,  ACCENT_VOLUMES first item is just 1.0, ie no effect
-    let stepGain = track.gain * (track.getAccent(rhythmIndex) ? ACCENT_VOLUME : 1);
-    console.log('step gain:' + stepGain + "[" + track.getAccent(rhythmIndex))
-
+    ////TODO: implement panning from orig shiny-drums seq
     // Connect to dry mix
     // const dryGainNode = new GainNode(this._context,
     //   { gain: ACCENT_VOLUMES[note] * instrument.mainGain * this.beat.effect.dryMix });
@@ -353,6 +352,10 @@ class ProjectPlayer {
     // const wetGainNode = new GainNode(context, { gain: instrument.sendGain });
     // finalNode.connect(wetGainNode);
     // wetGainNode.connect(this.convolver);
+
+    // apply accent,  ACCENT_VOLUMES first item is just 1.0, ie no effect
+    let stepGain = track.gain * (track.getAccent(rhythmIndex) ? ACCENT_VOLUME : 1);
+
     const opts: OptsInterface = {
       gain: stepGain,
       duration: track.duration,

@@ -594,30 +594,29 @@ function _paintPadsKeyboard() {
 }
 // show list of all tracks, 1 per top pad row, each pad in colour of the track
 function _paintPadsNoteTracks(tracks, currentTrack) {
-    const mutedColor = { r: 30, g: 30, b: 30 };
     const tracksInFirstRow = Math.min(16, tracks.length);
     for (var i = 0; i < tracksInFirstRow; i++) {
         const track = tracks[i];
         let color = track.color;
-        if (track.muted) {
-            color = mutedColor; //_dim(color, 50);
-        }
         if (currentTrack == track) {
             color = { r: 120, g: 120, b: 120 };
+        }
+        if (track.muted) {
+            color = _dim(color, 0.3);
         }
         padControl.padLedOn(i, color);
     }
 }
 function _dim(color, dimBy) {
-    const r = Math.max(8, color.r - dimBy);
-    const g = Math.max(8, color.g - dimBy);
-    const b = Math.max(8, color.b - dimBy);
+    const r = Math.round(color.r * dimBy);
+    const g = Math.round(color.g * dimBy);
+    const b = Math.round(color.b * dimBy);
     return { r: r, g: g, b: b };
 }
 function _padColor(track, stepIndex) {
     let colour = (track.steps[stepIndex].note != 0) ? track.color : OFF_COLOR;
     if (track.steps[stepIndex].accent) {
-        colour = _dim(colour, 40);
+        colour = _dim(colour, 0.3);
     }
     return colour;
 }

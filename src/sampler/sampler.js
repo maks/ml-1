@@ -95,9 +95,9 @@ async function init() {
     project = await Project.fromData(context, selectPack, data);
     machineState.tracks = project.tracks;
     machineState.tempo = project.tempo;
+    machineState.currentTrack = project.tracks[0];
 
     console.log("LOADED project", project);
-
   }
   projectPlayer = new ProjectPlayer(context, project, handleOnNextBeat);
 
