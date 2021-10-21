@@ -4,6 +4,7 @@ import { MenuController } from '../menu/menu_controller.js';
 import { ListScreen, ListScreenItem, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js';
 const MENU_LIST_ITEMS_COUNT = 9;
 const DURATION_INCREMENT = 0.02;
+const OFF_COLOR = { r: 0, g: 0, b: 0 };
 let oled;
 let menu;
 let buttons;
@@ -34,13 +35,31 @@ export var TransportMode;
     TransportMode[TransportMode["Record"] = 5] = "Record";
     TransportMode[TransportMode["CountIn"] = 6] = "CountIn";
 })(TransportMode || (TransportMode = {}));
-export function initControls(instrumentNames, control, machineState) {
+export class Beat {
+    constructor() {
+        this._listeners = [];
+    }
+    addListener(listener) {
+        this._listeners.push(listener);
+        return this._listeners.length - 1;
+    }
+    removeListener(listenerId) {
+        this._listeners.splice(listenerId, 1);
+    }
+    beat(count) {
+        this._listeners.forEach(listener => {
+            listener(count);
+        });
+    }
+}
+export function initControls(instrumentNames, control, machineState, theBeat) {
     getMidi(midiReady, (isConnected) => {
         if (isConnected) {
             console.log('reconnected');
             midiReady();
         }
     });
+    // ==========================================================
     function midiReady() {
         console.log('SAMPLER MIDI IS READY');
         // pass in callbacks which will be called when one of the 3 transport buttons is pressed
@@ -75,6 +94,14 @@ export function initControls(instrumentNames, control, machineState) {
         });
         padControl = setupPads((index) => handlePad(index, machineState, control));
         oled = setupOled();
+        // setup updating pads/oled when playing beat
+        theBeat.addListener((beatCount) => {
+            console.log("UI counting the beat:" + beatCount);
+            if (machineState.mode == MachineMode.Step) {
+                const tracks = machineState.tracks;
+                _paintPlayHead(beatCount, tracks);
+            }
+        });
         const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT, _topMenuListItems(instrumentNames, (instrumentName) => _handleInstrumentSelection(control, machineState, instrumentName)), () => {
             _topMenu.updateItems(_topMenuListItems(instrumentNames, (instrumentName) => _handleInstrumentSelection(control, machineState, instrumentName)));
         });
@@ -100,7 +127,7 @@ export function initControls(instrumentNames, control, machineState) {
         dials = setupDials({
             onVolume: (dir) => {
                 // handleDialInput(dir, overlays["volume"]);
-                if (machineState.mode == MachineMode.Note) {
+                if (machineState.mode == MachineMode.Note || machineState.mode == MachineMode.Step) {
                     if (machineState.keyMod == KeyMod.Alt) {
                         const attack = machineState.currentTrack.attack;
                         //TODO: clamp max at track max audiosample duration
@@ -569,10 +596,26 @@ function _paintPadsSteps(tracks) {
 function _paintPadsStepsRow(track, rowIndex) {
     const steps = track.steps;
     const trackcolour = track.color;
-    const off = { r: 0, g: 0, b: 0 };
     for (let i = 0; i < steps.length; i++) {
-        const colour = (steps[i].note != 0) ? trackcolour : off;
+        const colour = (steps[i].note != 0) ? trackcolour : OFF_COLOR;
         padControl.padLedOn(i + (rowIndex * 16), colour);
+    }
+}
+function _paintPlayHead(beatCount, tracks) {
+    const columnIndex = beatCount % 16;
+    const trackHeadColor = { r: 120, g: 120, b: 120 };
+    const trackHeadColors = [trackHeadColor, trackHeadColor, trackHeadColor, trackHeadColor];
+    _paintPadsStepsColumn(columnIndex, trackHeadColors);
+    const prevColumnIndex = columnIndex == 0 ? 15 : columnIndex - 1;
+    const prevColumnColors = [];
+    for (let i = 0; i < 4; i++) {
+        prevColumnColors[i] = tracks[i].steps[prevColumnIndex].note > 0 ? tracks[i].color : OFF_COLOR;
+    }
+    _paintPadsStepsColumn(prevColumnIndex, prevColumnColors);
+}
+function _paintPadsStepsColumn(columnIndex, colors) {
+    for (let i = 0; i < 4; i++) {
+        padControl.padLedOn(columnIndex + (i * 16), colors[i]);
     }
 }
 // work out note from chromatic keyboard displayed on bottom 2 rows of pads

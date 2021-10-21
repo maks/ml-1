@@ -284,7 +284,7 @@ class ProjectPlayer {
         this._onNextBeat(this._rhythmIndex);
         // Then, increase rhythmIndex and nextBeatAt for beat `n+1`.
         this.advanceBeat();
-        console.log("BEAT:" + this._rhythmIndex);
+        // console.log("BEAT:" + this._rhythmIndex);
         // Schedule notes to be played at beat `n+1`.
         for (const track of this._project.tracks) {
             // allow for tracks with step counts of any length, for tracks with step counts less than current rythmIndex

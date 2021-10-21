@@ -1,7 +1,7 @@
 import { DSPreset } from "/dist/sampler/dspreset_parser.js";
 import { FileStore } from '/dist/sampler/file_browser.js';
 import { instrumentFromDS } from '/dist/sampler/audio_handling.js';
-import { initControls } from '/dist/sampler/sampler_ui.js';
+import { initControls, Beat } from '/dist/sampler/sampler_ui.js';
 import { Project, ProjectPlayer } from '/dist/sampler/sequencer.js';
 
 const baseUrl = "http://127.0.0.1:8008/";
@@ -21,6 +21,8 @@ let projectPlayer;
 let packs = [];
 
 let selectedPack;
+
+let theBeat = new Beat();
 
 let machineState = {
   mode: 1, // MachineMode.Step = 1,
@@ -95,7 +97,7 @@ async function init() {
   }
   projectPlayer = new ProjectPlayer(context, project, handleOnNextBeat);
 
-  initControls(packs.map((p) => p.name), controls, machineState);
+  initControls(packs.map((p) => p.name), controls, machineState, theBeat);
 }
 
 async function selectPack(name) {
@@ -126,7 +128,8 @@ async function loadDSPreset(url, name, path) {
 }
 
 function handleOnNextBeat(beatCount) {
-  //console.log('Sampler BEAT:' + beatCount)
+  // console.log('Player BEAT:' + beatCount)
+  theBeat.beat(beatCount);
 }
 
 const projectKey = 'default.project';

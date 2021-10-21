@@ -1,0 +1,778 @@
+{
+  "tracks": [
+    {
+      "name": "Loopop-6m0d6",
+      "color": {
+        "r": 0,
+        "g": 100,
+        "b": 0
+      },
+      "instrumentName": "Loopop-6m0d6",
+      "mute": true,
+      "gain": 0.9000000000000004,
+      "steps": [
+        {
+          "note": 61,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 61,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 61,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 61,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-HydraSynth-3-PianoPad",
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 100
+      },
+      "instrumentName": "Loopop-HydraSynth-3-PianoPad",
+      "duration": 2.1400000000000015,
+      "offset": 0.02,
+      "mute": false,
+      "gain": 0.02,
+      "release": 0.9000000000000004,
+      "steps": [
+        {
+          "note": 52,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 59,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-HydraSynth-3-PianoPad",
+      "color": {
+        "r": 80,
+        "g": 80,
+        "b": 0
+      },
+      "instrumentName": "Loopop-HydraSynth-3-PianoPad",
+      "duration": 2.1000000000000005,
+      "mute": true,
+      "gain": 0.8600000000000003,
+      "steps": [
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 52,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 52,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-UDO-1-TwinkleWow",
+      "color": {
+        "r": 0,
+        "g": 80,
+        "b": 80
+      },
+      "instrumentName": "Loopop-UDO-1-TwinkleWow",
+      "duration": 1.5000000000000002,
+      "mute": true,
+      "gain": 0.7800000000000004,
+      "steps": [
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 48,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 48,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 53,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-UDO-1-TwinkleWow",
+      "color": {
+        "r": 80,
+        "g": 0,
+        "b": 80
+      },
+      "instrumentName": "Loopop-UDO-1-TwinkleWow",
+      "duration": 0.9800000000000004,
+      "offset": 0.32,
+      "mute": true,
+      "gain": 2.280000000000001,
+      "attack": 0.02,
+      "sustain": 1,
+      "release": 0.5,
+      "steps": [
+        {
+          "note": 41,
+          "velocity": 127
+        },
+        {
+          "note": 41,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 40,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 38,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 33,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 35,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-Waldorf-M-6",
+      "color": {
+        "r": 0,
+        "g": 100,
+        "b": 0
+      },
+      "instrumentName": "Loopop-Waldorf-M-6",
+      "duration": 1.660000000000001,
+      "offset": 5.199999999999977,
+      "mute": true,
+      "gain": 1.8200000000000007,
+      "attack": 0.02,
+      "sustain": 1,
+      "release": 0.1,
+      "steps": [
+        {
+          "note": 67,
+          "velocity": 127
+        },
+        {
+          "note": 76,
+          "velocity": 127
+        },
+        {
+          "note": 65,
+          "velocity": 127
+        },
+        {
+          "note": 64,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 62,
+          "velocity": 127
+        },
+        {
+          "note": 60,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 59,
+          "velocity": 127
+        },
+        {
+          "note": 57,
+          "velocity": 127
+        },
+        {
+          "note": 55,
+          "velocity": 127
+        },
+        {
+          "note": 64,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 65,
+          "velocity": 127
+        },
+        {
+          "note": 64,
+          "velocity": 127
+        },
+        {
+          "note": 62,
+          "velocity": 127
+        },
+        {
+          "note": 59,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-6m0d6",
+      "color": {
+        "r": 80,
+        "g": 80,
+        "b": 80
+      },
+      "instrumentName": "Loopop-6m0d6",
+      "duration": 0.6800000000000003,
+      "offset": 0.08,
+      "mute": true,
+      "gain": 0.12000000000000001,
+      "sustain": 1,
+      "steps": [
+        {
+          "note": 94,
+          "velocity": 120
+        },
+        {
+          "note": 0,
+          "velocity": 100
+        },
+        {
+          "note": 94,
+          "velocity": 90
+        },
+        {
+          "note": 0,
+          "velocity": 110
+        },
+        {
+          "note": 94,
+          "velocity": 80
+        },
+        {
+          "note": 0,
+          "velocity": 70
+        },
+        {
+          "note": 94,
+          "velocity": 110
+        },
+        {
+          "note": 0,
+          "velocity": 120
+        }
+      ]
+    },
+    {
+      "name": "Loopop-HydraSynth-2",
+      "color": {
+        "r": 80,
+        "g": 80,
+        "b": 0
+      },
+      "instrumentName": "Loopop-HydraSynth-2",
+      "duration": 4.419999999999994,
+      "offset": 2.3600000000000017,
+      "mute": true,
+      "gain": 0.8399999999999999,
+      "sustain": 1,
+      "release": 0.12000000000000001,
+      "steps": [
+        {
+          "note": 40,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 45,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 48,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 55,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "name": "Loopop-UDO-1-TwinkleWow",
+      "color": {
+        "r": 80,
+        "g": 0,
+        "b": 80
+      },
+      "instrumentName": "Loopop-UDO-1-TwinkleWow",
+      "offset": 0,
+      "mute": true,
+      "gain": 1,
+      "sustain": 1,
+      "steps": [
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        },
+        {
+          "note": 0,
+          "velocity": 127
+        }
+      ]
+    }
+  ],
+  "tempo": 80,
+  "swing": 0,
+  "effect": {
+    "wetMix": 0,
+    "dryMix": 0,
+    "_buffer": null,
+    "_context": {},
+    "_name": "No Effect"
+  }
+}

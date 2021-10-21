@@ -10,6 +10,7 @@ import { Track } from './sequencer.js';
 
 const MENU_LIST_ITEMS_COUNT = 9;
 const DURATION_INCREMENT = 0.02;
+const OFF_COLOR = { r: 0, g: 0, b: 0 };
 
 let oled: OledControl;
 let menu: MenuController;
@@ -62,18 +63,42 @@ interface MachineState {
   selectedStep: number,
   selectedNote: number,
   keybdOctave: number,
-  tracks: Track[]
+  tracks: Track[],
+  theBeat: Beat
 }
 
+type BeatListener = (beatCount: number) => void;
+
+export class Beat {
+  _listeners: BeatListener[] = [];
+
+  addListener(listener: BeatListener): number {
+    this._listeners.push(listener);
+    return this._listeners.length - 1;
+  }
+
+  removeListener(listenerId: number) {
+    this._listeners.splice(listenerId, 1);
+  }
+
+  beat(count: number) {
+    this._listeners.forEach(listener => {
+      listener(count);
+    });
+  }
+}
 
 export function initControls(
   instrumentNames: string[],
   control: controlInterface,
-  machineState: MachineState
+  machineState: MachineState,
+  theBeat: Beat
 ) {
   getMidi(midiReady, (isConnected: boolean) => {
     if (isConnected) { console.log('reconnected'); midiReady(); }
   });
+
+  // ==========================================================
 
   function midiReady() {
     console.log('SAMPLER MIDI IS READY');
@@ -115,6 +140,15 @@ export function initControls(
     padControl = setupPads((index) => handlePad(index, machineState, control));
     oled = setupOled();
 
+    // setup updating pads/oled when playing beat
+    theBeat.addListener((beatCount) => {
+      console.log("UI counting the beat:" + beatCount)
+      if (machineState.mode == MachineMode.Step) {
+        const tracks = machineState.tracks;
+        _paintPlayHead(beatCount, tracks);
+      }
+    });
+
     const _topMenu = new ListScreen(MENU_LIST_ITEMS_COUNT,
       _topMenuListItems(instrumentNames,
         (instrumentName: string) => _handleInstrumentSelection(control, machineState, instrumentName)),
@@ -153,7 +187,7 @@ export function initControls(
       {
         onVolume: (dir) => {
           // handleDialInput(dir, overlays["volume"]);
-          if (machineState.mode == MachineMode.Note) {
+          if (machineState.mode == MachineMode.Note || machineState.mode == MachineMode.Step) {
             if (machineState.keyMod == KeyMod.Alt) {
               const attack = machineState.currentTrack.attack;
               //TODO: clamp max at track max audiosample duration
@@ -641,10 +675,30 @@ function _paintPadsSteps(tracks: Track[]) {
 function _paintPadsStepsRow(track: Track, rowIndex: number) {
   const steps = track.steps;
   const trackcolour = track.color;
-  const off = { r: 0, g: 0, b: 0 };
   for (let i = 0; i < steps.length; i++) {
-    const colour = (steps[i].note != 0) ? trackcolour : off;
+    const colour = (steps[i].note != 0) ? trackcolour : OFF_COLOR;
     padControl.padLedOn(i + (rowIndex * 16), colour);
+  }
+}
+
+function _paintPlayHead(beatCount: number, tracks: Track[]) {
+  const columnIndex = beatCount % 16;
+  const trackHeadColor = { r: 120, g: 120, b: 120 };
+  const trackHeadColors = [trackHeadColor, trackHeadColor, trackHeadColor, trackHeadColor];
+  _paintPadsStepsColumn(columnIndex, trackHeadColors);
+
+  const prevColumnIndex = columnIndex == 0 ? 15 : columnIndex - 1;
+  const prevColumnColors = [];
+  for (let i = 0; i < 4; i++) {
+    prevColumnColors[i] = tracks[i].steps[prevColumnIndex].note > 0 ? tracks[i].color : OFF_COLOR;
+  }
+
+  _paintPadsStepsColumn(prevColumnIndex, prevColumnColors);
+}
+
+function _paintPadsStepsColumn(columnIndex: number, colors: Color[]) {
+  for (let i = 0; i < 4; i++) {
+    padControl.padLedOn(columnIndex + (i * 16), colors[i]);
   }
 }
 
