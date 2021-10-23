@@ -2,7 +2,7 @@ import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons
 import { DialEvent } from '../fire_controls/dials.js';
 import { CCInputs } from '../fire_raw/cc_inputs.js';
 import { MenuController } from '../menu/menu_controller.js';
-import { ListScreen, ListScreenItem, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js';
+import { LabelOverlayScreen, ListScreen, ListScreenItem, NumberEditScreen } from '../shiny-drums/screen_widgets.js';
 const MENU_LIST_ITEMS_COUNT = 9;
 const DURATION_INCREMENT = 0.02;
 const OFF_COLOR = { r: 0, g: 0, b: 0 };
@@ -108,24 +108,24 @@ export function initControls(instrumentNames, control, machineState, theBeat) {
         });
         menu = new MenuController(oled);
         menu.pushMenuScreen(_topMenu);
-        overlays["pitch"] = new NumberOverlayScreen(`P:`, 1, 127, 1, 1, 1, (pitch) => {
+        overlays["pitch"] = new NumberEditScreen(`P:`, 1, 127, 1, 1, 1, (pitch) => {
             machineState.currentTrack.steps[machineState.selectedStep].note = pitch;
         });
-        overlays["stepseq"] = new NumberOverlayScreen(`P:`, 1, 127, 1, 1, 1, (step) => {
+        overlays["stepseq"] = new NumberEditScreen(`P:`, 1, 127, 1, 1, 1, (step) => {
             infiniSeqCurrentStep = step;
             console.log('step now:' + step);
         }, 0 //no decimal display
         );
-        overlays["tempo"] = new NumberOverlayScreen("BPM", machineState.tempo, 300, 20, 1, 10, (val) => { control.setTempo(val); }, 0);
-        overlays["swing"] = new NumberOverlayScreen("SWING", machineState.swing, 1, 0, 0.01, 0.1, (val) => { control.setSwing(val); });
-        overlays["volume"] = new NumberOverlayScreen("VOLUME", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.gain = val; });
-        overlays["duration"] = new NumberOverlayScreen("DURATION", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.duration = val; });
-        overlays["offset"] = new NumberOverlayScreen("OFFSET", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.offset = val; });
-        overlays["attack"] = new NumberOverlayScreen("ATTACK", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.attack = val; });
-        overlays["decay"] = new NumberOverlayScreen("DECAY", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.decay = val; });
-        overlays["sustain"] = new NumberOverlayScreen("SUSTAIN", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.sustain = val; });
-        overlays["release"] = new NumberOverlayScreen("RELEASE", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.release = val; });
-        //   // 'effects': new NumberOverlayScreen(
+        overlays["tempo"] = new NumberEditScreen("BPM", machineState.tempo, 300, 20, 1, 10, (val) => { control.setTempo(val); }, 0);
+        overlays["swing"] = new NumberEditScreen("SWING", machineState.swing, 1, 0, 0.01, 0.1, (val) => { control.setSwing(val); });
+        overlays["volume"] = new NumberEditScreen("VOLUME", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.gain = val; });
+        overlays["duration"] = new NumberEditScreen("DURATION", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.duration = val; });
+        overlays["offset"] = new NumberEditScreen("OFFSET", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.offset = val; });
+        overlays["attack"] = new NumberEditScreen("ATTACK", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.attack = val; });
+        overlays["decay"] = new NumberEditScreen("DECAY", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.decay = val; });
+        overlays["sustain"] = new NumberEditScreen("SUSTAIN", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.sustain = val; });
+        overlays["release"] = new NumberEditScreen("RELEASE", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.release = val; });
+        //   // 'effects': new NumberEditScreen(
         //   //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
         //   // ),
         // };
@@ -392,7 +392,7 @@ export function initControls(instrumentNames, control, machineState, theBeat) {
         // update solo/mute status button leds
         _setoloMuteTrackButtonLeds(machineState.tracks.map((t) => t.muted));
         // make first track (selected) current track
-        machineState.currentTrack = machineState.tracks[0];
+        _setCurrentTrack(machineState.tracks[0], machineState);
         // update row leds to show (selected) currentTrack
         _setSelectedTrackLeds(0);
         // update OLED with loaded preset
@@ -438,10 +438,12 @@ function _handleToggleTrackMute(machineState, trackIndex) {
     _setoloMuteTrackButtonLeds(machineState.tracks.map((t) => t.muted));
 }
 function _handleTrackSelect(machineState, trackIndex) {
-    console.log('handle track sel', trackIndex);
-    machineState.currentTrack = machineState.tracks[trackIndex];
+    _setCurrentTrack(machineState.tracks[trackIndex], machineState);
     machineState.selectedStep = 0; //TODO: for now just always reset to first step
-    _setSelectedTrackLeds(trackIndex);
+    // only show select state for first 4 "drum" tracks shown in Step mode
+    if (trackIndex < 4) {
+        _setSelectedTrackLeds(trackIndex);
+    }
 }
 function _handleUpdateMode(machineState) {
     _setModeButtonLeds(machineState.mode);
@@ -529,7 +531,7 @@ function handlePad(index, machineState, control) {
         if (rowIndex == 0) {
             if (!machineState.tracks[columnIndex]) {
                 console.log('creating new track');
-                machineState.currentTrack = control.addTrack();
+                _setCurrentTrack(control.addTrack(), machineState);
                 console.log('new sel track', machineState.currentTrack);
             }
             else {
@@ -544,6 +546,7 @@ function handlePad(index, machineState, control) {
             }
             // repaint pad leds to show new selected and/or newly created track
             _paintPadsNoteTracks(machineState.tracks, machineState.currentTrack);
+            return;
         }
         const note = _noteFromPadIndex(machineState, index);
         _playNoteWithOpts(note, machineState, control);
@@ -569,6 +572,17 @@ function handlePad(index, machineState, control) {
             _paintPadsStepsRow(machineState.tracks[rowIndex], rowIndex);
         }
     }
+}
+function _setCurrentTrack(track, machineState) {
+    var _a, _b;
+    // quick hack to show track name when changing curr track in note mode
+    if (machineState.mode == MachineMode.Note) {
+        const name = (_a = track.name) === null || _a === void 0 ? void 0 : _a.substring(((_b = track.name) === null || _b === void 0 ? void 0 : _b.startsWith('Loopop-')) ? 7 : 0);
+        const overlay = new LabelOverlayScreen(name !== null && name !== void 0 ? name : 'track', '');
+        menu.setOverlay(overlay);
+        setTimeout(() => { menu.clearOverlay(); }, 500);
+    }
+    machineState.currentTrack = track;
 }
 function _playNoteWithOpts(note, machineState, control) {
     console.log('AUDITION NOTE:' + note);
@@ -610,7 +624,7 @@ function _paintPadsNoteTracks(tracks, currentTrack) {
         const track = tracks[i];
         let color = track.color;
         if (currentTrack == track) {
-            color = { r: 120, g: 120, b: 120 };
+            color = { r: 90, g: 90, b: 90 };
         }
         if (track.muted) {
             color = _dim(color, 0.3);

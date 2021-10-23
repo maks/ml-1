@@ -1,4 +1,16 @@
-export class NumberOverlayScreen {
+export class LabelOverlayScreen {
+    constructor(title, value) {
+        this._title = title;
+        this._value = value;
+    }
+    get title() {
+        return this._title;
+    }
+    get stringValue() {
+        return this._value;
+    }
+}
+export class NumberEditScreen {
     constructor(title, value, max, min, interval, largeInterval, onUpdate, decimalDisplay = 2) {
         this._title = title;
         this._value = value;

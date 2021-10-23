@@ -13,7 +13,7 @@ import { instrumentIndexed, instrumentRows, noteColours } from './ui_config.js'
 
 import { MenuController } from '/dist/menu/menu_controller.js'
 
-import { ListScreen, ListScreenItem, NumberOverlayScreen } from '/dist/shiny-drums/screen_widgets.js'
+import { ListScreen, ListScreenItem, NumberEditScreen } from '/dist/shiny-drums/screen_widgets.js'
 
 
 // Events
@@ -113,13 +113,13 @@ function onKitMenuSelected() {
 }
 
 function onBPMMenuSelected() {
-  menu.pushMenuScreen(new NumberOverlayScreen(
+  menu.pushMenuScreen(new NumberEditScreen(
     "BPM", theBeat.tempo, 300, 20, 1, 10, (val) => { theBeat.tempo = val; }, 0
   ));
 }
 
 function onSwingMenuSelected() {
-  menu.pushMenuScreen(new NumberOverlayScreen(
+  menu.pushMenuScreen(new NumberEditScreen(
     "Swing", theBeat.swingFactor, 1, 0, 0.1, 0.1, (val) => { theBeat.swingFactor = val; }, 2
   ));
 }
@@ -186,15 +186,15 @@ function initControls() {
     menu.pushMenuScreen(_topMenu);
 
     const overlays = {
-      'volume': new NumberOverlayScreen(
+      'volume': new NumberEditScreen(
         "VOL", player.masterGainNode.gain["value"], 1, 0, 0.01, 0.1, (val) => { player.masterGainNode.gain["value"] = val; },
       ),
-      'pitch': new NumberOverlayScreen(
+      'pitch': new NumberEditScreen(
         `P:`, -1, 1, 0, 0.01, 0.1, (pitch) => {
           theBeat.setPitch(machineState.currentInstrumentName, pitch);
         },
       ),
-      'effects': new NumberOverlayScreen(
+      'effects': new NumberEditScreen(
         "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
       ),
     };

@@ -5,7 +5,7 @@ import { Color, colorPad } from '../fire_raw/pads.js';
 
 import { MenuController } from '../menu/menu_controller.js'
 
-import { ListScreen, ListScreenItem, MenuScreen, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js'
+import { LabelOverlayScreen, ListScreen, ListScreenItem, MenuScreen, NumberEditScreen } from '../shiny-drums/screen_widgets.js'
 import { Instrument, OptsInterface } from './audio_handling.js';
 import { Track } from './sequencer.js';
 
@@ -21,7 +21,7 @@ let padControl: PadsControl;
 
 let infiniSeqCurrentStep: number = 0;
 
-let overlays: Record<string, NumberOverlayScreen> = {};
+let overlays: Record<string, NumberEditScreen> = {};
 
 interface controlInterface {
   selectInstrument: (instrument: string) => void,
@@ -165,45 +165,45 @@ export function initControls(
     menu = new MenuController(oled);
     menu.pushMenuScreen(_topMenu);
 
-    overlays["pitch"] = new NumberOverlayScreen(
+    overlays["pitch"] = new NumberEditScreen(
       `P:`, 1, 127, 1, 1, 1, (pitch) => {
         machineState.currentTrack.steps[machineState.selectedStep].note = pitch;
       },
     );
-    overlays["stepseq"] = new NumberOverlayScreen(
+    overlays["stepseq"] = new NumberEditScreen(
       `P:`, 1, 127, 1, 1, 1, (step) => {
         infiniSeqCurrentStep = step;
         console.log('step now:' + step)
       }, 0 //no decimal display
     );
-    overlays["tempo"] = new NumberOverlayScreen(
+    overlays["tempo"] = new NumberEditScreen(
       "BPM", machineState.tempo, 300, 20, 1, 10, (val) => { control.setTempo(val); }, 0
     );
-    overlays["swing"] = new NumberOverlayScreen(
+    overlays["swing"] = new NumberEditScreen(
       "SWING", machineState.swing, 1, 0, 0.01, 0.1, (val) => { control.setSwing(val); },
     );
-    overlays["volume"] = new NumberOverlayScreen(
+    overlays["volume"] = new NumberEditScreen(
       "VOLUME", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.gain = val; },
     );
-    overlays["duration"] = new NumberOverlayScreen(
+    overlays["duration"] = new NumberEditScreen(
       "DURATION", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.duration = val; },
     );
-    overlays["offset"] = new NumberOverlayScreen(
+    overlays["offset"] = new NumberEditScreen(
       "OFFSET", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.offset = val; },
     );
-    overlays["attack"] = new NumberOverlayScreen(
+    overlays["attack"] = new NumberEditScreen(
       "ATTACK", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.attack = val; },
     );
-    overlays["decay"] = new NumberOverlayScreen(
+    overlays["decay"] = new NumberEditScreen(
       "DECAY", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.decay = val; },
     );
-    overlays["sustain"] = new NumberOverlayScreen(
+    overlays["sustain"] = new NumberEditScreen(
       "SUSTAIN", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.sustain = val; },
     );
-    overlays["release"] = new NumberOverlayScreen(
+    overlays["release"] = new NumberEditScreen(
       "RELEASE", 0, 10, 0, 0.01, 0.1, (val) => { machineState.currentTrack.release = val; },
     );
-    //   // 'effects': new NumberOverlayScreen(
+    //   // 'effects': new NumberEditScreen(
     //   //   "FX", theBeat["effectMix"], 1, 0, 0.01, 0.1, (val) => { theBeat["effectMix"] = val; player.updateEffect(); },
     //   // ),
     // };
@@ -460,7 +460,7 @@ export function initControls(
     _setoloMuteTrackButtonLeds(machineState.tracks.map((t) => t.muted));
 
     // make first track (selected) current track
-    machineState.currentTrack = machineState.tracks[0];
+    _setCurrentTrack(machineState.tracks[0], machineState);
 
     // update row leds to show (selected) currentTrack
     _setSelectedTrackLeds(0);
@@ -511,10 +511,13 @@ function _handleToggleTrackMute(machineState: MachineState, trackIndex: number) 
 }
 
 function _handleTrackSelect(machineState: MachineState, trackIndex: number) {
-  console.log('handle track sel', trackIndex)
-  machineState.currentTrack = machineState.tracks[trackIndex];
+  _setCurrentTrack(machineState.tracks[trackIndex], machineState);
   machineState.selectedStep = 0; //TODO: for now just always reset to first step
-  _setSelectedTrackLeds(trackIndex);
+
+  // only show select state for first 4 "drum" tracks shown in Step mode
+  if (trackIndex < 4) {
+    _setSelectedTrackLeds(trackIndex);
+  }
 }
 
 function _handleUpdateMode(machineState: MachineState) {
@@ -522,7 +525,6 @@ function _handleUpdateMode(machineState: MachineState) {
   padControl.allOff();
   switch (machineState.mode) {
     case MachineMode.Step:
-
       _paintPadsSteps(machineState.tracks);
       break;
     case MachineMode.Note:
@@ -579,7 +581,7 @@ function _setSelectedTrackLeds(trackNum: number) {
   padControl.rowLedOn(trackNum);
 }
 
-function handleDialInput(dialEvent: DialEvent, overlay: NumberOverlayScreen) {
+function handleDialInput(dialEvent: DialEvent, overlay: NumberEditScreen) {
   // button up
   if (dialEvent == DialEvent.Release) {
     menu.onBack();
@@ -608,7 +610,7 @@ function handlePad(index: number, machineState: MachineState, control: controlIn
     if (rowIndex == 0) {
       if (!machineState.tracks[columnIndex]) {
         console.log('creating new track')
-        machineState.currentTrack = control.addTrack();
+        _setCurrentTrack(control.addTrack(), machineState);
         console.log('new sel track', machineState.currentTrack);
       } else {
         if (machineState.keyMod == KeyMod.Shift) {
@@ -621,11 +623,11 @@ function handlePad(index: number, machineState: MachineState, control: controlIn
       }
       // repaint pad leds to show new selected and/or newly created track
       _paintPadsNoteTracks(machineState.tracks, machineState.currentTrack);
+      return;
     }
-
     const note = _noteFromPadIndex(machineState, index);
-
     _playNoteWithOpts(note, machineState, control);
+
     if (machineState.transportMode == TransportMode.Record) {
       const velocity = 127; //TODO: use pad velocity not hardcode value
       machineState.currentTrack.setStepNote(infiniSeqCurrentStep++, note, velocity);
@@ -646,6 +648,17 @@ function handlePad(index: number, machineState: MachineState, control: controlIn
       _paintPadsStepsRow(machineState.tracks[rowIndex], rowIndex);
     }
   }
+}
+
+function _setCurrentTrack(track: Track, machineState: MachineState) {
+  // quick hack to show track name when changing curr track in note mode
+  if (machineState.mode == MachineMode.Note) {
+    const name = track.name?.substring(track.name?.startsWith('Loopop-') ? 7 : 0);
+    const overlay = new LabelOverlayScreen(name ?? 'track', '');
+    menu.setOverlay(overlay);
+    setTimeout(() => { menu.clearOverlay() }, 500);
+  }
+  machineState.currentTrack = track;
 }
 
 function _playNoteWithOpts(note: number, machineState: MachineState, control: controlInterface) {
@@ -691,7 +704,7 @@ function _paintPadsNoteTracks(tracks: Track[], currentTrack: Track) {
     const track = tracks[i];
     let color = track.color;
     if (currentTrack == track) {
-      color = { r: 120, g: 120, b: 120 };
+      color = { r: 90, g: 90, b: 90 };
     }
     if (track.muted) {
       color = _dim(color, 0.3);

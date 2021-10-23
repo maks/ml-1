@@ -2,6 +2,11 @@ export type NumberCallback = (val: number) => void;
 export type VoidCallback = () => void;
 export type ObjectCallback = (obj: any) => void;
 
+export interface OverlayScreen {
+  title: string,
+  stringValue: string
+}
+
 export interface MenuScreen {
   next(): void;
   prev(): void;
@@ -12,7 +17,26 @@ export interface MenuScreen {
   get viewportSelected(): number;
 }
 
-export class NumberOverlayScreen implements MenuScreen {
+export class LabelOverlayScreen implements OverlayScreen {
+  private _title: string;
+  private _value: string;
+
+  constructor(title: string, value: string) {
+    this._title = title;
+    this._value = value;
+  }
+
+  get title() {
+    return this._title;
+  }
+  get stringValue() {
+    return this._value;
+  }
+
+
+}
+
+export class NumberEditScreen implements MenuScreen {
   private _title: string;
   private _value: number;
   readonly _max: number;

@@ -1,4 +1,4 @@
-import { NumberOverlayScreen } from '../shiny-drums/screen_widgets.js';
+import { NumberEditScreen } from '../shiny-drums/screen_widgets.js';
 export class MenuController {
     constructor(oled) {
         this._screenStack = [];
@@ -51,7 +51,7 @@ export class MenuController {
             this._oled.bigTitled(this._overlay.title, this._overlay.stringValue);
         }
         else {
-            if (this._currentScreen instanceof NumberOverlayScreen) {
+            if (this._currentScreen instanceof NumberEditScreen) {
                 this._oled.clear();
                 this._oled.bigTitled(this._currentScreen.title, this._currentScreen.stringValue);
             }

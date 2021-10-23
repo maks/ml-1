@@ -1,4 +1,4 @@
-import { MenuScreen, NumberOverlayScreen } from '../shiny-drums/screen_widgets.js';
+import { MenuScreen, NumberEditScreen, OverlayScreen } from '../shiny-drums/screen_widgets.js';
 import { OledControl } from "../firemidi.js";
 
 export class MenuController {
@@ -9,7 +9,7 @@ export class MenuController {
 
   get _currentScreen() { return this._screenStack[this._screenStack.length - 1]; };
 
-  private _overlay: NumberOverlayScreen | null = null;
+  private _overlay: OverlayScreen | null = null;
 
   constructor(oled: OledControl,) {
     this._oled = oled;
@@ -21,7 +21,7 @@ export class MenuController {
     this.updateOled();
   }
 
-  setOverlay(overlay: NumberOverlayScreen): void {
+  setOverlay(overlay: OverlayScreen): void {
     this._overlay = overlay;
     // console.log('set overlay', overlay)
     this.updateOled();
@@ -63,7 +63,7 @@ export class MenuController {
       this._oled.clear();
       this._oled.bigTitled(this._overlay.title, this._overlay.stringValue);
     } else {
-      if (this._currentScreen instanceof NumberOverlayScreen) {
+      if (this._currentScreen instanceof NumberEditScreen) {
         this._oled.clear();
         this._oled.bigTitled(this._currentScreen.title, this._currentScreen.stringValue);
       }
