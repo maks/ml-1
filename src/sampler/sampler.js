@@ -1,5 +1,4 @@
-import { DSPreset } from "/dist/sampler/dspreset_parser.js";
-import { FileStore } from '/dist/sampler/file_browser.js';
+import { SampleKitManager } from "/dist/sampler/samplekit_manager.js";
 import { instrumentFromDS } from '/dist/sampler/audio_handling.js';
 import { initControls, Beat } from '/dist/sampler/sampler_ui.js';
 import { Project, ProjectPlayer } from '/dist/sampler/sequencer.js';
@@ -16,11 +15,8 @@ let instrument;
 let fileStore;
 let project;
 let projectPlayer;
-
-// array of packs as DSPreset objects
-let packs = [];
-
 let selectedPack;
+let kitManager;
 
 let theBeat = new Beat();
 
@@ -52,28 +48,9 @@ async function init() {
 
   machineState.tracks = project.tracks;
 
-  fileStore = new FileStore(baseUrl);
-
-  // top level dir file list
-  const topDirlist = await fileStore.getCurrentDirFilelist();
-
-  console.log(topDirlist)
-
-  for (const dir of topDirlist) {
-    fileStore.enterDir(dir.name);
-    const dsFiles = await fileStore.currentDirFilesByExtension("dspreset");
-    if (dsFiles.length > 0) {
-      for (const file of dsFiles) {
-        const url = `${baseUrl}${dir.name}/${file.name}`;
-        const nameWithoutExtension = file.name.replace(/\.[^/.]+$/, "")
-        const dspreset = await loadDSPreset(url, nameWithoutExtension, dir.name);
-        packs.push(dspreset);
-      }
-    }
-    fileStore.upDir();
-  }
-
-  console.log('Packs', packs)
+  kitManager = new SampleKitManager(baseUrl);
+  await kitManager.scanForDSKits();
+  console.log('Packs loaded:', kitManager.packs)
 
   const controls = {
     selectInstrument: selectPack,
@@ -88,7 +65,7 @@ async function init() {
   };
 
   // hardcode first pack found for now for debugging
-  selectedPack = packs[0];
+  selectedPack = kitManager.packs[0];
   instrument = await instrumentFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
 
   // load from saved data in localstorage
@@ -104,7 +81,7 @@ async function init() {
   }
   projectPlayer = new ProjectPlayer(context, project, handleOnNextBeat);
 
-  initControls(packs.map((p) => p.name), controls, machineState, theBeat);
+  initControls(kitManager.packs.map((p) => p.name), controls, machineState, theBeat);
 }
 
 async function selectPack(name) {
@@ -112,9 +89,9 @@ async function selectPack(name) {
     console.log("no point looking up undefined instrument pack name");
     return;
   }
-  console.log('looking for:' + name, packs)
-  selectedPack = packs.find((p) => p.name === name);
-  console.log('selected:', selectedPack);
+  console.log('looking for:' + name, kitManager.packs)
+  selectedPack = kitManager.packs.find((p) => p.name === name);
+  console.log('selected pack:', selectedPack);
   instrument = await instrumentFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
   if (machineState.currentTrack) {
     machineState.currentTrack.instrument = instrument;
@@ -123,15 +100,6 @@ async function selectPack(name) {
   }
   console.log('current sampleplayer', instrument);
   return instrument;
-}
-
-// Load a multisample pack using a DecentSampler .dspresets file format at given url
-/// returns a DSPreset
-async function loadDSPreset(url, name, path) {
-  const response = await fetch(url);
-  const body = await response.text();
-  const ds = new DSPreset(new window.DOMParser().parseFromString(body, "text/xml"), name, path);
-  return ds;
 }
 
 function handleOnNextBeat(beatCount) {
