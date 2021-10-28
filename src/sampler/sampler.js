@@ -3,7 +3,7 @@ import { instrumentFromDS } from '/dist/sampler/audio_handling.js';
 import { initControls, Beat } from '/dist/sampler/sampler_ui.js';
 import { Project, ProjectPlayer } from '/dist/sampler/sequencer.js';
 
-const baseUrl = "http://127.0.0.1:8008/";
+const baseUrl = "http://127.0.0.1:8008/samples/";
 
 const startingOctave = 4;
 

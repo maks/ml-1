@@ -17,7 +17,7 @@ export class SampleKitManager {
     // top level dir file list
     const topDirlist = await fileStore.getCurrentDirFilelist();
 
-    console.log(topDirlist)
+    console.log("top sample dir:", topDirlist)
 
     for (const dir of topDirlist) {
       fileStore.enterDir(dir.name);

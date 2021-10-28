@@ -20,7 +20,7 @@ export class SampleKitManager {
             const fileStore = new FileStore(this._baseUrl);
             // top level dir file list
             const topDirlist = yield fileStore.getCurrentDirFilelist();
-            console.log(topDirlist);
+            console.log("top sample dir:", topDirlist);
             for (const dir of topDirlist) {
                 fileStore.enterDir(dir.name);
                 const dsFiles = yield fileStore.currentDirFilesByExtension("dspreset");
