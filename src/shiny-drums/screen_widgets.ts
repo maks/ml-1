@@ -58,14 +58,14 @@ export class NumberEditScreen implements MenuScreen {
     this._onUpdate = onUpdate;
   }
 
-  prev(mod?: boolean): void {
-    const increment = mod ? this._largeInterval : this._interval;
+  prev(factor: number = 1): void {
+    const increment = factor * this._interval;
     this._value = Math.max(this._min, this._value - increment);
     this._onUpdate(this._value);
   }
 
-  next(mod?: boolean): void {
-    const increment = mod ? this._largeInterval : this._interval;
+  next(factor: number = 1): void {
+    const increment = factor * this._interval;
     this._value = Math.min(this._max, this._value + increment);
     this._onUpdate(this._value);
   }

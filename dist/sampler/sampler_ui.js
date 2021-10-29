@@ -513,12 +513,14 @@ function handleDialInput(dialEvent, overlay) {
     else if (dialEvent == DialEvent.Touch) {
         menu.setOverlay(overlay);
     }
-    else if (dialEvent == DialEvent.Left) {
-        overlay.prev();
+    else if (dialEvent > 64) {
+        const factor = 128 - dialEvent;
+        overlay.prev(factor);
         menu.updateOled();
     }
-    else if (dialEvent == DialEvent.Right) {
-        overlay.next();
+    else if (dialEvent < 64) {
+        const factor = dialEvent;
+        overlay.next(factor);
         menu.updateOled();
     }
     else {

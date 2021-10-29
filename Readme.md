@@ -34,25 +34,12 @@ A rough roadmap of planned features:
 ---
 ## Trying it out
 
+Install deps using npm or yarn.
 
-To install dev server:
+To run http server to serve code and samples content:
 ```
-yarn add --dev live-server
+node src/file_server/servedir.js 8008 .
 ```
-
-```
-tsc --project tsconfig.json
-```
-and then:
-```
-yarn run live-server
-```
-
-running the server to serve sample content:
-```
-node src/file_server/servedir.js 8008 path/to/samples/
-```
-
 
 ### Devtools
 

@@ -10,8 +10,6 @@ export class CCInputs {
 CCInputs.buttonDown = 144;
 CCInputs.buttonUp = 128;
 CCInputs.dialRotate = 176;
-CCInputs.rotateLeft = 127;
-CCInputs.rotateRight = 1;
 CCInputs.dialTouchOn = 127;
 CCInputs.dialTouchOff = 0;
 CCInputs.volume = 16;

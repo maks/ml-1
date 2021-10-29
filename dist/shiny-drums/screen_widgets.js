@@ -21,13 +21,13 @@ export class NumberEditScreen {
         this._decimals = decimalDisplay;
         this._onUpdate = onUpdate;
     }
-    prev(mod) {
-        const increment = mod ? this._largeInterval : this._interval;
+    prev(factor = 1) {
+        const increment = factor * this._interval;
         this._value = Math.max(this._min, this._value - increment);
         this._onUpdate(this._value);
     }
-    next(mod) {
-        const increment = mod ? this._largeInterval : this._interval;
+    next(factor = 1) {
+        const increment = factor * this._interval;
         this._value = Math.min(this._max, this._value + increment);
         this._onUpdate(this._value);
     }

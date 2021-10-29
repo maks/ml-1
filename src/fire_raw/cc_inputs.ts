@@ -3,9 +3,6 @@ export class CCInputs {
   public static readonly buttonUp = 128;
   public static readonly dialRotate = 176;
 
-  public static readonly rotateLeft = 127;
-  public static readonly rotateRight = 1;
-
   public static readonly dialTouchOn = 127;
   public static readonly dialTouchOff = 0;
 

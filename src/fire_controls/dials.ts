@@ -41,8 +41,9 @@ export class DialControls {
       return;
     }
     let event: DialEvent;
+    console.log(`raw dial [${data[0]},${data[1]},${data[2]}]`)
     if (data[0] == CCInputs.dialRotate) {
-      event = data[2] == CCInputs.rotateLeft ? DialEvent.Left : DialEvent.Right;
+      event = data[2];
     } else {
       event = data[2] == CCInputs.dialTouchOn ? DialEvent.Touch : DialEvent.Release;
     }
