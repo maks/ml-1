@@ -19,3 +19,4 @@ export class MidiDispatcher {
         this.midiOutput.send(data);
     }
 }
+//# sourceMappingURL=midi_dispatcher.js.map

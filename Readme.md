@@ -59,6 +59,19 @@ function testBitmap() {
   sendSysexBitmap(oled);
 }
 ```
+
+### File server
+
+```
+openssl genrsa -out key.pem
+openssl req -new -key key.pem -out csr.pem
+openssl x509 -req -days 9999 -in csr.pem -signkey key.pem -out cert.pem
+```
+append csr.pem to end of cert.pem (need only for android webview?)
+
+ref: https://nodejs.org/en/knowledge/HTTP/servers/how-to-create-a-HTTPS-server/
+
+
 ---
 
 ## Refs and notes
@@ -124,6 +137,14 @@ https://github.com/danigb/synth-kit
 ### WebAudio Sampler
 
 https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop
+
+### HTTPS
+
+https://nodejs.org/en/knowledge/HTTP/servers/how-to-create-a-HTTPS-server/
+
+### Debugging
+
+https://christianheilmann.com/2021/11/01/developer-tools-secrets-that-shouldnt-be-secrets/
 
 ### License
 

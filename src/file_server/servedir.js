@@ -1,5 +1,6 @@
 let finalhandler = require('finalhandler')
-let http = require('http')
+let fs = require('fs');
+let https = require('https')
 let serveIndex = require('serve-index')
 let serveStatic = require('serve-static')
 
@@ -16,8 +17,14 @@ let index = serveIndex(path, { 'template': showDir })
 // Serve up public/ftp folder files
 let serve = serveStatic(path)
 
+// SSL
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+
 // Create server
-let server = http.createServer(function onRequest(req, res) {
+let server = https.createServer(options, function onRequest(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Request-Method', '*');

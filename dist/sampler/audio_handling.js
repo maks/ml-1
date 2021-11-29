@@ -73,3 +73,4 @@ export class Instrument {
         this._player.stop();
     }
 }
+//# sourceMappingURL=audio_handling.js.map

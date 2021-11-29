@@ -117,3 +117,4 @@ export const font5x7 = {
         'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ä', 'ö', 'ü', '{', '|', '}', '€', '†', '‡', '°'
     ]
 };
+//# sourceMappingURL=oled_font57.js.map

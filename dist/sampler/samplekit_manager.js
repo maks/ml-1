@@ -47,3 +47,4 @@ export class SampleKitManager {
         });
     }
 }
+//# sourceMappingURL=samplekit_manager.js.map

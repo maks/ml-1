@@ -35,3 +35,4 @@ export class FileStore {
         });
     }
 }
+//# sourceMappingURL=file_browser.js.map

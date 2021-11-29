@@ -41,3 +41,4 @@ export class PadControls {
         }
     }
 }
+//# sourceMappingURL=pads.js.map

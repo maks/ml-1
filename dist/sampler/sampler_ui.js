@@ -700,3 +700,4 @@ function _noteFromPadIndex(machineState, index) {
     }
     return midiNote;
 }
+//# sourceMappingURL=sampler_ui.js.map

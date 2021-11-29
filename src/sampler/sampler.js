@@ -3,7 +3,7 @@ import { instrumentFromDS } from '/dist/sampler/audio_handling.js';
 import { initControls, Beat } from '/dist/sampler/sampler_ui.js';
 import { Project, ProjectPlayer } from '/dist/sampler/sequencer.js';
 
-const baseUrl = "http://127.0.0.1:8008/samples/";
+const baseUrl = "/samples/";
 
 const startingOctave = 4;
 
@@ -69,16 +69,16 @@ async function init() {
   instrument = await instrumentFromDS(`${baseUrl}${selectedPack.path}/`, context, selectedPack);
 
   // load from saved data in localstorage
-  const data = loadFromStorage();
-  if (data) {
-    project = await Project.fromData(context, selectPack, data);
-    machineState.tracks = project.tracks;
-    machineState.tempo = project.tempo;
-    machineState.swing = project.swing;
-    machineState.currentTrack = project.tracks[0];
+  // const data = loadFromStorage();
+  // if (data) {
+  //   project = await Project.fromData(context, selectPack, data);
+  //   machineState.tracks = project.tracks;
+  //   machineState.tempo = project.tempo;
+  //   machineState.swing = project.swing;
+  //   machineState.currentTrack = project.tracks[0];
 
-    console.log("LOADED project", project);
-  }
+  //   console.log("LOADED project", project);
+  // }
   projectPlayer = new ProjectPlayer(context, project, handleOnNextBeat);
 
   initControls(kitManager.packs.map((p) => p.name), controls, machineState, theBeat);

@@ -205,3 +205,4 @@ export function getMidi(midiReadyCallback, midiStateChange) {
     });
 }
 export function allOff() { clearAll(midiOutput); }
+//# sourceMappingURL=firemidi.js.map

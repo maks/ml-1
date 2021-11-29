@@ -48,3 +48,4 @@ export function allPadsColor(midi, color) {
     const midiData = [...sysexHeader, ...allLeds, ...sysexFooter];
     midi.send(midiData);
 }
+//# sourceMappingURL=pads.js.map

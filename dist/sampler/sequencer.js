@@ -341,3 +341,4 @@ class ProjectPlayer {
         this._project.tracks.forEach((tr) => { var _a; return (_a = tr.instrument) === null || _a === void 0 ? void 0 : _a.stop(); });
     }
 }
+//# sourceMappingURL=sequencer.js.map

@@ -21,3 +21,4 @@ export class TrackHead {
         this.pads.padLedOn(this.index + 48);
     }
 }
+//# sourceMappingURL=track_head.js.map
