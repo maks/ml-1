@@ -1,0 +1,1 @@
+Sequencer initially based on the sequencer from Shiny Drums webaudio: https://googlechromelabs.github.io/web-audio-samples/shiny-drum-machine/ 
