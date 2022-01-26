@@ -8,6 +8,29 @@
 <body>
     <h1>ML-1</h1>
     <script type="module" src="/ml1.js"></script>
+
+    <script>// click event
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.permission')) {
+                document.initAudio();
+            }
+            if (e.target.closest('.play1')) {
+                document.testplay();
+            }
+        })
+    </script>
+
+    <body id="body">
+        <div id="title">
+            Sampler <span id="version">1.0</span>
+            <button class="permission" type="button">
+                Give permission
+            </button>
+            <button class="play1" type="button">
+                Play
+            </button>
+        </div>
+    </body>
 </body>
 
 </html>

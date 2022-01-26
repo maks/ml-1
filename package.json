@@ -2,7 +2,8 @@
   "dependencies": {
     "@types/webmidi": "^2.0.6",
     "live-server-https": "0.0.2",
-    "serve": "^12.0.1"
+    "serve": "^12.0.1",
+    "tone": "^14.7.77"
   },
   "devDependencies": {
     "jest": "^27.2.3"
