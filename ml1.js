@@ -1,33 +1,20 @@
 import { Main } from "/dist/app/main.js";
-import * as Tone from "https://unpkg.com/tone@14.7.77/build/esm/index.js?module";
+import { ML1Player } from "/dist/app/sequencer/player.js";
 
 // init once the page has finished loading.
 window.onload = init;
 
-let synth = new Tone.Synth().toDestination()
+const main = new Main();
 
 window.document.testplay = function () {
-  Tone.start();
-
-  if (Tone.Transport.state !== 'started') {
-    Tone.Transport.start();
-  } else {
-    Tone.Transport.stop();
-  }
-  console.log('play');
-
+  const p = new ML1Player();
+  p.togglePlay();
 }
 
 window.document.initAudio = function() {
-  Tone.start();
-  console.log('Tone started');
+  main.initAudioContext();
 }
 
-async function init() {
-  const main = new Main();
+async function init() { 
   main.run();
-  Tone.Transport.scheduleRepeat((time) => {
-    // use the callback time to schedule events
-    synth.triggerAttackRelease('C4', '8n');
-  }, "4n");
 }

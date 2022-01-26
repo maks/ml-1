@@ -1,7 +1,8 @@
 import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons, allOff, ButtonsSetup, ButtonControl, ButtonCode, PadsControl, OledControl } from '../firemidi.js';
 import { DialEvent } from '../fire_controls/dials.js';
 import { CCInputs } from '../fire_raw/cc_inputs.js';
-import { Color, colorPad } from '../fire_raw/pads.js';
+import { colorPad } from '../fire_raw/pads.js';
+import { Color } from '../app/globals.js';
 
 import { MenuController } from '../menu/menu_controller.js'
 

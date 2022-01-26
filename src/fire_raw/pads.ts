@@ -1,10 +1,5 @@
 import { MidiDispatcher } from "../midi_dispatcher";
-
-export interface Color {
-  r: number,
-  g: number,
-  b: number
-}
+import { Color } from "../app/globals";
 
 /// turn on and set the colour of a pad button
 // export function colorPad(int padRow, int padColumn, PadColor color) {

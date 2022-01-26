@@ -1,5 +1,5 @@
 import { fetchAndDecodeAudio, Instrument, OptsInterface } from "./audio_handling.js";
-import { Color } from "../fire_raw/pads.js";
+import { Color } from "../app/globals";
 
 export { Project, Track, ProjectPlayer, Effect };
 
