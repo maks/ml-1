@@ -45,12 +45,13 @@ export function setupTransport(onPlay, onStop, onRecord) {
             }
         },
     });
+    transport.allOff();
 }
 export function setupPads(onPad) {
     firePads = new PadControls({
         midi: dispatcher,
         onPad: (index) => {
-            console.log('PAD:' + index);
+            //console.log('PAD:' + index)
             onPad(index);
         }
     });
@@ -201,7 +202,7 @@ export function getMidi(midiReadyCallback, midiStateChange) {
         else {
             console.error("== MISSING midiInput cannot create Dispatcher ==");
         }
-        midiReadyCallback();
+        midiReadyCallback(dispatcher);
     });
 }
 export function allOff() { clearAll(midiOutput); }

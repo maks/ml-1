@@ -3,3 +3,10 @@ export interface Color {
   g: number,
   b: number
 }
+
+export enum AppMode {
+  Drum,
+  Note,
+  Step,
+  Perform
+}

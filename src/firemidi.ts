@@ -62,6 +62,7 @@ export function setupTransport(
       }
     },
   });
+  transport.allOff();
 }
 
 export interface PadsControl {
@@ -78,7 +79,7 @@ export function setupPads(onPad: (padIndex: number) => void): PadsControl {
     {
       midi: dispatcher,
       onPad: (index) => {
-        console.log('PAD:' + index)
+        //console.log('PAD:' + index)
         onPad(index);
       }
     }
@@ -285,7 +286,7 @@ function oledBigWithTitle(title: string, value: string) {
   oled.bigText(value);
 }
 
-export function getMidi(midiReadyCallback: () => void, midiStateChange: (connected: boolean) => void) {
+export function getMidi(midiReadyCallback: (displatcher: MidiDispatcher) => void, midiStateChange: (connected: boolean) => void) {
   navigator.requestMIDIAccess({ sysex: true })
     .then(function (midiAccess) {
       console.log("MIDI Access Ready, getting input, outputs...")
@@ -315,7 +316,7 @@ export function getMidi(midiReadyCallback: () => void, midiStateChange: (connect
         console.error("== MISSING midiInput cannot create Dispatcher ==");
       }
 
-      midiReadyCallback();
+      midiReadyCallback(dispatcher);
     });
 }
 
