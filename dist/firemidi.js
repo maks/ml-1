@@ -1,7 +1,7 @@
 export let midiOutput;
 export * from "./fire_raw/controlbank_led.js";
-export { TransportControls } from "./fire_controls/transport.js";
-export { ButtonCode } from "./fire_controls/buttons.js";
+export { TransportControls, TransportButton } from "./fire_controls/transport.js";
+export { ButtonControls, ButtonCode } from "./fire_controls/buttons.js";
 import { PadControls } from "./fire_controls/pads.js";
 import { clearAll } from "./fire_controls/device.js";
 import { OledScreen } from "./fire_controls/oled.js";
@@ -19,33 +19,39 @@ let buttons;
 const BAR_LENGTH = 16;
 // the optional bool return val from the onX callbacks means
 // if ===true, clear all transport button leds
-export function setupTransport(onPlay, onStop, onRecord) {
+export function setupTransport(onButton
+// onPlay: boolOptionalReturnCallback,
+// onStop: boolOptionalReturnCallback,
+// onRecord: boolOptionalReturnCallback
+) {
     const transport = new TransportControls({
         midi: dispatcher,
-        onPlay: () => {
-            console.log('ts play');
-            transport.play();
-            const clear = onPlay();
-            if (clear === true) {
-                transport.allOff();
-            }
-        },
-        onStop: () => {
-            transport.stop();
-            const clear = onStop();
-            if (clear === true) {
-                transport.allOff();
-            }
-        },
-        onRecord: () => {
-            transport.record();
-            const clear = onRecord();
-            if (clear === true) {
-                transport.allOff();
-            }
-        },
+        onButton: onButton
+        // onPlay: () => {
+        //   console.log('ts play');
+        //   transport.play()
+        //   const clear = onPlay()
+        //   if (clear === true) {
+        //     transport.allOff();
+        //   }
+        // },
+        // onStop: () => {
+        //   transport.stop()
+        //   const clear = onStop();
+        //   if (clear === true) {
+        //     transport.allOff();
+        //   }
+        // },
+        // onRecord: () => {
+        //   transport.record()
+        //   const clear = onRecord()
+        //   if (clear === true) {
+        //     transport.allOff();
+        //   }
+        // },
     });
     transport.allOff();
+    return transport;
 }
 export function setupPads(onPad) {
     firePads = new PadControls({

@@ -1,6 +1,6 @@
 import * as Tone from "https://unpkg.com/tone@14.7.77/build/esm/index.js?module";
-import { getMidi, setupTransport, setupPads } from '../firemidi.js';
-import { ButtonControls } from "../fire_controls/buttons.js";
+import { getMidi, setupTransport, setupPads, TransportButton, ButtonControls } from '../firemidi.js';
+import { TransportState } from "./data/app_state.js";
 import { AppMode } from "./globals.js";
 let synth = new Tone.Synth().toDestination();
 export class Main {
@@ -9,7 +9,8 @@ export class Main {
             mode: AppMode.Step,
             shift: false,
             alt: false,
-            selectedPads: []
+            selectedPads: [],
+            transport: TransportState.None
         };
         getMidi((disp) => this._midiReady(disp), (isConnected) => {
             if (isConnected) {
@@ -28,7 +29,7 @@ export class Main {
         });
         this.padControl = setupPads((index) => this.handlePad(index));
         // pass in callbacks which will be called when one of the 3 transport buttons is pressed
-        setupTransport(() => { this.handleTransport(TransportButton.Play); }, () => { this.handleTransport(TransportButton.Stop); }, () => { this.handleTransport(TransportButton.Record); });
+        this.transportControl = setupTransport((button) => { this.handleTransport(button); });
     }
     initAudioContext() {
         Tone.start();
@@ -45,14 +46,22 @@ export class Main {
     }
     handleTransport(button) {
         console.log('transport button:', button);
+        switch (button) {
+            case TransportButton.Play:
+                this.appState = Object.assign({}, this.appState, { transport: TransportState.Playing });
+                break;
+            case TransportButton.Stop:
+                this.appState = Object.assign({}, this.appState, { transport: TransportState.Stopped });
+                break;
+            case TransportButton.Record:
+                this.appState = Object.assign({}, this.appState, { transport: TransportState.Recording });
+                break;
+        }
+        this.uiUpdate();
     }
     uiUpdate() {
+        // update transport state display
+        this.transportControl.buttonsOn(this.appState.transport == TransportState.Playing, this.appState.transport == TransportState.Stopped, this.appState.transport == TransportState.Recording);
     }
 }
-export var TransportButton;
-(function (TransportButton) {
-    TransportButton[TransportButton["Play"] = 0] = "Play";
-    TransportButton[TransportButton["Stop"] = 1] = "Stop";
-    TransportButton[TransportButton["Record"] = 2] = "Record";
-})(TransportButton || (TransportButton = {}));
 //# sourceMappingURL=main.js.map

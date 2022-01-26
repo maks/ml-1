@@ -1,41 +1,37 @@
+import { Color } from "../app/globals.js";
 import { CCInputs } from "../fire_raw/cc_inputs.js";
 import { MidiDispatcher } from "../midi_dispatcher.js";
+
+export enum TransportButton {
+  Play, Stop, Record
+}
 
 export class TransportControls {
   midi: MidiDispatcher;
 
-  playListener: () => void;
-  stopListener: () => void;
-  recordListener: () => void;
+  buttonListener: (button: TransportButton) => void;
 
-  constructor({ midi, onPlay, onStop, onRecord }:
+  constructor({ midi, onButton }:
     {
       midi: MidiDispatcher,
-      onPlay: () => void
-      onStop: () => void
-      onRecord: () => void
+      onButton: (button: TransportButton) => void
     }) {
     midi.addInputListener((data) => this.onMidiMessage(data));
     this.midi = midi;
-    this.playListener = onPlay;
-    this.stopListener = onStop;
-    this.recordListener = onRecord;
+    this.buttonListener = onButton;
   }
 
-
-  public play() {
+  public buttonsOn(play: boolean, stop: boolean, record: boolean) {
     this.allOff();
-    this.midi.send(CCInputs.on(CCInputs.play, CCInputs.green3));
-  }
-
-  public stop() {
-    this.allOff();
-    this.midi.send(CCInputs.on(CCInputs.stop, CCInputs.yellow));
-  }
-
-  public record() {
-    this.allOff();
-    this.midi.send(CCInputs.on(CCInputs.record, CCInputs.recRed));
+    if (play) {
+      this.midi.send(CCInputs.on(CCInputs.play, CCInputs.green3));
+    }
+    if (stop) {
+      this.midi.send(CCInputs.on(CCInputs.stop, CCInputs.yellow));
+    }
+    if (record) {
+      this.midi.send(CCInputs.on(CCInputs.record, CCInputs.recRed));
+    }
   }
 
   public allOff() {
@@ -51,13 +47,13 @@ export class TransportControls {
     }
     switch (data[1]) {
       case CCInputs.play:
-        this.playListener();
+        this.buttonListener(TransportButton.Play);
         break;
       case CCInputs.stop:
-        this.stopListener();
+        this.buttonListener(TransportButton.Stop);
         break;
       case CCInputs.record:
-        this.recordListener();
+        this.buttonListener(TransportButton.Record);
         break;
     }
   }

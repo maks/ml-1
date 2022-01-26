@@ -1,17 +1,15 @@
 export let midiOutput: WebMidi.MIDIOutput;
 
 export * from "./fire_raw/controlbank_led.js";
-
-export { TransportControls } from "./fire_controls/transport.js";
-
-export { ButtonCode } from "./fire_controls/buttons.js";
+export { TransportControls, TransportButton } from "./fire_controls/transport.js";
+export { ButtonControls, ButtonCode } from "./fire_controls/buttons.js";
 
 import { PadControls, PadColour } from "./fire_controls/pads.js";
 import { clearAll } from "./fire_controls/device.js";
 import { OledScreen } from "./fire_controls/oled.js";
 import { MidiDispatcher } from "./midi_dispatcher.js";
 import { TrackHead } from "./fire_controls/track_head.js";
-import { TransportControls } from "./fire_controls/transport.js";
+import { TransportControls, TransportButton } from "./fire_controls/transport.js";
 import { DialControls, dialCallback } from "./fire_controls/dials.js";
 import { ButtonControls, ButtonCode } from "./fire_controls/buttons.js";
 import { sendSysexBitmap } from "./fire_raw/fire_oled.js";
@@ -33,36 +31,39 @@ const BAR_LENGTH = 16;
 // the optional bool return val from the onX callbacks means
 // if ===true, clear all transport button leds
 export function setupTransport(
-  onPlay: boolOptionalReturnCallback,
-  onStop: boolOptionalReturnCallback,
-  onRecord: boolOptionalReturnCallback
-) {
+  onButton: (button: TransportButton) => void
+  // onPlay: boolOptionalReturnCallback,
+  // onStop: boolOptionalReturnCallback,
+  // onRecord: boolOptionalReturnCallback
+) : TransportControls {
   const transport = new TransportControls({
     midi: dispatcher,
-    onPlay: () => {
-      console.log('ts play');
-      transport.play()
-      const clear = onPlay()
-      if (clear === true) {
-        transport.allOff();
-      }
-    },
-    onStop: () => {
-      transport.stop()
-      const clear = onStop();
-      if (clear === true) {
-        transport.allOff();
-      }
-    },
-    onRecord: () => {
-      transport.record()
-      const clear = onRecord()
-      if (clear === true) {
-        transport.allOff();
-      }
-    },
+    onButton: onButton
+    // onPlay: () => {
+    //   console.log('ts play');
+    //   transport.play()
+    //   const clear = onPlay()
+    //   if (clear === true) {
+    //     transport.allOff();
+    //   }
+    // },
+    // onStop: () => {
+    //   transport.stop()
+    //   const clear = onStop();
+    //   if (clear === true) {
+    //     transport.allOff();
+    //   }
+    // },
+    // onRecord: () => {
+    //   transport.record()
+    //   const clear = onRecord()
+    //   if (clear === true) {
+    //     transport.allOff();
+    //   }
+    // },
   });
   transport.allOff();
+  return transport;
 }
 
 export interface PadsControl {

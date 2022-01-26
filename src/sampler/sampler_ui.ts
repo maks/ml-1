@@ -110,39 +110,39 @@ export function initControls(
     console.log('SAMPLER MIDI IS READY');
 
     // pass in callbacks which will be called when one of the 3 transport buttons is pressed
-    setupTransport(
-      () => {
-        machineState.transportMode = TransportMode.Play;
-        control.startPlayer();
-      },
-      () => {
-        // for now use ALT+Stop to clear current tracks steps 
-        if (machineState.keyMod == KeyMod.Alt) {
-          machineState.currentTrack.clearSteps();
-          console.log('Clear currrent track steps')
-          return true; // true means to clear all buttons after handling this
-        }
-        machineState.transportMode = TransportMode.Stop;
-        control.stop();
-        overlays["stepseq"].value = 0;
-        menu.clearOverlay(); // stop showing step num overlay if prev in Record mode
-        console.log('curr track', machineState.currentTrack)
-      },
-      () => {
-        // for now special case to SAVE Project data using REC+SHIFT buttons
-        if (machineState.keyMod == KeyMod.Shift) {
-          control.save();
-          return true; // true means to clear all buttons after handling this
-        }
-        else {
-          machineState.transportMode = TransportMode.Record;
-          // reset the infini-seq step counter
-          infiniSeqCurrentStep = 0;
-          menu.setOverlay(overlays["stepseq"]); // show swq step number overlay
-          console.log('reset infini seq steps');
-        }
-      }
-    );
+    // setupTransport(
+    //   () => {
+    //     machineState.transportMode = TransportMode.Play;
+    //     control.startPlayer();
+    //   },
+    //   () => {
+    //     // for now use ALT+Stop to clear current tracks steps 
+    //     if (machineState.keyMod == KeyMod.Alt) {
+    //       machineState.currentTrack.clearSteps();
+    //       console.log('Clear currrent track steps')
+    //       return true; // true means to clear all buttons after handling this
+    //     }
+    //     machineState.transportMode = TransportMode.Stop;
+    //     control.stop();
+    //     overlays["stepseq"].value = 0;
+    //     menu.clearOverlay(); // stop showing step num overlay if prev in Record mode
+    //     console.log('curr track', machineState.currentTrack)
+    //   },
+    //   () => {
+    //     // for now special case to SAVE Project data using REC+SHIFT buttons
+    //     if (machineState.keyMod == KeyMod.Shift) {
+    //       control.save();
+    //       return true; // true means to clear all buttons after handling this
+    //     }
+    //     else {
+    //       machineState.transportMode = TransportMode.Record;
+    //       // reset the infini-seq step counter
+    //       infiniSeqCurrentStep = 0;
+    //       menu.setOverlay(overlays["stepseq"]); // show swq step number overlay
+    //       console.log('reset infini seq steps');
+    //     }
+    //   }
+    // );
     padControl = setupPads((index) => handlePad(index, machineState, control));
     oled = setupOled();
 

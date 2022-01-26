@@ -1,8 +1,7 @@
 import * as Tone from "https://unpkg.com/tone@14.7.77/build/esm/index.js?module";
-import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons, allOff, ButtonsSetup, ButtonControl, ButtonCode, PadsControl, OledControl } from '../firemidi.js';
-import { ButtonControls } from "../fire_controls/buttons.js";
+import { getMidi, setupTransport, setupPads, setupOled, setupDials, setupButtons, allOff, ButtonsSetup, ButtonControl, ButtonCode, PadsControl, OledControl, TransportButton, TransportControls, ButtonControls } from '../firemidi.js';
 import { MidiDispatcher } from "../midi_dispatcher.js";
-import { AppState } from "./data/app_state.js";
+import { AppState, TransportState } from "./data/app_state.js";
 import { AppMode } from "./globals.js";
 
 let synth = new Tone.Synth().toDestination()
@@ -12,13 +11,15 @@ export class Main {
   private dispatcher!: MidiDispatcher;
   private buttonControl!: ButtonControls;
   private padControl!: PadsControl;
+  private transportControl!: TransportControls;
 
   constructor(dispatcher: MidiDispatcher) {
     this.appState = {
       mode: AppMode.Step,
       shift: false,
       alt: false,
-      selectedPads: []
+      selectedPads: [],
+      transport: TransportState.None
     };
 
     getMidi((disp) => this._midiReady(disp), (isConnected: boolean) => {
@@ -42,10 +43,8 @@ export class Main {
     this.padControl = setupPads((index) => this.handlePad(index));
 
     // pass in callbacks which will be called when one of the 3 transport buttons is pressed
-    setupTransport(
-      () => { this.handleTransport(TransportButton.Play) },
-      () => { this.handleTransport(TransportButton.Stop) },
-      () => { this.handleTransport(TransportButton.Record) }
+    this.transportControl = setupTransport(
+      (button) => { this.handleTransport(button) }
     );
   }
 
@@ -67,17 +66,29 @@ export class Main {
 
   private handleTransport(button: TransportButton) {
     console.log('transport button:', button)
+    switch (button) {
+      case TransportButton.Play:
+        this.appState = Object.assign({}, this.appState, {transport: TransportState.Playing});
+        break;
+      case TransportButton.Stop:
+        this.appState = Object.assign({}, this.appState, {transport: TransportState.Stopped});
+        break;
+      case TransportButton.Record:
+        this.appState = Object.assign({}, this.appState, {transport: TransportState.Recording});
+        break;
+    }
+    this.uiUpdate();
   }
 
   uiUpdate() {
+    // update transport state display
+    this.transportControl.buttonsOn(
+      this.appState.transport == TransportState.Playing,
+      this.appState.transport == TransportState.Stopped,
+      this.appState.transport == TransportState.Recording
+    );
 
   }
 
 
-}
-
-export enum TransportButton {
-  Play,
-  Stop,
-  Record
 }
