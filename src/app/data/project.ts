@@ -23,31 +23,31 @@ class Project {
   private _tempo: number;
   private _swingFactor: number = 0;
   
-  static async fromData(context: AudioContext, lookupInstrument: (name: string) => Promise<Instrument>, data: any): Promise<Project> {
+  static async fromData(lookupInstrument: (name: string) => Promise<Instrument>, data: any): Promise<Project> {
 
     const tracks: Track[] = [];
     for (const tr of data.tracks) {
       const instrument = await lookupInstrument(tr.instrumentName);
-      const track = Track.fromData(context, instrument, tr);
+      const track = Track.fromData(instrument, tr);
       tracks.push(track);
     }
-    const project = new Project(context, tracks, data.tempo);
+    const project = new Project(tracks, data.tempo);
     return project;
   }
 
-  constructor(context: AudioContext, tracks: Track[], tempo: number) {
+  constructor(tracks: Track[], tempo: number) {
     this._tempo = tempo;
 
     if (tracks) {
       this._tracks = tracks;
     } else {
-      this._tracks = [0, 1, 2, 3].map((i) => new Track(context, null, `Trk${i}`, null));
+      this._tracks = [0, 1, 2, 3].map((i) => new Track(null, `Trk${i}`, null));
     }
   }
 
-  addTrack(context: AudioContext, instrument: Instrument): Track {
+  addTrack(instrument: Instrument): Track {
     const i = this.tracks.length;
-    const nuTrack = new Track(context, instrument, `Trk${i}`, COLORS[i + 1]);
+    const nuTrack = new Track(instrument, `Trk${i}`, COLORS[i + 1]);
     this._tracks.push(nuTrack);
     return nuTrack;
   }
@@ -106,7 +106,6 @@ class Instrument {
 }
 
 class Track {
-  readonly _context: AudioContext;
   private _instrument: Instrument | null;
   private _name: string | undefined;
   private _color: Color;
@@ -123,8 +122,8 @@ class Track {
 
   static colorCounter = 0;
 
-  static fromData(context: AudioContext, instrument: Instrument, data: any): Track {
-    const track = new Track(context, instrument, data.name, data.color);
+  static fromData(instrument: Instrument, data: any): Track {
+    const track = new Track(instrument, data.name, data.color);
     track.duration = data.duration;
     track.offset = data.offset;
     track._mute = data.mute ?? false;
@@ -137,8 +136,7 @@ class Track {
     return track;
   }
 
-  constructor(context: AudioContext, instrument: Instrument | null, name: string, color: Color | null) {
-    this._context = context;
+  constructor(instrument: Instrument | null, name: string, color: Color | null) {
     this._instrument = instrument;
     for (let i = 0; i < LOOP_LENGTH; i++) {
       this._steps[i] = { note: 0, velocity: 127, accent: false };

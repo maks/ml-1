@@ -1,7 +1,9 @@
 import * as Tone from "https://unpkg.com/tone@14.7.77/build/esm/index.js?module";
 import { getMidi, setupTransport, setupPads, TransportButton, ButtonControls } from '../firemidi.js';
 import { TransportState } from "./data/app_state.js";
+import { Project } from "./data/project.js";
 import { AppMode } from "./globals.js";
+import { ML1Player } from "./sequencer/player.js";
 let synth = new Tone.Synth().toDestination();
 export class Main {
     constructor(dispatcher) {
@@ -12,6 +14,8 @@ export class Main {
             selectedPads: [],
             transport: TransportState.None
         };
+        this.project = new Project([], 120);
+        this.player = new ML1Player(this.project);
         getMidi((disp) => this._midiReady(disp), (isConnected) => {
             if (isConnected) {
                 console.log('reconnected');
@@ -31,6 +35,7 @@ export class Main {
         // pass in callbacks which will be called when one of the 3 transport buttons is pressed
         this.transportControl = setupTransport((button) => { this.handleTransport(button); });
     }
+    // must be called from user initiated event in std web browsers
     initAudioContext() {
         Tone.start();
     }
@@ -58,6 +63,15 @@ export class Main {
                 break;
         }
         this.uiUpdate();
+        this.playerUpdate();
+    }
+    playerUpdate() {
+        if (this.appState.transport == TransportState.Playing) {
+            this.player.play();
+        }
+        else if (this.appState.transport == TransportState.Stopped) {
+            this.player.pause();
+        }
     }
     uiUpdate() {
         // update transport state display

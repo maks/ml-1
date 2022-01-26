@@ -5,13 +5,19 @@ export class ML1Player {
     }
     togglePlay() {
         if (Tone.Transport.state !== 'started') {
-            console.log('ML1 Playing');
-            Tone.Transport.start();
+            this.play();
         }
         else {
-            console.log('ML1 Stopped');
-            Tone.Transport.stop();
+            this.pause();
         }
+    }
+    play() {
+        console.log('ML1 Playing');
+        Tone.Transport.start();
+    }
+    pause() {
+        console.log('ML1 Stopped');
+        Tone.Transport.stop();
     }
 }
 //# sourceMappingURL=player.js.map

@@ -23,31 +23,31 @@ const COLORS = [
     { r: 90, g: 20, b: 20 },
 ];
 class Project {
-    constructor(context, tracks, tempo) {
+    constructor(tracks, tempo) {
         this._swingFactor = 0;
         this._tempo = tempo;
         if (tracks) {
             this._tracks = tracks;
         }
         else {
-            this._tracks = [0, 1, 2, 3].map((i) => new Track(context, null, `Trk${i}`, null));
+            this._tracks = [0, 1, 2, 3].map((i) => new Track(null, `Trk${i}`, null));
         }
     }
-    static fromData(context, lookupInstrument, data) {
+    static fromData(lookupInstrument, data) {
         return __awaiter(this, void 0, void 0, function* () {
             const tracks = [];
             for (const tr of data.tracks) {
                 const instrument = yield lookupInstrument(tr.instrumentName);
-                const track = Track.fromData(context, instrument, tr);
+                const track = Track.fromData(instrument, tr);
                 tracks.push(track);
             }
-            const project = new Project(context, tracks, data.tempo);
+            const project = new Project(tracks, data.tempo);
             return project;
         });
     }
-    addTrack(context, instrument) {
+    addTrack(instrument) {
         const i = this.tracks.length;
-        const nuTrack = new Track(context, instrument, `Trk${i}`, COLORS[i + 1]);
+        const nuTrack = new Track(instrument, `Trk${i}`, COLORS[i + 1]);
         this._tracks.push(nuTrack);
         return nuTrack;
     }
@@ -88,13 +88,12 @@ class Instrument {
     }
 }
 class Track {
-    constructor(context, instrument, name, color) {
+    constructor(instrument, name, color) {
         this._mute = false;
         this._steps = [];
         this.offset = 0;
         this.sustain = 1; // 1.0 is no effect
         this.gain = 1; // 1.0 is no effect
-        this._context = context;
         this._instrument = instrument;
         for (let i = 0; i < LOOP_LENGTH; i++) {
             this._steps[i] = { note: 0, velocity: 127, accent: false };
@@ -102,9 +101,9 @@ class Track {
         this._name = name;
         this._color = color || COLORS[Track.colorCounter++ % COLORS.length];
     }
-    static fromData(context, instrument, data) {
+    static fromData(instrument, data) {
         var _a;
-        const track = new Track(context, instrument, data.name, data.color);
+        const track = new Track(instrument, data.name, data.color);
         track.duration = data.duration;
         track.offset = data.offset;
         track._mute = (_a = data.mute) !== null && _a !== void 0 ? _a : false;
