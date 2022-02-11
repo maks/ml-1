@@ -5,10 +5,10 @@ import 'package:bonsai/bonsai.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_midi_command/flutter_midi_command.dart';
-
-import 'fire_midi.dart';
+import 'package:ml1_flutter/fire_control/fire_device.dart';
 
 void main() {
+  Log.init();
   runApp(const MyApp());
 }
 
@@ -20,25 +20,22 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamSubscription<MidiPacket>? _rxSubscription;
   final MidiCommand _midiCommand = MidiCommand();
+  late final FireDevice _fireDevice;
+  StreamSubscription? _fireSubscription;
 
   Uint8List? lastMidiMesg;
 
   @override
   void initState() {
     super.initState();
-    _rxSubscription = _midiCommand.onMidiDataReceived?.listen((packet) {
-      log('received packet: ${packet.data}');
-      setState(() {
-        lastMidiMesg = packet.data;
-      });
-    });
+    _fireDevice = FireDevice(_midiCommand);
+    _subscribeFireEvents();
   }
 
   @override
   void dispose() {
-    _rxSubscription?.cancel();
+    _fireSubscription?.cancel();
     super.dispose();
   }
 
@@ -47,64 +44,39 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('ML-1'),
         ),
-        body: Center(
-            child: FutureBuilder<List<MidiDevice>?>(
-                future: _midiCommand.devices,
-                builder: (context, snapshot) {
-                  if (snapshot.data == null) {
-                    return const CircularProgressIndicator();
-                  }
-                  final devices = snapshot.data;
-                  if (devices == null) {
-                    return const Text('No Devices');
-                  }
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: 200,
-                        child: ListView.builder(
-                            itemCount: devices.length,
-                            itemBuilder: (context, index) {
-                              return MaterialButton(
-                                child: Text(_deviceLabel(devices[index])),
-                                onPressed: () async {
-                                  final dev = devices[index];
-                                  if (dev.connected) {
-                                    _midiCommand.disconnectDevice(dev);
-                                    log('device disconnected');
-                                  } else {
-                                    await _midiCommand.connectToDevice(dev);
-                                    log('device connected - reconnect Rx stream');
-                                    _rxSubscription =
-                                        _midiCommand.onMidiDataReceived?.listen((packet) {
-                                      log('received packet: ${packet.data}');
-                                      setState(() {
-                                        lastMidiMesg = packet.data;
-                                      });
-                                    });
-                                  }
-                                  setState(() {});
-                                },
-                              );
-                            }),
-                      ),
-                      Text('Last midi: $lastMidiMesg'),
-                      MaterialButton(
-                          child: const Text('FIRE: ALL PADS OFF'),
-                          onPressed: () {
-                            log('send all off');
-                            _midiCommand.sendData(Uint8List.fromList(fireAllPads(0, 0, 0)));
-                          })
-                    ],
-                  );
-                })),
+        body: Column(
+          children: [
+            Row(
+              children: [
+                MaterialButton(
+                  child: const Text('Disconnect'),
+                  onPressed: () async {
+                    _fireDevice.disconnect();
+                    log('device disconnected');
+                  },
+                ),
+                MaterialButton(
+                  child: const Text('Connect'),
+                  onPressed: () async {
+                    _fireDevice.connectDevice();
+                    _subscribeFireEvents();
+                    log('device connected');
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  String _deviceLabel(MidiDevice device) {
-    return device.connected ? '${device.name} CONNECTED' : 'connect: ${device.name}';
+  void _subscribeFireEvents() {
+    _fireSubscription = _fireDevice.fireEvents.listen((packet) {
+      log('received packet: $packet');
+    });
+    log('subscribed to Fire events');
   }
 }
