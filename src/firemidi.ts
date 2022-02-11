@@ -297,12 +297,18 @@ export function getMidi(midiReadyCallback: (displatcher: MidiDispatcher) => void
       console.log(outputs);
       for (const output of outputs) {
         console.log(output);
+        if (output.name?.toUpperCase().startsWith("FL STUDIO")) {
+          console.log('using output:'+output?.name);
+        }
         midiOutput = output;
       }
       console.log(inputs);
       let midiInput;
       for (const input of inputs) {
         console.log(input);
+        if (input.name?.toUpperCase().startsWith("FL STUDIO")) {
+          console.log('using input:'+input?.name);
+        }
         midiInput = input;
       }
       midiOutput.onstatechange = (state) => {

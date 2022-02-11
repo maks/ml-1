@@ -16,7 +16,7 @@ export class MidiDispatcher {
   }
 
   private listenMidi(mesg: WebMidi.MIDIMessageEvent) {
-    //console.log(`Midi mesg data: ${mesg.data}`);
+    console.log(`Midi mesg data: ${mesg.data}`);
 
     this.listeners.forEach(listener => {
       listener(mesg.data);

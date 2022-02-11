@@ -183,18 +183,25 @@ function oledBigWithTitle(title, value) {
 export function getMidi(midiReadyCallback, midiStateChange) {
     navigator.requestMIDIAccess({ sysex: true })
         .then(function (midiAccess) {
+        var _a, _b;
         console.log("MIDI Access Ready, getting input, outputs...");
         const outputs = midiAccess.outputs.values();
         const inputs = midiAccess.inputs.values();
         console.log(outputs);
         for (const output of outputs) {
             console.log(output);
+            if ((_a = output.name) === null || _a === void 0 ? void 0 : _a.toUpperCase().startsWith("FL STUDIO")) {
+                console.log('using output:' + (output === null || output === void 0 ? void 0 : output.name));
+            }
             midiOutput = output;
         }
         console.log(inputs);
         let midiInput;
         for (const input of inputs) {
             console.log(input);
+            if ((_b = input.name) === null || _b === void 0 ? void 0 : _b.toUpperCase().startsWith("FL STUDIO")) {
+                console.log('using input:' + (input === null || input === void 0 ? void 0 : input.name));
+            }
             midiInput = input;
         }
         midiOutput.onstatechange = (state) => {
